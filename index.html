@@ -437,11 +437,11 @@
           <div class="grid2 field">
             <div>
               <label>발생일시</label>
-              <input type="text" id="acc_date" placeholder="예) 2025-03-15 14:30">
+              <input type="datetime-local" id="acc_date">
             </div>
             <div>
               <label>보고일시</label>
-              <input type="text" id="rep_date" placeholder="예) 2025-03-15 16:00">
+              <input type="datetime-local" id="rep_date">
             </div>
           </div>
 
@@ -520,8 +520,11 @@
             <div class="card-title">무엇이 일어났는가?</div>
           </div>
           <div class="field">
-            <label>간단 요약</label>
-            <textarea id="prob_def" placeholder="환자안전사고 보고서 내용을 간단히 요약하세요."></textarea>
+            <label>간단 요약
+              <button type="button" class="btn btn-sm" id="aiSumBtn" onclick="aiSummarize()" style="margin-left:10px; padding:4px 12px; font-size:12px; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:600;">✨ AI 자동 요약</button>
+            </label>
+            <div id="aiSumStatus" style="font-size:12px; color:var(--gray-400); margin-bottom:6px; display:none;">AI가 요약 중입니다...</div>
+            <textarea id="prob_def" placeholder="위 사고내용을 입력한 후 'AI 자동 요약' 버튼을 누르면 자동으로 요약해드립니다."></textarea>
           </div>
         </div>
 
@@ -882,6 +885,43 @@ function initImprove() {
       plan.appendChild(div);
     });
   } else { addImprove(); }
+}
+
+async function aiSummarize() {
+  const content = document.getElementById('acc_content').value.trim();
+  if (!content) {
+    alert('먼저 위의 "사고내용"을 입력해주세요.');
+    return;
+  }
+  const btn = document.getElementById('aiSumBtn');
+  const status = document.getElementById('aiSumStatus');
+  btn.disabled = true;
+  btn.textContent = '요약 중...';
+  status.style.display = 'block';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `다음은 환자안전사고 보고서 내용입니다. 이를 3~5문장으로 간결하게 요약해주세요. 누가, 언제, 어디서, 무엇이, 어떻게 발생했는지 핵심만 담아주세요. 요약문만 출력하세요.\n\n${content}`
+        }]
+      })
+    });
+    const data = await response.json();
+    const summary = data.content?.[0]?.text || '';
+    document.getElementById('prob_def').value = summary;
+  } catch (e) {
+    alert('요약 중 오류가 발생했습니다. 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ AI 자동 요약';
+    status.style.display = 'none';
+  }
 }
 
 function exportSummary() {
