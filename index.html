@@ -420,6 +420,19 @@
     transition: border-color 0.12s, box-shadow 0.12s !important;
   }
   .flow-input:focus { outline: none; border-color: var(--blue) !important; box-shadow: 0 0 0 3px rgba(26,95,168,0.1) !important; }
+
+  @media print {
+    .sidebar, .topbar, .btn-row, .export-bar, .save-btns, .restore-banner,
+    button, .btn, .progress-pill { display: none !important; }
+    .main { margin-left: 0 !important; }
+    .page-content { padding: 10px !important; max-width: 100% !important; }
+    .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 10px !important; }
+    body { font-size: 11pt; background: #fff; }
+    .chip { border: 1px solid #ccc !important; }
+    .chip.selected { background: #eaf1fb !important; border-color: #1a5fa8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    input, textarea, select { border: 1px solid #ccc !important; background: #fff !important; }
+    .app-shell { display: block !important; }
+  }
 </style>
 </head>
 <body>
@@ -1163,10 +1176,16 @@ function aiSummarize() {
   document.getElementById('prob_def').value = summary.trim();
 }
 
+function formatDate(val) {
+  if (!val) return '';
+  const d = new Date(val);
+  if (isNaN(d)) return val;
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${d.getHours().toString().padStart(2,'0')}시 ${d.getMinutes().toString().padStart(2,'0')}분`;
+}
+
 function downloadRCAWord() {
-  const procName = document.getElementById('acc_content')?.value?.substring(0,20) || 'RCA';
-  const accDate = document.getElementById('acc_date')?.value || '';
-  const repDate = document.getElementById('rep_date')?.value || '';
+  const accDate = formatDate(document.getElementById('acc_date')?.value);
+  const repDate = formatDate(document.getElementById('rep_date')?.value);
   const gender = document.getElementById('gender')?.value || '';
   const age = document.getElementById('age')?.value || '';
   const place = document.querySelector('input[name="place"]:checked')?.value || '';
@@ -1226,74 +1245,75 @@ function downloadRCAWord() {
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset='utf-8'>
 <style>
-  body { font-family: '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; margin: 2cm; }
-  h1 { font-size: 16pt; color: #1a5fa8; border-bottom: 2px solid #1a5fa8; padding-bottom: 6px; margin-bottom: 16px; }
-  h2 { font-size: 12pt; color: #fff; background: #1a5fa8; padding: 5px 12px; margin-top: 20px; margin-bottom: 8px; }
-  table { border-collapse: collapse; width: 100%; margin-bottom: 14px; font-size: 10pt; }
-  th { background: #1a5fa8; color: white; padding: 6px 8px; text-align: left; font-weight: bold; }
-  td { border: 1px solid #dde1e9; padding: 6px 8px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f5f6f8; }
-  .info-label { font-weight: bold; color: #374151; background: #eceef2 !important; width: 130px; }
+  body { font-family: '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; margin: 2.5cm; line-height: 1.6; }
+  h1 { font-size: 18pt; color: #0f4080; border-bottom: 3px solid #1a5fa8; padding-bottom: 8px; margin-bottom: 20px; text-align: center; }
+  h2 { font-size: 11pt; color: #ffffff; background: #1a5fa8; padding: 6px 14px; margin-top: 24px; margin-bottom: 10px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 10pt; page-break-inside: avoid; }
+  th { background: #1a5fa8; color: white; padding: 7px 10px; text-align: left; font-weight: bold; border: 1px solid #1a5fa8; }
+  td { border: 1px solid #c4cad5; padding: 6px 10px; vertical-align: top; }
+  .lbl { font-weight: bold; color: #374151; background: #eceef2; width: 100px; }
+  .footer { margin-top: 30px; border-top: 1px solid #dde1e9; padding-top: 10px; font-size: 9pt; color: #9199a8; text-align: center; }
 </style>
 </head>
 <body>
 <h1>근본원인분석(RCA) 보고서</h1>
+<p style="text-align:center; color:#6b7280; font-size:9.5pt; margin-bottom:24px;">KoSQIN · 환자안전법 제12조 기반 · 작성일: ${new Date().toLocaleDateString('ko-KR')}</p>
 
 <h2>1단계 — 사고 기본 정보</h2>
 <table>
-  <tr><td class="info-label">발생일시</td><td>${accDate}</td><td class="info-label">보고일시</td><td>${repDate}</td></tr>
-  <tr><td class="info-label">성별</td><td>${gender}</td><td class="info-label">연령</td><td>${age}</td></tr>
-  <tr><td class="info-label">사고 발생 장소</td><td>${place}</td><td class="info-label">사고분류</td><td>${acctype}</td></tr>
-  <tr><td class="info-label">사고 위해정도</td><td colspan="3">${severity}</td></tr>
+  <tr><td class="lbl">발생일시</td><td>${accDate}</td><td class="lbl">보고일시</td><td>${repDate}</td></tr>
+  <tr><td class="lbl">성별</td><td>${gender}</td><td class="lbl">연령</td><td>${age}</td></tr>
+  <tr><td class="lbl">사고 발생 장소</td><td>${place}</td><td class="lbl">사고분류</td><td>${acctype}</td></tr>
+  <tr><td class="lbl">사고 위해정도</td><td colspan="3">${severity}</td></tr>
 </table>
 
 <table>
-  <tr><th>6하원칙</th><th>내용</th></tr>
-  <tr><td class="info-label">누가</td><td>${who}</td></tr>
-  <tr><td class="info-label">어디서</td><td>${where}</td></tr>
-  <tr><td class="info-label">무엇을</td><td>${what}</td></tr>
-  <tr><td class="info-label">어떻게</td><td>${how}</td></tr>
-  <tr><td class="info-label">왜</td><td>${why}</td></tr>
-  <tr><td class="info-label">추가내용</td><td>${etc}</td></tr>
+  <tr><th width="15%">6하원칙</th><th>내용</th></tr>
+  <tr><td class="lbl">누가</td><td>${who}</td></tr>
+  <tr><td class="lbl">어디서</td><td>${where}</td></tr>
+  <tr><td class="lbl">무엇을</td><td>${what}</td></tr>
+  <tr><td class="lbl">어떻게</td><td>${how}</td></tr>
+  <tr><td class="lbl">왜 (원인)</td><td>${why}</td></tr>
+  <tr><td class="lbl">추가내용</td><td>${etc}</td></tr>
 </table>
 
 <table>
   <tr><th>사고내용 (자동 조합)</th></tr>
-  <tr><td>${content}</td></tr>
+  <tr><td style="line-height:1.8;">${content}</td></tr>
 </table>
 
 <table>
   <tr><th>사고 후 조치</th></tr>
-  <tr><td>${action}</td></tr>
+  <tr><td style="line-height:1.8;">${action}</td></tr>
 </table>
 
 <table>
   <tr><th>문제정의 (간단 요약)</th></tr>
-  <tr><td>${probDef}</td></tr>
+  <tr><td style="line-height:1.8;">${probDef}</td></tr>
 </table>
 
 <h2>팀 구성</h2>
 <table>
-  <tr><th>역할</th><th>소속부서/직위</th><th>이름</th></tr>
-  ${teamRows}
+  <tr><th width="15%">역할</th><th width="50%">소속부서/직위</th><th>이름</th></tr>
+  ${teamRows || '<tr><td colspan="3">-</td></tr>'}
 </table>
 
-<h2>2단계 — 기여요인(CF)</h2>
+<h2>2단계 — 기여요인(CF) 분석</h2>
 <table>
   <tr><th>사고 발생 단계 (시간 순서)</th></tr>
-  <tr><td>${flowSteps}</td></tr>
+  <tr><td>${flowSteps || '-'}</td></tr>
 </table>
 <table>
   <tr><th>사고 분석 주요 사항</th></tr>
-  <tr><td>${s2main}</td></tr>
+  <tr><td style="line-height:1.8;">${s2main || '-'}</td></tr>
 </table>
 <table>
   <tr><th>관련 직원</th></tr>
-  <tr><td>${s2staff}</td></tr>
+  <tr><td>${s2staff || '-'}</td></tr>
 </table>
 <table>
-  <tr><th style="text-align:center; width:60px;">CF</th><th>위험요인 상세기술</th></tr>
-  ${cfRows}
+  <tr><th width="8%" style="text-align:center;">CF</th><th>위험요인 상세기술</th></tr>
+  ${cfRows || '<tr><td colspan="2">-</td></tr>'}
 </table>
 
 <h2>3단계 — 도출된 근본원인</h2>
@@ -1304,10 +1324,13 @@ function downloadRCAWord() {
 
 <h2>4단계 — 개선활동 계획</h2>
 <table>
-  <tr><th>분석수준 / 근본원인</th><th>개선전략</th><th>담당자</th><th>완료예정일</th><th>효과측정지표</th></tr>
+  <tr><th width="28%">분석수준 / 근본원인</th><th width="32%">개선전략</th><th width="15%">담당자</th><th width="12%">완료예정일</th><th>효과측정지표</th></tr>
   ${improveRows || '<tr><td colspan="5">-</td></tr>'}
 </table>
 
+<div class="footer">
+  본 보고서는 KoSQIN RCA 작성 도구를 통해 작성되었습니다. | samsun-rca-tool.vercel.app
+</div>
 </body></html>`;
 
   const blob = new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' });
