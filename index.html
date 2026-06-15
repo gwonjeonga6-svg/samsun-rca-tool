@@ -432,7 +432,18 @@
     .chip.selected { background: #eaf1fb !important; border-color: #1a5fa8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     input, textarea, select { border: 1px solid #ccc !important; background: #fff !important; }
     .app-shell { display: block !important; }
+    /* 전체 출력 모드: 모든 단계 표시 */
+    body.print-mode .hidden { display: block !important; }
+    body.print-mode #step1,
+    body.print-mode #step2,
+    body.print-mode #step3,
+    body.print-mode #step4 { display: block !important; }
+    /* 단계 구분선 */
+    body.print-mode .step-divider { display: block !important; border: none; border-top: 2px solid #1a5fa8; margin: 16px 0 8px; }
+    body.print-mode .step-print-title { display: block !important; font-size: 13pt; font-weight: bold; color: #0f4080; background: #eaf1fb; padding: 4px 10px; margin-bottom: 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
+  /* 화면에서는 숨김 */
+  .step-divider, .step-print-title { display: none; }
 </style>
 </head>
 <body>
@@ -512,6 +523,7 @@
 
       <!-- ── STEP 1 ── -->
       <div id="step1">
+        <div class="step-print-title">1단계 — 사고 기본 정보 · 팀 구성</div>
         <div class="card">
           <div class="card-header">
             <div class="card-eyebrow">환자안전사고 보고서</div>
@@ -668,6 +680,8 @@
 
       <!-- ── STEP 2 ── -->
       <div id="step2" class="hidden">
+        <div class="step-divider"></div>
+        <div class="step-print-title">2단계 — 기여요인(CF) 분석</div>
         <div class="card">
           <div class="card-header">
             <div class="card-eyebrow">2단계 — 프로세스 분석</div>
@@ -719,6 +733,8 @@
 
       <!-- ── STEP 3 ── -->
       <div id="step3" class="hidden">
+        <div class="step-divider"></div>
+        <div class="step-print-title">3단계 — 근본원인 도출</div>
         <div class="card">
           <div class="card-header">
             <div class="card-eyebrow">3단계 — 원인 분석</div>
@@ -742,6 +758,8 @@
 
       <!-- ── STEP 4 ── -->
       <div id="step4" class="hidden">
+        <div class="step-divider"></div>
+        <div class="step-print-title">4단계 — 개선활동 계획</div>
         <div class="card">
           <div class="card-header">
             <div class="card-eyebrow">4단계 — 개선활동</div>
@@ -761,7 +779,7 @@
           <span class="bar-title">📊 완료 — 데이터 내보내기</span>
           <button class="btn btn-ghost btn-sm" onclick="downloadRCAWord()">📄 Word 다운로드</button>
           <button class="btn btn-ghost btn-sm" onclick="copyRCAToSheet()">📋 구글 시트에 복사</button>
-          <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 PDF 출력</button>
+          <button class="btn btn-ghost btn-sm" onclick="printReport()">🖨 PDF 출력 (전체)</button>
         </div>
       </div>
 
@@ -1174,6 +1192,31 @@ function aiSummarize() {
   if (sevVal) summary += `사고의 위해정도는 "${sevVal}"로 분류됩니다.`;
 
   document.getElementById('prob_def').value = summary.trim();
+}
+
+// 전체 PDF 출력
+function printReport() {
+  // 모든 단계 표시
+  document.body.classList.add('print-mode');
+  ['step1','step2','step3','step4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+  });
+  // 잠깐 후 인쇄 (렌더링 대기)
+  setTimeout(() => {
+    window.print();
+    // 인쇄 후 원래 상태로 복원
+    setTimeout(() => {
+      document.body.classList.remove('print-mode');
+      // 현재 활성 단계만 다시 표시
+      const badge = document.getElementById('stepBadge');
+      const cur = badge ? parseInt(badge.textContent.split('/')[0].trim()) : 4;
+      ['step1','step2','step3','step4'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el && i + 1 !== cur) el.classList.add('hidden');
+      });
+    }, 500);
+  }, 300);
 }
 
 function formatDate(val) {
