@@ -193,7 +193,18 @@
     font-family: inherit;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
-  input[type=text]:focus, textarea:focus, select:focus {
+  input[type=datetime-local] {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--gray-900);
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type=datetime-local]:focus {
     outline: none;
     border-color: var(--blue);
     box-shadow: 0 0 0 3px rgba(26,95,168,0.1);
@@ -457,7 +468,7 @@
     <div class="topbar">
       <div>
         <div class="topbar-title" id="topbarTitle">1단계 — 근본원인 분석 준비</div>
-        <div class="topbar-sub">환자안전사고 보고서 및 팀 구성</div>
+        <div class="topbar-sub" id="topbarSub">환자안전사고 보고서 및 팀 구성</div>
       </div>
       <div style="display:flex; align-items:center; gap:12px;">
         <div class="save-btns">
@@ -493,11 +504,11 @@
           <div class="grid2 field">
             <div>
               <label>발생일시</label>
-              <input type="text" id="acc_date" placeholder="예) 2025-03-15 14:30">
+              <input type="datetime-local" id="acc_date">
             </div>
             <div>
               <label>보고일시</label>
-              <input type="text" id="rep_date" placeholder="예) 2025-03-15 16:00">
+              <input type="datetime-local" id="rep_date">
             </div>
           </div>
 
@@ -560,8 +571,35 @@
           </div>
 
           <div class="field">
-            <label>사고내용 <span class="opt">(누가, 언제, 어디서, 무엇을, 어떻게, 왜)</span></label>
-            <textarea id="acc_content" placeholder="예) 2025년 3월 15일 오후 2시 30분, 6병동에서 간호사 A가 환자 B(65세 남)에게..."></textarea>
+            <label>사고내용 <span class="opt">— 육하원칙에 따라 항목별로 입력하세요</span></label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">👤 누가 (관련 직원/환자)</div>
+                <input type="text" id="w_who" placeholder="예) 간호사 A, 환자 B(65세 남)" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">📍 어디서 (발생 장소)</div>
+                <input type="text" id="w_where" placeholder="예) 6병동 처치실" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">❓ 무엇을 (사고 내용)</div>
+                <input type="text" id="w_what" placeholder="예) 투약 오류가 발생함" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">🔧 어떻게 (경위/상황)</div>
+                <input type="text" id="w_how" placeholder="예) 유사 약품명 혼동으로 잘못된 약을 투약" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">💡 왜 (원인)</div>
+                <input type="text" id="w_why" placeholder="예) 바쁜 업무환경, 이중확인 미시행" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">📋 추가 내용 (기타)</div>
+                <input type="text" id="w_etc" placeholder="예) 즉시 주치의 보고, 활력징후 확인" oninput="composeContent()">
+              </div>
+            </div>
+            <div style="font-size:12px; color:var(--gray-400); margin-bottom:4px;">▼ 자동 조합된 사고내용</div>
+            <textarea id="acc_content" placeholder="위 항목을 입력하면 자동으로 조합됩니다. 직접 수정도 가능합니다." style="min-height:80px;"></textarea>
           </div>
 
           <div class="field">
@@ -577,9 +615,10 @@
           </div>
           <div class="field">
             <label>간단 요약
-              <button type="button" class="btn btn-sm" id="aiSumBtn" onclick="aiSummarize()" style="margin-left:10px; padding:4px 12px; font-size:12px; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:600;">⚡ 자동 요약</button>
+              <button type="button" id="aiSumBtn" onclick="aiSummarize()" style="margin-left:10px; padding:4px 12px; font-size:12px; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:600;">⚡ 자동 요약</button>
             </label>
-            <textarea id="prob_def" placeholder="위 사고내용, 장소, 분류 등을 입력한 후 '자동 요약' 버튼을 누르면 자동으로 요약해드립니다."></textarea>
+            <div style="font-size:12px; color:var(--gray-400); margin-bottom:6px;">위 항목 입력 후 버튼을 누르면 6하원칙 형식으로 자동 정리됩니다.</div>
+            <textarea id="prob_def" placeholder="자동 요약 버튼을 누르거나 직접 입력하세요."></textarea>
           </div>
         </div>
 
@@ -605,7 +644,7 @@
         </div>
 
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="goStep(2)">다음 단계 →</button>
+          <button class="btn btn-primary" onclick="validateStep1()">다음 단계 →</button>
         </div>
       </div>
 
@@ -742,7 +781,7 @@ function goStep(n) {
   document.getElementById('step'+n).classList.remove('hidden');
   document.getElementById('stepBadge').textContent = n + ' / 4단계';
   document.getElementById('topbarTitle').textContent = topTitles[n-1];
-  document.querySelector('.topbar-sub').textContent = topSubs[n-1];
+  document.getElementById('topbarSub').textContent = topSubs[n-1];
   if (n === 3) { initLevelNav(); renderLevel(); }
   if (n === 4) { initImprove(); }
   window.scrollTo(0,0);
@@ -942,54 +981,65 @@ function initImprove() {
   } else { addImprove(); }
 }
 
+// 6하원칙 자동 조합
+function composeContent() {
+  const who   = document.getElementById('w_who')?.value.trim() || '';
+  const where = document.getElementById('w_where')?.value.trim() || '';
+  const what  = document.getElementById('w_what')?.value.trim() || '';
+  const how   = document.getElementById('w_how')?.value.trim() || '';
+  const why   = document.getElementById('w_why')?.value.trim() || '';
+  const etc   = document.getElementById('w_etc')?.value.trim() || '';
+
+  const accDate = document.getElementById('acc_date')?.value || '';
+  let dateStr = '';
+  if (accDate) {
+    const d = new Date(accDate);
+    if (!isNaN(d)) {
+      dateStr = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${d.getHours().toString().padStart(2,'0')}시 ${d.getMinutes().toString().padStart(2,'0')}분`;
+    }
+  }
+
+  const parts = [];
+  if (dateStr) parts.push(dateStr);
+  if (where) parts.push(where + '에서');
+  if (who) parts.push(who + '이(가)');
+  if (what) parts.push(what);
+  if (how) parts.push(how);
+  if (why) parts.push('(원인: ' + why + ')');
+  if (etc) parts.push(etc);
+
+  const composed = parts.join(', ') + (parts.length > 0 ? '.' : '');
+  document.getElementById('acc_content').value = composed;
+}
+
 function aiSummarize() {
-  const content = document.getElementById('acc_content').value.trim();
-  if (!content) {
-    alert('먼저 위의 "사고내용"을 입력해주세요.');
+  const who   = document.getElementById('w_who')?.value.trim() || '';
+  const where = document.getElementById('w_where')?.value.trim() || '';
+  const what  = document.getElementById('w_what')?.value.trim() || '';
+  const how   = document.getElementById('w_how')?.value.trim() || '';
+  const why   = document.getElementById('w_why')?.value.trim() || '';
+
+  const place = document.querySelector('input[name="place"]:checked');
+  const acctype = document.querySelector('input[name="acctype"]:checked');
+  const severity = document.querySelector('input[name="severity"]:checked');
+
+  const placeVal = place?.value === '기타' ? document.getElementById('place_other').value : place?.value || '';
+  const typeVal  = acctype?.value === '기타' ? document.getElementById('acctype_other').value : acctype?.value || '';
+  const sevVal   = severity?.value || '';
+
+  if (!who && !what && !where) {
+    alert('먼저 누가/무엇을/어디서 항목을 입력해주세요.');
     return;
   }
 
-  // 입력값 수집
-  const accDate = document.getElementById('acc_date').value;
-  const place = document.querySelector('input[name="place"]:checked');
-  const placeOther = document.getElementById('place_other').value.trim();
-  const acctype = document.querySelector('input[name="acctype"]:checked');
-  const acctypeOther = document.getElementById('acctype_other').value.trim();
-  const severity = document.querySelector('input[name="severity"]:checked');
-
-  const placeVal = place ? (place.value === '기타' ? placeOther || '기타 장소' : place.value) : '';
-  const typeVal = acctype ? (acctype.value === '기타' ? acctypeOther || '기타' : acctype.value) : '';
-  const sevVal = severity ? severity.value : '';
-
-  // 날짜 포맷
-  let dateStr = '';
-  if (accDate) {
-    dateStr = accDate; // 입력한 텍스트 그대로 사용
-  }
-
-  // 사고내용에서 첫 2문장 추출
-  const sentences = content.replace(/([.!?])\s+/g, '$1\n').split('\n').filter(s => s.trim().length > 5);
-  const mainContent = sentences.slice(0, 2).join(' ');
-
-  // 요약문 조합
   let summary = '';
-  const parts = [];
-  if (dateStr) parts.push(dateStr);
-  if (placeVal) parts.push(placeVal + '에서');
-  if (typeVal) parts.push(typeVal + ' 관련');
-
-  if (parts.length > 0) {
-    summary += parts.join(' ') + ' 사고가 발생하였습니다. ';
-  }
-
-  if (mainContent) {
-    summary += mainContent;
-    if (!mainContent.match(/[.!?]$/)) summary += '.';
-  }
-
-  if (sevVal) {
-    summary += ` 사고의 위해정도는 "${sevVal}"로 분류됩니다.`;
-  }
+  if (placeVal || typeVal) summary += `${placeVal ? placeVal + ' ' : ''}${typeVal ? typeVal + ' 관련 ' : ''}사고가 발생하였습니다. `;
+  if (who) summary += `${who}이(가) `;
+  if (where) summary += `${where}에서 `;
+  if (what) summary += `${what}. `;
+  if (how) summary += `${how}. `;
+  if (why) summary += `발생 원인은 ${why}으로 파악됩니다. `;
+  if (sevVal) summary += `사고의 위해정도는 "${sevVal}"로 분류됩니다.`;
 
   document.getElementById('prob_def').value = summary.trim();
 }
@@ -1000,7 +1050,65 @@ function exportSummary() {
   else alert('도출된 근본원인:\n' + (selectedRoots.length ? selectedRoots.join('\n') : '없음'));
 }
 
-// ── 임시저장 기능 ──
+// ── 필수값 검사 ──
+function validateStep1() {
+  const missing = [];
+
+  // 필수 항목 체크
+  if (!document.getElementById('acc_date').value)
+    missing.push({ msg: '발생일시', id: 'acc_date' });
+  if (!document.getElementById('rep_date').value)
+    missing.push({ msg: '보고일시', id: 'rep_date' });
+  if (!document.getElementById('gender').value)
+    missing.push({ msg: '성별', id: 'gender' });
+  if (!document.getElementById('age').value)
+    missing.push({ msg: '연령', id: 'age' });
+  if (!document.querySelector('input[name="place"]:checked'))
+    missing.push({ msg: '사고 발생 장소', id: 'w_who' });
+  if (!document.querySelector('input[name="acctype"]:checked'))
+    missing.push({ msg: '사고분류', id: 'w_who' });
+  if (!document.querySelector('input[name="severity"]:checked'))
+    missing.push({ msg: '사고 위해정도', id: 'w_who' });
+  if (!document.getElementById('w_who').value)
+    missing.push({ msg: '사고내용 — 누가', id: 'w_who' });
+  if (!document.getElementById('w_where').value)
+    missing.push({ msg: '사고내용 — 어디서', id: 'w_where' });
+  if (!document.getElementById('w_what').value)
+    missing.push({ msg: '사고내용 — 무엇을', id: 'w_what' });
+  if (!document.getElementById('acc_action').value)
+    missing.push({ msg: '사고 후 조치', id: 'acc_action' });
+
+  if (missing.length > 0) {
+    // 누락 항목 하이라이트
+    clearHighlights();
+    missing.forEach(m => {
+      const el = document.getElementById(m.id);
+      if (el) {
+        el.style.borderColor = '#b03030';
+        el.style.boxShadow = '0 0 0 3px rgba(176,48,48,0.15)';
+      }
+    });
+
+    // 팝업 메시지
+    const list = missing.map(m => `• ${m.msg}`).join('\n');
+    alert(`⚠️ 다음 항목이 누락되었습니다:\n\n${list}\n\n입력 후 다음 단계로 진행해주세요.`);
+
+    // 첫 번째 누락 항목으로 스크롤
+    const firstEl = document.getElementById(missing[0].id);
+    if (firstEl) firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  clearHighlights();
+  goStep(2);
+}
+
+function clearHighlights() {
+  ['acc_date','rep_date','gender','age','acc_action','w_who','w_where','w_what','w_how','w_why'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
+  });
+}
 const SAVE_KEY = 'rca_temp_save';
 
 function collectData() {
@@ -1019,6 +1127,12 @@ function collectData() {
     acc_content: document.getElementById('acc_content')?.value || '',
     acc_action: document.getElementById('acc_action')?.value || '',
     prob_def: document.getElementById('prob_def')?.value || '',
+    w_who: document.getElementById('w_who')?.value || '',
+    w_where: document.getElementById('w_where')?.value || '',
+    w_what: document.getElementById('w_what')?.value || '',
+    w_how: document.getElementById('w_how')?.value || '',
+    w_why: document.getElementById('w_why')?.value || '',
+    w_etc: document.getElementById('w_etc')?.value || '',
     // 팀 구성
     team: [...document.querySelectorAll('#team-list .member-row')].map(row => ({
       role: row.querySelector('select')?.value || '',
@@ -1070,6 +1184,12 @@ function restoreData(data) {
   if (data.acc_content) document.getElementById('acc_content').value = data.acc_content;
   if (data.acc_action) document.getElementById('acc_action').value = data.acc_action;
   if (data.prob_def) document.getElementById('prob_def').value = data.prob_def;
+  if (data.w_who) document.getElementById('w_who').value = data.w_who;
+  if (data.w_where) document.getElementById('w_where').value = data.w_where;
+  if (data.w_what) document.getElementById('w_what').value = data.w_what;
+  if (data.w_how) document.getElementById('w_how').value = data.w_how;
+  if (data.w_why) document.getElementById('w_why').value = data.w_why;
+  if (data.w_etc) document.getElementById('w_etc').value = data.w_etc;
 
   // 팀 구성
   if (data.team && data.team.length > 0) {
@@ -1113,15 +1233,13 @@ function autoSave() {
 
 function manualSave() {
   const data = collectData();
-  const procName = document.getElementById('acc_content')?.value?.substring(0,10) || 'RCA';
   const dateStr = new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','');
-  const fileName = `RCA_${procName}_${dateStr}.json`;
+  const defaultName = `RCA_${dateStr}`;
 
-  // 파일명 입력 받기
-  const customName = prompt('저장할 파일명을 입력하세요 (.json 자동 추가)', fileName.replace('.json',''));
-  if (customName === null) return; // 취소
+  const customName = prompt('저장할 파일명을 입력하세요 (.json 자동 추가)\n예) RCA_낙상예방_V1', defaultName);
+  if (customName === null) return;
 
-  const finalName = (customName.trim() || fileName.replace('.json','')) + '.json';
+  const finalName = (customName.trim() || defaultName) + '.json';
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
