@@ -353,6 +353,8 @@
   }
   .improve-card + .improve-card { border-top: none; border-radius: 0 0 var(--radius) var(--radius); margin-top: -12px; }
 
+  .export-bar { display:flex; gap:10px; margin-bottom:16px; padding:12px 16px; background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); align-items:center; flex-wrap:wrap; }
+  .export-bar .bar-title { font-size:13px; font-weight:600; color:var(--gray-700); margin-right:auto; }
   .hidden { display: none !important; }
 
   .toast {
@@ -662,12 +664,16 @@
 
           <div class="field">
             <label>① 사고 발생 단계 <span class="opt">(시간 순서대로)</span></label>
-            <div class="flow-grid">
+            <div class="flow-grid" id="flow-steps">
               <input class="flow-input" type="text" placeholder="단계 1">
               <input class="flow-input" type="text" placeholder="단계 2">
               <input class="flow-input" type="text" placeholder="단계 3">
               <input class="flow-input" type="text" placeholder="단계 4">
               <input class="flow-input" type="text" placeholder="단계 5">
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button class="btn btn-ghost btn-sm" onclick="addFlowStep()">+ 단계 추가</button>
+              <button class="btn btn-ghost btn-sm" onclick="removeFlowStep()" style="color:var(--red);">- 단계 삭제</button>
             </div>
           </div>
 
@@ -735,7 +741,14 @@
 
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="goStep(3)">← 이전</button>
-          <button class="btn btn-success" onclick="exportSummary()">결과 요약 보기 ↗</button>
+        </div>
+
+        <!-- 내보내기 바 -->
+        <div class="export-bar" style="margin-top:8px;">
+          <span class="bar-title">📊 완료 — 데이터 내보내기</span>
+          <button class="btn btn-ghost btn-sm" onclick="downloadRCAWord()">📄 Word 다운로드</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyRCAToSheet()">📋 구글 시트에 복사</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 PDF 출력</button>
         </div>
       </div>
 
@@ -797,6 +810,22 @@ function addMember() {
   row.className = 'member-row';
   row.innerHTML = `<select><option>팀원</option><option>팀장</option><option>간사</option></select><input type="text" placeholder="소속부서/직위"><input type="text" placeholder="이름">`;
   list.appendChild(row);
+}
+
+// ── 사고 발생 단계 추가/삭제 ──
+function addFlowStep() {
+  const grid = document.getElementById('flow-steps');
+  const n = grid.children.length + 1;
+  const input = document.createElement('input');
+  input.className = 'flow-input';
+  input.type = 'text';
+  input.placeholder = '단계 ' + n;
+  grid.appendChild(input);
+}
+
+function removeFlowStep() {
+  const grid = document.getElementById('flow-steps');
+  if (grid.children.length > 1) grid.removeChild(grid.lastChild);
 }
 
 // ── CF ──
@@ -1134,6 +1163,195 @@ function aiSummarize() {
   document.getElementById('prob_def').value = summary.trim();
 }
 
+function downloadRCAWord() {
+  const procName = document.getElementById('acc_content')?.value?.substring(0,20) || 'RCA';
+  const accDate = document.getElementById('acc_date')?.value || '';
+  const repDate = document.getElementById('rep_date')?.value || '';
+  const gender = document.getElementById('gender')?.value || '';
+  const age = document.getElementById('age')?.value || '';
+  const place = document.querySelector('input[name="place"]:checked')?.value || '';
+  const acctype = document.querySelector('input[name="acctype"]:checked')?.value || '';
+  const severity = document.querySelector('input[name="severity"]:checked')?.value || '';
+  const who = document.getElementById('w_who')?.value || '';
+  const where = document.getElementById('w_where')?.value || '';
+  const what = document.getElementById('w_what')?.value || '';
+  const how = document.getElementById('w_how')?.value || '';
+  const why = document.getElementById('w_why')?.value || '';
+  const etc = document.getElementById('w_etc')?.value || '';
+  const content = document.getElementById('acc_content')?.value || '';
+  const action = document.getElementById('acc_action')?.value || '';
+  const probDef = document.getElementById('prob_def')?.value || '';
+  const s2main = document.getElementById('s2_main')?.value || '';
+  const s2staff = document.getElementById('s2_staff')?.value || '';
+
+  // 팀 구성
+  let teamRows = '';
+  document.querySelectorAll('#team-list .member-row').forEach(row => {
+    const role = row.querySelector('select')?.value || '';
+    const dept = row.querySelectorAll('input')[0]?.value || '';
+    const name = row.querySelectorAll('input')[1]?.value || '';
+    teamRows += `<tr><td>${role}</td><td>${dept}</td><td>${name}</td></tr>`;
+  });
+
+  // 사고 발생 단계
+  const flowSteps = [...document.querySelectorAll('#flow-steps .flow-input')]
+    .map(i => i.value).filter(v => v).join(' → ');
+
+  // CF 항목
+  let cfRows = '';
+  document.querySelectorAll('#cf-list .cf-item').forEach((item, i) => {
+    const checked = item.querySelector('.cf-check')?.checked ? '✅' : '';
+    const text = item.querySelector('.cf-text')?.value || '';
+    if (text) cfRows += `<tr><td style="text-align:center">${checked}</td><td>${text}</td></tr>`;
+  });
+
+  // 근본원인
+  const rootsHtml = selectedRoots.map(r =>
+    `<tr><td style="background:#eaf1fb; color:#1a5fa8; font-weight:bold;">${r}</td></tr>`
+  ).join('');
+
+  // 개선활동
+  let improveRows = '';
+  document.querySelectorAll('#improvePlan .improve-card').forEach(card => {
+    const inputs = card.querySelectorAll('input[type=text]');
+    const ta = card.querySelector('textarea')?.value || '';
+    const level = inputs[0]?.value || '';
+    const manager = inputs[1]?.value || '';
+    const deadline = inputs[2]?.value || '';
+    const kpi = inputs[3]?.value || '';
+    improveRows += `<tr><td>${level}</td><td>${ta}</td><td>${manager}</td><td>${deadline}</td><td>${kpi}</td></tr>`;
+  });
+
+  const html = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='utf-8'>
+<style>
+  body { font-family: '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; margin: 2cm; }
+  h1 { font-size: 16pt; color: #1a5fa8; border-bottom: 2px solid #1a5fa8; padding-bottom: 6px; margin-bottom: 16px; }
+  h2 { font-size: 12pt; color: #fff; background: #1a5fa8; padding: 5px 12px; margin-top: 20px; margin-bottom: 8px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 14px; font-size: 10pt; }
+  th { background: #1a5fa8; color: white; padding: 6px 8px; text-align: left; font-weight: bold; }
+  td { border: 1px solid #dde1e9; padding: 6px 8px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f5f6f8; }
+  .info-label { font-weight: bold; color: #374151; background: #eceef2 !important; width: 130px; }
+</style>
+</head>
+<body>
+<h1>근본원인분석(RCA) 보고서</h1>
+
+<h2>1단계 — 사고 기본 정보</h2>
+<table>
+  <tr><td class="info-label">발생일시</td><td>${accDate}</td><td class="info-label">보고일시</td><td>${repDate}</td></tr>
+  <tr><td class="info-label">성별</td><td>${gender}</td><td class="info-label">연령</td><td>${age}</td></tr>
+  <tr><td class="info-label">사고 발생 장소</td><td>${place}</td><td class="info-label">사고분류</td><td>${acctype}</td></tr>
+  <tr><td class="info-label">사고 위해정도</td><td colspan="3">${severity}</td></tr>
+</table>
+
+<table>
+  <tr><th>6하원칙</th><th>내용</th></tr>
+  <tr><td class="info-label">누가</td><td>${who}</td></tr>
+  <tr><td class="info-label">어디서</td><td>${where}</td></tr>
+  <tr><td class="info-label">무엇을</td><td>${what}</td></tr>
+  <tr><td class="info-label">어떻게</td><td>${how}</td></tr>
+  <tr><td class="info-label">왜</td><td>${why}</td></tr>
+  <tr><td class="info-label">추가내용</td><td>${etc}</td></tr>
+</table>
+
+<table>
+  <tr><th>사고내용 (자동 조합)</th></tr>
+  <tr><td>${content}</td></tr>
+</table>
+
+<table>
+  <tr><th>사고 후 조치</th></tr>
+  <tr><td>${action}</td></tr>
+</table>
+
+<table>
+  <tr><th>문제정의 (간단 요약)</th></tr>
+  <tr><td>${probDef}</td></tr>
+</table>
+
+<h2>팀 구성</h2>
+<table>
+  <tr><th>역할</th><th>소속부서/직위</th><th>이름</th></tr>
+  ${teamRows}
+</table>
+
+<h2>2단계 — 기여요인(CF)</h2>
+<table>
+  <tr><th>사고 발생 단계 (시간 순서)</th></tr>
+  <tr><td>${flowSteps}</td></tr>
+</table>
+<table>
+  <tr><th>사고 분석 주요 사항</th></tr>
+  <tr><td>${s2main}</td></tr>
+</table>
+<table>
+  <tr><th>관련 직원</th></tr>
+  <tr><td>${s2staff}</td></tr>
+</table>
+<table>
+  <tr><th style="text-align:center; width:60px;">CF</th><th>위험요인 상세기술</th></tr>
+  ${cfRows}
+</table>
+
+<h2>3단계 — 도출된 근본원인</h2>
+<table>
+  <tr><th>근본원인</th></tr>
+  ${rootsHtml || '<tr><td>-</td></tr>'}
+</table>
+
+<h2>4단계 — 개선활동 계획</h2>
+<table>
+  <tr><th>분석수준 / 근본원인</th><th>개선전략</th><th>담당자</th><th>완료예정일</th><th>효과측정지표</th></tr>
+  ${improveRows || '<tr><td colspan="5">-</td></tr>'}
+</table>
+
+</body></html>`;
+
+  const blob = new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','');
+  a.download = `RCA_보고서_${dateStr}.doc`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyRCAToSheet() {
+  let tsv = '항목\t내용\n';
+  tsv += `발생일시\t${document.getElementById('acc_date')?.value || ''}\n`;
+  tsv += `보고일시\t${document.getElementById('rep_date')?.value || ''}\n`;
+  tsv += `성별\t${document.getElementById('gender')?.value || ''}\n`;
+  tsv += `연령\t${document.getElementById('age')?.value || ''}\n`;
+  tsv += `사고장소\t${document.querySelector('input[name="place"]:checked')?.value || ''}\n`;
+  tsv += `사고분류\t${document.querySelector('input[name="acctype"]:checked')?.value || ''}\n`;
+  tsv += `위해정도\t${document.querySelector('input[name="severity"]:checked')?.value || ''}\n`;
+  tsv += `사고내용\t${document.getElementById('acc_content')?.value || ''}\n`;
+  tsv += `사고후조치\t${document.getElementById('acc_action')?.value || ''}\n`;
+  tsv += `문제정의\t${document.getElementById('prob_def')?.value || ''}\n\n`;
+
+  tsv += '근본원인\n';
+  selectedRoots.forEach(r => { tsv += `\t${r}\n`; });
+  tsv += '\n분석수준/근본원인\t개선전략\t담당자\t완료예정일\t효과측정지표\n';
+  document.querySelectorAll('#improvePlan .improve-card').forEach(card => {
+    const inputs = card.querySelectorAll('input[type=text]');
+    const ta = card.querySelector('textarea')?.value || '';
+    tsv += `${inputs[0]?.value||''}\t${ta}\t${inputs[1]?.value||''}\t${inputs[2]?.value||''}\t${inputs[3]?.value||''}\n`;
+  });
+
+  navigator.clipboard.writeText(tsv).then(() => {
+    alert('✅ 클립보드에 복사되었습니다!\n구글 시트 또는 엑셀을 열고 Ctrl+V로 붙여넣으세요.');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = tsv; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('✅ 복사되었습니다! 구글 시트에서 Ctrl+V로 붙여넣으세요.');
+  });
+}
+
 function exportSummary() {
   const roots = selectedRoots.length > 0 ? selectedRoots.join(', ') : '없음';
   if (typeof sendPrompt === 'function') sendPrompt(`RCA 결과를 요약해주세요. 도출된 근본원인: ${roots}`);
@@ -1249,7 +1467,7 @@ function collectData() {
     // 2단계
     s2_main: document.getElementById('s2_main')?.value || '',
     s2_staff: document.getElementById('s2_staff')?.value || '',
-    flow_steps: [...document.querySelectorAll('#flow-steps input')].map(i => i.value),
+    flow_steps: [...document.querySelectorAll('#flow-steps .flow-input')].map(i => i.value),
     cf_items: [...document.querySelectorAll('#cf-list .cf-item')].map(item => ({
       checked: item.querySelector('.cf-check')?.checked || false,
       text: item.querySelector('.cf-text')?.value || ''
@@ -1313,9 +1531,26 @@ function restoreData(data) {
   // 2단계
   if (data.s2_main) document.getElementById('s2_main').value = data.s2_main;
   if (data.s2_staff) document.getElementById('s2_staff').value = data.s2_staff;
-  if (data.flow_steps) {
-    const inputs = document.querySelectorAll('#flow-steps input');
-    data.flow_steps.forEach((v, i) => { if (inputs[i]) inputs[i].value = v; });
+  if (data.flow_steps && data.flow_steps.length > 0) {
+    const grid = document.getElementById('flow-steps');
+    // 기존 칸 비우기
+    grid.innerHTML = '';
+    data.flow_steps.forEach((v, i) => {
+      const input = document.createElement('input');
+      input.className = 'flow-input';
+      input.type = 'text';
+      input.placeholder = '단계 ' + (i+1);
+      input.value = v;
+      grid.appendChild(input);
+    });
+    // 최소 5칸 유지
+    while (grid.children.length < 5) {
+      const input = document.createElement('input');
+      input.className = 'flow-input';
+      input.type = 'text';
+      input.placeholder = '단계 ' + grid.children.length;
+      grid.appendChild(input);
+    }
   }
   if (data.cf_items) {
     const list = document.getElementById('cf-list');
