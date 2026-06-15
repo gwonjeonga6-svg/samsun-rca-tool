@@ -425,9 +425,9 @@
     .sidebar, .topbar, .btn-row, .export-bar, .save-btns, .restore-banner,
     button, .btn, .progress-pill { display: none !important; }
     .main { margin-left: 0 !important; }
-    .page-content { padding: 10px !important; max-width: 100% !important; }
-    .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 10px !important; }
-    body { font-size: 11pt; background: #fff; }
+    .page-content { padding: 4px 10px !important; max-width: 100% !important; margin-top: 0 !important; }
+    .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 8px !important; }
+    body { font-size: 11pt; background: #fff; margin: 0 !important; }
     .chip { border: 1px solid #ccc !important; }
     .chip.selected { background: #eaf1fb !important; border-color: #1a5fa8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     input, textarea, select { border: 1px solid #ccc !important; background: #fff !important; }
@@ -439,8 +439,17 @@
     body.print-mode #step3,
     body.print-mode #step4 { display: block !important; }
     /* 단계 구분선 */
-    body.print-mode .step-divider { display: block !important; border: none; border-top: 2px solid #1a5fa8; margin: 16px 0 8px; }
-    body.print-mode .step-print-title { display: block !important; font-size: 13pt; font-weight: bold; color: #0f4080; background: #eaf1fb; padding: 4px 10px; margin-bottom: 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.print-mode .step-divider { display: block !important; border: none; border-top: 2px solid #1a5fa8; margin: 10px 0 4px; }
+    body.print-mode .step-print-title {
+      display: block !important;
+      font-size: 12pt; font-weight: bold;
+      color: #fff; background: #1a5fa8;
+      padding: 5px 10px; margin-bottom: 8px;
+      break-after: avoid;   /* 제목 뒤에서 페이지 나눔 방지 */
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    /* 제목 바로 뒤 카드는 페이지 앞에서 안 끊기게 */
+    body.print-mode .step-print-title + .card { break-before: avoid; }
   }
   /* 화면에서는 숨김 */
   .step-divider, .step-print-title { display: none; }
