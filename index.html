@@ -1261,6 +1261,7 @@ function downloadRCAWord() {
 
 <h2>1단계 — 사고 기본 정보</h2>
 <table>
+  <colgroup><col style="width:18%"><col style="width:32%"><col style="width:18%"><col style="width:32%"></colgroup>
   <tr><td class="lbl">발생일시</td><td>${accDate}</td><td class="lbl">보고일시</td><td>${repDate}</td></tr>
   <tr><td class="lbl">성별</td><td>${gender}</td><td class="lbl">연령</td><td>${age}</td></tr>
   <tr><td class="lbl">사고 발생 장소</td><td>${place}</td><td class="lbl">사고분류</td><td>${acctype}</td></tr>
@@ -1294,7 +1295,8 @@ function downloadRCAWord() {
 
 <h2>팀 구성</h2>
 <table>
-  <tr><th width="15%">역할</th><th width="50%">소속부서/직위</th><th>이름</th></tr>
+  <colgroup><col style="width:15%"><col style="width:50%"><col style="width:35%"></colgroup>
+  <tr><th>역할</th><th>소속부서/직위</th><th>이름</th></tr>
   ${teamRows || '<tr><td colspan="3">-</td></tr>'}
 </table>
 
@@ -1312,7 +1314,8 @@ function downloadRCAWord() {
   <tr><td>${s2staff || '-'}</td></tr>
 </table>
 <table>
-  <tr><th width="8%" style="text-align:center;">CF</th><th>위험요인 상세기술</th></tr>
+  <colgroup><col style="width:8%"><col style="width:92%"></colgroup>
+  <tr><th style="text-align:center;">CF</th><th>위험요인 상세기술</th></tr>
   ${cfRows || '<tr><td colspan="2">-</td></tr>'}
 </table>
 
@@ -1324,7 +1327,8 @@ function downloadRCAWord() {
 
 <h2>4단계 — 개선활동 계획</h2>
 <table>
-  <tr><th width="28%">분석수준 / 근본원인</th><th width="32%">개선전략</th><th width="15%">담당자</th><th width="12%">완료예정일</th><th>효과측정지표</th></tr>
+  <colgroup><col style="width:25%"><col style="width:32%"><col style="width:15%"><col style="width:13%"><col style="width:15%"></colgroup>
+  <tr><th>분석수준 / 근본원인</th><th>개선전략</th><th>담당자</th><th>완료예정일</th><th>효과측정지표</th></tr>
   ${improveRows || '<tr><td colspan="5">-</td></tr>'}
 </table>
 
