@@ -1144,6 +1144,23 @@ function exportSummary() {
 function validateStep1() {
   const missing = [];
 
+  // 날짜 논리 검증
+  const accDate = document.getElementById('acc_date').value;
+  const repDate = document.getElementById('rep_date').value;
+  if (accDate && repDate) {
+    if (new Date(accDate) > new Date(repDate)) {
+      const accEl = document.getElementById('acc_date');
+      const repEl = document.getElementById('rep_date');
+      accEl.style.borderColor = '#b03030';
+      accEl.style.boxShadow = '0 0 0 3px rgba(176,48,48,0.15)';
+      repEl.style.borderColor = '#b03030';
+      repEl.style.boxShadow = '0 0 0 3px rgba(176,48,48,0.15)';
+      alert('⚠️ 보고일시가 발생일시보다 앞에 있습니다.\n발생일시와 보고일시를 다시 확인해주세요.');
+      repEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+
   // 필수 항목 체크
   if (!document.getElementById('acc_date').value)
     missing.push({ msg: '발생일시', id: 'acc_date' });
@@ -1322,6 +1339,13 @@ function autoSave() {
 }
 
 function manualSave() {
+  // 날짜 논리 검증
+  const accDate = document.getElementById('acc_date').value;
+  const repDate = document.getElementById('rep_date').value;
+  if (accDate && repDate && new Date(accDate) > new Date(repDate)) {
+    alert('⚠️ 보고일시가 발생일시보다 앞에 있습니다.\n날짜를 확인 후 저장해주세요.');
+    return;
+  }
   const data = collectData();
   const dateStr = new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','');
   const defaultName = `RCA_${dateStr}`;
