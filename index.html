@@ -811,31 +811,68 @@ function addCF() {
 
 // ── Level data ──
 const levels = [
-  { id:1, name:"업무절차", q1:"환자안전사고와 관련된 규정/지침/절차 등이 있습니까?", q2:"규정/지침/절차에 따라 모두 적용하였습니까?",
+  { id:1, name:"업무절차", note:"낙상예방, 투약, 수혈 등 관련 규정·지침·절차의 존재와 적용 여부를 검토합니다.",
+    q1:"환자안전사고와 관련된 규정/지침/절차 등이 있습니까?", q2:"규정/지침/절차에 따라 모두 적용하였습니까?",
+    q2yes:"예 (적용함)", q2no:"아니오 (적용 안 함)",
+    q2yesMsg:"규정대로 적용했으나 사고 발생 — 규정 자체의 문제를 검토하세요.",
+    q2noMsg:"규정/지침/절차가 있으나 적용하지 않음 — 근접원인을 선택하세요.",
     roots:["1.1 규정/지침/절차 부재","1.2 규정/지침/절차 관리 미흡"],
     proxies:["규정/지침/절차 제·개정을 공지하지 않음","규정/지침/절차 교육을 받지 못함","규정/지침/절차가 현장 실무와 맞지 않음","규정/지침/절차에 잘못된 업무절차가 있음","수행 주체 및 시기가 명확하지 않음"] },
-  { id:2, name:"교육/훈련", q1:"환자안전사고와 관련된 교육/훈련 프로그램이 있습니까?", q2:"직원이 교육/훈련을 충분히 받았습니까?",
+  { id:2, name:"교육/훈련", note:"사고와 관련된 직원·환자·보호자 교육/훈련 프로그램의 존재와 효과를 검토합니다.",
+    q1:"환자안전사고와 관련된 교육/훈련 프로그램이 있습니까?", q2:"직원이 교육/훈련을 충분히 받았습니까?",
+    q2yes:"예 (충분히 받음)", q2no:"아니오 (충분히 못 받음)",
+    q2yesMsg:"교육을 받았으나 사고 발생 — 교육 내용/방법/효과의 문제를 검토하세요.",
+    q2noMsg:"교육/훈련이 충분하지 않음 — 근접원인을 선택하세요.",
     roots:["2.1 교육/훈련 체계 부재","2.2 교육/훈련 계획 운영 미흡"],
-    proxies:["교육/훈련 내용이 적절하지 않음","교육/훈련 방법이 미흡","교육/훈련 시간이 충분하지 않음","교육/훈련 평가를 하지 않음","지속/반복 교육이 없음"] },
-  { id:3, name:"의사소통", q1:"환자안전사고와 관련하여 필요한 의사소통이 있었습니까?", q2:"의사소통에 문제가 있었습니까?",
+    proxies:["교육/훈련 내용이 적절하지 않음","교육/훈련 방법이 미흡","교육/훈련 시간이 충분하지 않음","교육/훈련 평가를 하지 않음","지속/반복 교육이 없음",
+             "환자/보호자가 교육내용을 충분히 이해하지 못함","환자/보호자가 교육받은 대로 이행하지 않음","환자 상태(인지저하, 언어장벽 등)를 고려한 교육 미흡","교육 후 이해도 확인(재교육) 미시행"] },
+  { id:3, name:"의사소통", note:"직원 간, 직원-환자/보호자 간 의사소통 체계와 실제 소통 여부를 검토합니다. (인수인계, 처방전달 등)",
+    q1:"환자안전사고와 관련하여 필요한 의사소통이 있었습니까?", q2:"의사소통에 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"의사소통 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["3.1 환자안전을 위한 의사소통 체계 미흡","3.2 안전한 의사소통을 위한 환자안전문화 인식 저하"],
     proxies:["의사소통을 위한 체계가 없음","의사소통 내용이 다르게 전달됨","표준화되지 않은 약어/용어 사용","인수인계가 불명확하거나 누락됨","안전하지 않은 의사소통 분위기"] },
-  { id:4, name:"업무수행", q1:"환자안전사고와 관련한 업무수행이 있었습니까?", q2:"업무를 규정에 따라 정확하게 수행하는데 문제가 있었습니까?",
+  { id:4, name:"업무수행", note:"사고와 관련된 직원의 실제 업무수행 방식과 문제를 검토합니다. (간호사, 의사, 간병인 등 관련 직원의 행동)",
+    q1:"환자안전사고와 관련한 업무수행이 있었습니까?", q2:"업무를 규정에 따라 정확하게 수행하는데 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"업무수행 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["4.1 규정/지침/절차에 따른 업무 불이행 또는 부적절한 수행","4.2 개인적 요인에 의한 업무 불이행","4.3 부적절한 업무 배분","4.4 불충분한 업무 지원"],
     proxies:["직원이 업무를 정확하게 파악하지 못함","개인 사정으로 업무집중 저하","무리한 근무 스케줄","동료 직원의 지원 부족"] },
-  { id:5, name:"부서관리", q1:"환자안전사고와 관련된 부서관리가 있었습니까?", q2:"부서관리에 문제가 있었습니까?",
+  { id:5, name:"부서관리", note:"사고가 발생한 해당 부서(병동, 외래 등)의 수간호사/부서장 차원의 관리를 검토합니다. QPS·경영진은 6단계(리더십)에서 검토합니다.",
+    q1:"환자안전사고와 관련된 부서관리가 있었습니까?", q2:"부서관리에 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"부서관리 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["5.1 부적절한 인력관리","5.2 부서장의 규정/지침/절차/매뉴얼 관리 미흡","5.3 부서장의 환자안전사고 관리 미흡","5.4 부서장의 위험관리 미흡"],
     proxies:["자격을 갖춘 인력이 배치되지 않음","업무 매뉴얼을 관리하지 않음","사고 후 개선활동 유지관리 미흡","위험상황 관리·감독 미흡"] },
-  { id:6, name:"리더십", q1:"리더십이 환자안전 감소 및 예방을 최우선 순위에 두고 있습니까?", q2:"리더십이 환자안전을 위해 지원과 참여를 하였습니까?",
+  { id:6, name:"리더십", note:"병원 경영진·QPS(환자안전팀)·간호부 등 조직 리더십 차원의 환자안전 지원과 참여를 검토합니다.",
+    q1:"리더십이 환자안전 감소 및 예방을 최우선 순위에 두고 있습니까?", q2:"리더십이 환자안전을 위해 지원과 참여를 하였습니까?",
+    q2yes:"예 (지원/참여 함)", q2no:"아니오 (지원/참여 안 함)",
+    q2yesMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
+    q2noMsg:"리더십 지원/참여 미흡 — 근접원인을 선택하세요.",
     roots:["6.1 리더십의 환자안전문화 인식 부족","6.2 리더십과 직원 간 소통 부재","6.3 리더십의 자원 지원 미흡","6.4 인지된 환자안전 이슈에 대한 지원 미흡","6.5 환자안전 및 의료 질 관리·감독 부재"],
     proxies:["직원 경고를 지지하지 않음","직원 제안을 받아들이지 않음","필요한 예산·인력을 지원하지 않음","환자안전 이슈에 적시 지원 없음"] },
-  { id:7, name:"인간공학", q1:"환자안전사고와 관련된 인간공학 요인이 있었습니까?", q2:"인간공학 요인에 문제가 있었습니까?",
+  { id:7, name:"인간공학", note:"업무 시스템·환경이 사람의 실수를 유발하거나 발견을 어렵게 만드는 요인을 검토합니다. (EMR 설계, 반복 동작, 작업 환경 등)",
+    q1:"환자안전사고와 관련된 인간공학 요인이 있었습니까?", q2:"인간공학 요인에 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"인간공학 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["7.1 환자안전 시스템 관리 부재","7.2 물리적 작업요인 관리 부재"],
     proxies:["복잡한 시스템으로 오류 발견 어려움","느슨한 시스템으로 오류 미보고","반복 동작, 불편한 자세 등 물리적 요인"] },
-  { id:8, name:"의료기기", q1:"환자안전사고와 관련하여 의료기기 요인이 있었습니까?", q2:"의료기기 문제가 있었습니까?",
+  { id:8, name:"의료기기", note:"사고와 관련된 의료기기·장비의 설계, 유지보수, 사용 문제를 검토합니다. 낙상 등 의료기기와 무관한 사고는 '미해당' 선택.",
+    q1:"환자안전사고와 관련하여 의료기기 요인이 있었습니까?", q2:"의료기기 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"의료기기 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["8.1 의료기기 안전 설계 미흡","8.2 의료기기 운영관리 미흡"],
     proxies:["안전 설계를 고려하지 않은 의료기기","노후 의료기기 고장 예방 조치 미흡","예방/유지보수 미이행","직원의 부주의한 의료기기 사용"] },
-  { id:9, name:"시설/환경", q1:"관련법을 준수하여 시설/환경 관리를 하였습니까?", q2:"시설 및 환경요인에 문제가 있었습니까?",
+  { id:9, name:"시설/환경", note:"사고가 발생한 물리적 환경(화장실, 복도, 병실 등)의 시설·안전 문제를 검토합니다. 낙상의 경우 화장실 안전바, 바닥 상태 등이 해당.",
+    q1:"관련법을 준수하여 시설/환경 관리를 하였습니까?", q2:"시설 및 환경요인에 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"시설/환경 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["9.1 시설 및 환경 관련 법 미준수","9.2 업무환경 안전관리 미흡","9.3 시설 및 환경 위험관리 미흡","9.4 재난관리시스템 미흡","9.5 환자 및 환자 보호자의 환자안전활동 참여 미흡"],
     proxies:["관련 법 미준수","소음, 조도, 공간/시설 문제","위험관리 미수행","재난 시 대응 체계 없음"] }
 ];
@@ -863,7 +900,8 @@ function renderLevel() {
   const state = levelState[curLevel] || {};
   const c = document.getElementById('levelContent');
 
-  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:14px;">${l.id}. ${l.name}</div>`;
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
 
   html += `<div class="q-box">
     <div class="q-label">질문 1</div>
@@ -889,24 +927,31 @@ function renderLevel() {
       <div class="q-label">질문 2</div>
       <div class="q-text">${l.q2}</div>
       <div class="q-btns">
-        <button class="q-btn ${state.q2==='yes'?'q-bad':''}" onclick="setQ(${l.id},2,'yes')">예 (문제 있음)</button>
-        <button class="q-btn ${state.q2==='no'?'q-good':''}" onclick="setQ(${l.id},2,'no')">아니오 (문제 없음)</button>
+        <button class="q-btn ${state.q2==='yes'?'q-bad':''}" onclick="setQ(${l.id},2,'yes')">${l.q2yes}</button>
+        <button class="q-btn ${state.q2==='no'?'q-bad':''}" onclick="setQ(${l.id},2,'no')">${l.q2no}</button>
       </div>
     </div>`;
 
     if (state.q2 === 'no') {
-      html += `<div class="alert alert-success">→ 이 분석수준에서 근본원인 없음. 다음으로 이동하세요.</div>`;
+      const isNoOk = l.q2noMsg.includes('근본원인 없음');
+      html += `<div class="alert ${isNoOk ? 'alert-success' : 'alert-warn'}">→ ${l.q2noMsg}</div>`;
     }
 
-    if (state.q2 === 'yes') {
-      html += `<div class="q-box">
-        <div class="q-label">근접원인 선택 (해당 항목 모두 체크)</div>
-        ${l.proxies.map((p,i)=>`<div class="proxy-item"><input type="checkbox" id="px${l.id}_${i}" ${state.proxies&&state.proxies.includes(p)?'checked':''} onchange="setProxy(${l.id},'${p.replace(/'/g,"\\'")}',this.checked)"><label for="px${l.id}_${i}">${p}</label></div>`).join('')}
-      </div>
-      <div class="q-box">
-        <div class="q-label">근본원인 선택</div>
-        ${l.roots.slice(1).map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="rt${l.id}_${i}" ${selectedRoots.includes(r)?'checked':''} onchange="toggleRoot('${r.replace(/'/g,"\\'")}',this.checked)"><label for="rt${l.id}_${i}">${r}</label></div>`).join('')}
-      </div>`;
+    if (state.q2 === 'yes' || state.q2 === 'no') {
+      const showProxy = state.q2 === 'yes' || !l.q2noMsg.includes('근본원인 없음');
+      if (showProxy) {
+        html += `<div class="q-box">
+          <div class="q-label">근접원인 선택 (해당 항목 모두 체크)</div>
+          ${l.proxies.map((p,i)=>`<div class="proxy-item"><input type="checkbox" id="px${l.id}_${i}" ${state.proxies&&state.proxies.includes(p)?'checked':''} onchange="setProxy(${l.id},'${p.replace(/'/g,"\\'")}',this.checked)"><label for="px${l.id}_${i}">${p}</label></div>`).join('')}
+        </div>
+        <div class="q-box">
+          <div class="q-label">근본원인 선택</div>
+          ${l.roots.slice(1).map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="rt${l.id}_${i}" ${selectedRoots.includes(r)?'checked':''} onchange="toggleRoot('${r.replace(/'/g,"\\'")}',this.checked)"><label for="rt${l.id}_${i}">${r}</label></div>`).join('')}
+        </div>`;
+      }
+      if (state.q2 === 'yes' && l.q2yesMsg) {
+        html += `<div class="alert alert-warn" style="margin-top:8px;">→ ${l.q2yesMsg}</div>`;
+      }
     }
   }
 
@@ -998,7 +1043,11 @@ function addImprove() {
 
 function initImprove() {
   const plan = document.getElementById('improvePlan');
-  if (plan.innerHTML !== '') return;
+  // 이미 근본원인 기반으로 채워진 경우 유지, 비어있거나 예시만 있으면 재생성
+  if (plan.innerHTML !== '' && plan.querySelector('input[style*="color"]')) return;
+
+  // 초기화 후 재생성
+  plan.innerHTML = '';
   if (selectedRoots.length > 0) {
     selectedRoots.forEach(r => {
       const header = getLevelHeader(r);
@@ -1017,7 +1066,9 @@ function initImprove() {
         </div>`;
       plan.appendChild(div);
     });
-  } else { addImprove(); }
+  } else {
+    addImprove();
+  }
 }
 
 // 6하원칙 자동 조합
