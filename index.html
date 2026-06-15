@@ -324,6 +324,7 @@
   .q-btn.q-yes { background: var(--blue); border-color: var(--blue); color: #fff; }
   .q-btn.q-bad { background: var(--red); border-color: var(--red); color: #fff; }
   .q-btn.q-good { background: var(--green); border-color: var(--green); color: #fff; }
+  .q-btn.q-na { background: var(--gray-400); border-color: var(--gray-400); color: #fff; }
 
   /* ══ Alerts ══ */
   .alert { padding: 11px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; border-left: 3px solid; }
@@ -351,6 +352,8 @@
     margin-bottom: 12px;
   }
   .improve-card + .improve-card { border-top: none; border-radius: 0 0 var(--radius) var(--radius); margin-top: -12px; }
+
+  .hidden { display: none !important; }
 
   .toast {
     position: fixed; bottom: 24px; right: 24px;
@@ -867,13 +870,18 @@ function renderLevel() {
     <div class="q-text">${l.q1}</div>
     <div class="q-btns">
       <button class="q-btn ${state.q1==='yes'?'q-yes':''}" onclick="setQ(${l.id},1,'yes')">예</button>
-      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오</button>
+      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오 (부재/미흡)</button>
+      <button class="q-btn ${state.q1==='na'?'q-na':''}" onclick="setQ(${l.id},1,'na')">미해당</button>
     </div>
   </div>`;
 
   if (state.q1 === 'no') {
     if (!selectedRoots.includes(l.roots[0])) selectedRoots.push(l.roots[0]);
     html += `<div class="alert alert-warn">→ 근본원인: <strong>${l.roots[0]}</strong> — 다음 분석수준으로 이동하세요.</div>`;
+  }
+
+  if (state.q1 === 'na') {
+    html += `<div class="alert alert-success">→ 이 분석수준은 해당 사고와 관련 없음. 다음 분석수준으로 이동하세요.</div>`;
   }
 
   if (state.q1 === 'yes') {
@@ -913,11 +921,21 @@ function renderLevel() {
 
 function setQ(id, qnum, val) {
   if (!levelState[id]) levelState[id] = {};
-  if (qnum === 1) { levelState[id].q1 = val; delete levelState[id].q2; delete levelState[id].proxies; }
-  else levelState[id].q2 = val;
-  if (qnum === 1 && val === 'no') {
-    const root = levels[id-1].roots[0];
-    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+  if (qnum === 1) {
+    levelState[id].q1 = val;
+    delete levelState[id].q2;
+    delete levelState[id].proxies;
+    // 이전 선택으로 추가됐던 roots[0] 제거 후 재처리
+    const root0 = levels[id-1].roots[0];
+    const idx = selectedRoots.indexOf(root0);
+    if (idx > -1) selectedRoots.splice(idx, 1);
+    // 아니오 → 규정/지침 부재 근본원인 추가
+    if (val === 'no') {
+      if (!selectedRoots.includes(root0)) selectedRoots.push(root0);
+    }
+    // 미해당 → 근본원인 추가 없이 통과
+  } else {
+    levelState[id].q2 = val;
   }
   renderLevel();
 }
@@ -946,6 +964,23 @@ function updateRootPanel() {
 function nextLevel() { if (curLevel < 9) { curLevel++; renderLevel(); } }
 function prevLevel() { if (curLevel > 1) { curLevel--; renderLevel(); } }
 
+// 분석수준명 매핑
+const levelNames = {
+  '1': '업무절차', '2': '교육/훈련', '3': '의사소통', '4': '업무수행',
+  '5': '부서관리', '6': '리더십', '7': '인간공학', '8': '의료기기', '9': '시설/환경'
+};
+
+function getLevelHeader(root) {
+  // "6.1 리더십의 환자안전문화 인식 부족" → "6. 리더십 / 6.1 리더십의 환자안전문화 인식 부족"
+  const match = root.match(/^(\d+)\./);
+  if (match) {
+    const num = match[1];
+    const name = levelNames[num] || '';
+    return `${num}. ${name} / ${root}`;
+  }
+  return root;
+}
+
 function addImprove() {
   const plan = document.getElementById('improvePlan');
   const div = document.createElement('div');
@@ -966,10 +1001,14 @@ function initImprove() {
   if (plan.innerHTML !== '') return;
   if (selectedRoots.length > 0) {
     selectedRoots.forEach(r => {
+      const header = getLevelHeader(r);
       const div = document.createElement('div');
       div.className = 'improve-card';
       div.innerHTML = `
-        <div class="field"><label>근본원인</label><input type="text" value="${r}" style="color:var(--blue); font-weight:600;"></div>
+        <div class="field">
+          <label>분석수준 / 근본원인</label>
+          <input type="text" value="${header}" style="color:var(--blue); font-weight:600;">
+        </div>
         <div class="field"><label>개선전략</label><textarea placeholder="해당 근본원인에 대한 개선전략을 작성하세요."></textarea></div>
         <div class="grid3">
           <div class="field"><label>담당자</label><input type="text" placeholder="담당자명"></div>
