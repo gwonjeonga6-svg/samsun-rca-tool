@@ -2,918 +2,2714 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>QPS위원회 회의록</title>
-<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCA 작성 도구 - KoSQIN</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Nanum Gothic','맑은 고딕',sans-serif;background:#E8ECF0;color:#1E293B;font-size:14px;}
-
-.toolbar{background:#1B3A6B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:100;}
-.toolbar-title{font-size:15px;font-weight:800;}
-.toolbar-btns{display:flex;gap:6px;flex-wrap:wrap;}
-.btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;}
-.btn-white{background:#fff;color:#1B3A6B;}
-.btn-gray{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);}
-.btn-green{background:#16A34A;color:#fff;}
-.btn-tab-active{background:#fff!important;color:#1B3A6B!important;}
-
-.doc-wrap{max-width:820px;margin:24px auto;padding:0 16px 60px;}
-.doc{background:#fff;border:1px solid #CBD5E1;padding:36px 40px;}
-
-/* ── 섹션 테이블 공통 ── */
-/* 모든 섹션 테이블은 좌우가 굵은 네이비 2px, 상하는 각 테이블이 책임 */
-.sec-table{
-  width:100%;border-collapse:collapse;
-  border-left:2px solid #1B3A6B;
-  border-right:2px solid #1B3A6B;
-}
-.sec-table td{border:1px solid #94A3B8;padding:7px 11px;font-size:13px;vertical-align:top;line-height:1.7;}
-.sec-table .lbl{
-  font-weight:800;color:#1B3A6B;width:80px;text-align:center;
-  vertical-align:middle;white-space:nowrap;
-  border-right:2px solid #1B3A6B;
-}
-.sec-table .sec-lbl{
-  color:#1B3A6B;font-weight:800;text-align:center;
-  white-space:nowrap;vertical-align:middle;width:80px;
-  border-right:2px solid #1B3A6B;
-}
-
-/* 제목 테이블 — 위 테두리 담당 */
-.title-table{
-  width:100%;border-collapse:collapse;
-  border:2px solid #1B3A6B;
-  border-bottom:none;
-}
-.title-table td{padding:10px 8px 8px;border-bottom:1.5px solid #1B3A6B;}
-/* 마지막(붙임자료) 테이블 — 아래 테두리 담당 */
-.last-table{
-  border-bottom:2px solid #1B3A6B!important;
-}
-/* 섹션 간 — 위 테두리 없애서 이중선 방지 */
-.sec-table{border-top:none;}
-
-/* 편집 */
-.editable{outline:none;cursor:text;min-height:18px;display:block;width:100%;line-height:1.7;}
-.editable:focus{background:#FAFBFF;}
-.editable:empty:before{content:attr(data-placeholder);color:#94A3B8;font-style:italic;}
-
-/* 안건/붙임 행 */
-.item-row{display:flex;align-items:flex-start;gap:2px;padding:4px 11px;border-bottom:1px solid #E2E8F0;}
-.item-row:last-child{border-bottom:none;}
-.item-num{font-weight:700;color:#1B3A6B;min-width:18px;flex-shrink:0;padding-top:1px;}
-.item-text{flex:1;outline:none;min-height:18px;line-height:1.7;}
-.item-text:empty:before{content:attr(data-placeholder);color:#94A3B8;font-style:italic;}
-.item-del{background:none;border:none;color:#CBD5E1;font-size:13px;cursor:pointer;flex-shrink:0;padding:2px 4px;margin-left:4px;}
-.item-del:hover{color:#DC2626;}
-
-/* 내용 행 */
-.content-row{padding:6px 11px;border-bottom:1px solid #E2E8F0;}
-.content-row:last-child{border-bottom:none;}
-.content-title{font-weight:700;outline:none;width:100%;min-height:18px;line-height:1.7;display:block;color:#1B3A6B;}
-.content-title:empty:before{content:attr(data-placeholder);color:#94A3B8;font-style:italic;font-weight:400;}
-.content-body{outline:none;width:100%;min-height:28px;line-height:1.7;display:block;margin-top:2px;white-space:pre-wrap;}
-.content-body:empty:before{content:attr(data-placeholder);color:#94A3B8;font-style:italic;}
-.row-del{float:right;background:none;border:none;color:#CBD5E1;font-size:13px;cursor:pointer;padding:2px 4px;}
-.row-del:hover{color:#DC2626;}
-.pgbreak-btn{
-  float:right;background:#F1F5F9;border:1px solid #CBD5E1;color:#64748B;
-  font-size:10px;font-weight:700;cursor:pointer;padding:3px 8px;border-radius:4px;
-  margin-right:4px;font-family:inherit;
-}
-.pgbreak-btn:hover{background:#E2E8F0;}
-.pgbreak-btn.active{background:#FEF3C7;border-color:#F59E0B;color:#92400E;}
-.content-row.manual-pgbreak{border-top:2px dashed #F59E0B;padding-top:8px;margin-top:6px;position:relative;}
-.content-row.manual-pgbreak::before{
-  content:"📄 새 페이지 시작";
-  position:absolute;top:-9px;left:11px;background:#FEF3C7;color:#92400E;
-  font-size:10px;font-weight:700;padding:1px 8px;border-radius:8px;
-}
-
-/* 건의사항 행 */
-.suggest-row{display:flex;border-bottom:1px solid #E2E8F0;}
-.suggest-row:last-child{border-bottom:none;}
-.suggest-who{min-width:80px;max-width:80px;font-weight:700;outline:none;padding:6px 8px;border-right:1px solid #94A3B8;text-align:center;line-height:1.7;font-size:13px;}
-.suggest-who:empty:before{content:'발언자';color:#94A3B8;font-style:italic;font-weight:400;}
-.suggest-text{flex:1;outline:none;padding:6px 11px;min-height:28px;line-height:1.7;white-space:pre-wrap;}
-.suggest-text:empty:before{content:'발언 내용...';color:#94A3B8;font-style:italic;}
-
-/* 논의사항 표 */
-.disc-table{width:100%;border-collapse:collapse;margin:0;}
-.disc-table td{border:1px solid #94A3B8;padding:5px 8px;font-size:13px;line-height:1.6;vertical-align:top;}
-.disc-title{font-weight:800;color:#1B3A6B;font-size:13px;border-left:none!important;border-right:none!important;border-top:none!important;}
-.disc-title:empty:before{content:attr(data-placeholder);color:#94A3B8;font-weight:400;font-style:italic;}
-.disc-lbl{font-weight:700;color:#1B3A6B;width:72px;white-space:nowrap;text-align:center;border-left:none!important;}
-.disc-lbl2{font-weight:700;color:#1B3A6B;width:44px;white-space:nowrap;text-align:center;}
-.disc-val{outline:none;min-height:18px;border-right:none!important;}
-.disc-val:empty:before{content:attr(data-placeholder);color:#94A3B8;font-style:italic;}
-.disc-val2{outline:none;width:72px;min-height:18px;}
-.disc-val2:empty:before{content:attr(data-placeholder);color:#94A3B8;font-style:italic;}
-.add-btn{background:#EFF6FF;border:1px dashed #93C5FD;color:#1D4ED8;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;text-align:left;}
-.add-btn:hover{background:#DBEAFE;}
-.add-btn-dark{background:#F0F4FF;border:1px dashed #1B3A6B;color:#1B3A6B;}
-
-/* 체크박스 */
-.check-row{display:flex;gap:20px;align-items:center;}
-.check-item{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;user-select:none;}
-
-/* 사진 */
-.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:8px 11px;}
-.photo-slot{border:2px dashed #CBD5E1;border-radius:4px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:#F8FAFC;}
-.photo-slot:hover{border-color:#1B3A6B;}
-.photo-slot img{width:100%;max-height:200px;object-fit:cover;border-radius:3px;}
-.photo-hint{font-size:11px;color:#94A3B8;margin-top:4px;}
-.photo-del{background:#FEE2E2;border:none;color:#DC2626;border-radius:3px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit;margin-top:4px;}
-
-.no-print{display:block;}
-
-/* ===== 인쇄 ===== */
-@media print{
-  @page{size:A4 portrait;margin:14mm 14mm 16mm 14mm;}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  .toolbar,.no-print,.add-btn,.add-btn-dark,.item-del,.row-del{display:none!important;}
-  body{background:#fff;font-size:10pt;line-height:1.5!important;}
-  .doc-wrap{max-width:100%;margin:0;padding:0;}
-  .doc{border:none;padding:0;}
-
-  /* 섹션 테이블 — 각자 좌우 2px 네이비, 인쇄에서도 유지 */
-  .title-table{border:2px solid #1B3A6B!important;border-bottom:none!important;}
-  .sec-table{
-    border-left:2px solid #1B3A6B!important;
-    border-right:2px solid #1B3A6B!important;
-    border-top:none!important;
-    border-bottom:none!important;
-  }
-  .last-table{border-bottom:2px solid #1B3A6B!important;}
-
-  .title-table td,.sec-table td{
-    font-size:10pt;padding:4px 6px;
-    line-height:1.5!important;
-    border:1px solid #94A3B8!important;
-  }
-  .title-table td{border-bottom:1.5px solid #1B3A6B!important;}
-  .sec-table .lbl,.sec-table .sec-lbl{
-    border-right:1.5px solid #1B3A6B!important;
-    font-size:9pt;padding:3px 4px;
+  :root {
+    --blue: #1a5fa8;
+    --blue-dark: #0f4080;
+    --blue-light: #eaf1fb;
+    --blue-mid: #c5d9f4;
+    --green: #0e6b4f;
+    --green-light: #e5f4ee;
+    --red: #b03030;
+    --red-light: #fdf0f0;
+    --amber: #8a5e00;
+    --amber-light: #fdf5e0;
+    --gray-50: #f5f6f8;
+    --gray-100: #eceef2;
+    --gray-200: #dde1e9;
+    --gray-300: #c4cad5;
+    --gray-400: #9199a8;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --sidebar-w: 220px;
+    --radius: 8px;
+    --radius-sm: 5px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
   }
 
-  .editable,.content-title,.content-body,.item-text,.suggest-text{
-    line-height:1.5!important;min-height:0!important;
-  }
-  .item-row{padding:2px 6px;gap:2px!important;border-bottom:1px solid #E2E8F0!important;}
-  .item-row:last-child{border-bottom:none!important;}
-  .item-num{min-width:16px!important;}
-  .content-row{padding:3px 6px;border-bottom:1px solid #E2E8F0!important;}
-  .content-row:last-child{border-bottom:none!important;}
-  .suggest-row{border-bottom:1px solid #E2E8F0!important;}
-  .suggest-row:last-child{border-bottom:none!important;}
-  .suggest-who{padding:3px 5px;min-width:65px;max-width:65px;border-right:1px solid #94A3B8!important;font-size:9pt;}
-  .suggest-text{padding:3px 6px;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .disc-table td{font-size:10pt;padding:3px 6px;line-height:1.5!important;border:1px solid #94A3B8!important;}
-  .disc-title{font-size:10pt;padding:3px 6px;border-left:none!important;border-right:none!important;border-top:none!important;}
-  .disc-lbl{border-left:none!important;font-size:9pt;}
-  .disc-val{border-right:none!important;}
-  .disc-val,.disc-val2{min-height:0!important;}
-
-  .photo-grid{padding:4px 6px;gap:6px;}
-  .photo-slot{border:1px solid #CBD5E1!important;background:#fff;min-height:120px;}
-  .photo-slot img{max-height:120px;}
-
-  /* 사용자 지정 페이지 나누기 */
-  .content-row.manual-pgbreak{
-    page-break-before:always!important;
-    border-top:2px solid #1B3A6B!important;
-    margin-top:0!important;padding-top:6px!important;
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', '맑은 고딕', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* 2페이지 고정 — 건의사항부터 새 페이지 시작 */
-  #suggest-table{page-break-before:always!important;border-top:2px solid #1B3A6B!important;}
+  /* ══ Layout ══ */
+  .app-shell { display: flex; flex: 1; min-height: 100vh; }
 
-  /* 붙임자료 번호 간격 */
-  #attachList .item-num{min-width:16px!important;}
+  /* ══ Sidebar ══ */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--blue-dark);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 10;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-logo .badge {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .sidebar-logo .name {
+    font-size: 17px; font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
 
-  .print-pagenum{display:block!important;text-align:right;font-size:7.5pt;color:#94A3B8;padding-top:4px;border-top:1px solid #E2E8F0;margin-top:6px;}
-}
-.print-pagenum{display:none;}
+  .sidebar-steps { padding: 20px 0; flex: 1; }
+  .sidebar-step {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .sidebar-step:hover { background: rgba(255,255,255,0.06); }
+  .sidebar-step.active { background: rgba(255,255,255,0.12); }
+  .sidebar-step::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    border-radius: 0 2px 2px 0;
+  }
+  .sidebar-step.active::before { background: #60a5fa; }
+  .sidebar-step.done::before { background: #34d399; }
+
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .sidebar-step.active .step-num { border-color: #60a5fa; color: #60a5fa; }
+  .sidebar-step.done .step-num { border-color: #34d399; background: #34d399; color: #fff; }
+
+  .step-info { flex: 1; }
+  .step-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .sidebar-step:not(.active) .step-name { color: rgba(255,255,255,0.5); }
+  .sidebar-step.done .step-name { color: rgba(255,255,255,0.8); }
+  .step-desc { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+  .sidebar-step.active .step-desc { color: rgba(255,255,255,0.55); }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* ══ Main area ══ */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    box-shadow: var(--shadow-sm);
+  }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--gray-900); }
+  .topbar-sub { font-size: 13px; color: var(--gray-400); margin-top: 1px; }
+  .progress-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-100);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px; font-weight: 600;
+    color: var(--gray-500);
+  }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+
+  .page-content { padding: 32px; max-width: 900px; }
+
+  /* ══ Card ══ */
+  .card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-header { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--gray-100); }
+  .card-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
+  .card-title { font-size: 18px; font-weight: 700; color: var(--gray-900); }
+  .card-desc { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
+
+  /* ══ Fields ══ */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  .field > label {
+    display: block;
+    font-size: 13px; font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 7px;
+  }
+  .field > label .opt { font-weight: 400; color: var(--gray-400); font-size: 12px; }
+
+  input[type=text], textarea, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--gray-900);
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type=datetime-local] {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--gray-900);
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type=datetime-local]:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,95,168,0.1);
+  }
+  textarea { resize: vertical; min-height: 88px; line-height: 1.65; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%239199a8' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+    -webkit-appearance: none;
+  }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* ══ Chips ══ */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    font-size: 13px; font-weight: 500;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.12s;
+    background: #fff;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .chip input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+  .chip.selected { border-color: var(--blue); background: var(--blue-light); color: var(--blue); font-weight: 600; }
+
+  .other-input { display: none; margin-top: 9px; }
+  .other-input.visible { display: block; }
+
+  /* ══ Buttons ══ */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    font-family: inherit;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-ghost { background: #fff; color: var(--gray-500); border-color: var(--gray-200); }
+  .btn-ghost:hover { background: var(--gray-50); border-color: var(--gray-300); }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { opacity: 0.9; }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+
+  /* ══ Member rows ══ */
+  .member-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+  .member-row select { flex: 0 0 88px; }
+  .member-row input:nth-child(2) { flex: 2; }
+  .member-row input:nth-child(3) { flex: 1; }
+
+  /* ══ Flow steps (시간순 카드) ══ */
+  .flow-step-list { display:flex; flex-direction:column; gap:14px; }
+  .flow-step-card {
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    background: #fff;
+  }
+  .flow-step-card-head {
+    display:flex; align-items:flex-end; gap:10px; margin-bottom:12px;
+  }
+  .flow-step-num {
+    flex-shrink:0; width:24px; height:24px; border-radius:50%;
+    background:var(--blue); color:#fff; font-size:12px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:8px;
+  }
+  .flow-time-wrap { flex-shrink:0; }
+  .flow-step-wrap { flex:1; min-width:120px; }
+  .flow-mini-label {
+    font-size:11px; color:var(--gray-400); font-weight:600;
+    margin-bottom:4px;
+  }
+  .flow-time-input {
+    width:100px;
+    border: 1.5px solid var(--gray-200) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 7px 8px !important;
+    font-size: 13px !important;
+    text-align: center;
+    font-family: inherit !important;
+    color: var(--gray-700) !important;
+  }
+  .flow-time-input:focus { outline:none; border-color: var(--blue) !important; }
+  .flow-input {
+    width:100%;
+    border: 1.5px solid var(--gray-200) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 7px 10px !important;
+    font-size: 14px !important;
+    font-weight: 700;
+    font-family: inherit !important;
+    color: var(--gray-900) !important;
+    background: #fff !important;
+  }
+  .flow-input:focus { outline: none; border-color: var(--blue) !important; box-shadow: 0 0 0 3px rgba(26,95,168,0.1) !important; }
+  .flow-step-del {
+    flex-shrink:0; background:none; border:none; color:var(--gray-300); font-size:13px; cursor:pointer; padding:4px 6px;
+  }
+  .flow-step-del:hover { color: var(--red); }
+  .flow-step-body { display:flex; flex-direction:column; gap:10px; }
+  .flow-step-body .field { margin-bottom:0; }
+  .flow-step-body .field > label { font-size:12px; margin-bottom:5px; }
+  .flow-step-body textarea { min-height:54px; }
+  .step-cf-list { display:flex; flex-direction:column; gap:6px; }
+
+  /* ══ CF items ══ */
+  .cf-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0;
+    background: #fff;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .cf-item:has(.cf-check:checked) { border-color: var(--blue); background: var(--blue-light); }
+  .cf-check { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--blue); cursor: pointer; }
+  .cf-text { flex: 1; border: none; background: transparent; font-size: 14px; color: var(--gray-900); font-family: inherit; }
+  .cf-text:focus { outline: none; }
+  .cf-badge { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; background: var(--blue-mid); color: var(--blue); flex-shrink: 0; letter-spacing: 0.04em; }
+  .cf-del { background: none; border: none; color: var(--gray-300); font-size: 13px; cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
+  .cf-del:hover { color: var(--red); }
+
+  /* ══ Level nav ══ */
+  .level-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .level-btn {
+    padding: 5px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    background: #fff; color: var(--gray-500);
+    cursor: pointer; font-family: inherit;
+    transition: all 0.12s;
+  }
+  .level-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .level-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+  .level-btn.done { background: var(--green); border-color: var(--green); color: #fff; }
+
+  /* ══ Q boxes ══ */
+  .q-box {
+    padding: 16px 18px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+  }
+  .q-label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 8px; }
+  .q-text { font-size: 14px; font-weight: 500; color: var(--gray-900); margin-bottom: 12px; line-height: 1.6; }
+  .q-btns { display: flex; gap: 8px; }
+  .q-btn {
+    padding: 7px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--gray-200);
+    background: #fff; color: var(--gray-600);
+    cursor: pointer; font-family: inherit;
+    transition: all 0.12s;
+  }
+  .q-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .q-btn.q-yes { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .q-btn.q-bad { background: var(--red); border-color: var(--red); color: #fff; }
+  .q-btn.q-good { background: var(--green); border-color: var(--green); color: #fff; }
+  .q-btn.q-na { background: var(--gray-400); border-color: var(--gray-400); color: #fff; }
+
+  /* ══ Alerts ══ */
+  .alert { padding: 11px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; border-left: 3px solid; }
+  .alert-warn { background: var(--amber-light); color: var(--amber); border-color: #d97706; }
+  .alert-success { background: var(--green-light); color: var(--green); border-color: var(--green); }
+
+  /* ══ Root panel ══ */
+  .root-panel { background: var(--blue-light); border: 1px solid var(--blue-mid); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 14px; }
+  .root-panel-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+  .root-tag { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; background: var(--blue); color: #fff; margin-right: 8px; letter-spacing: 0.04em; }
+  .root-item { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(26,95,168,0.12); font-size: 13px; color: var(--gray-900); }
+  .root-item:last-child { border-bottom: none; }
+
+  /* ══ Proxy ══ */
+  .proxy-item { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 9px; }
+  .proxy-item input[type=checkbox] { margin-top: 2px; flex-shrink: 0; accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
+  .proxy-item label { font-size: 13px; color: var(--gray-700); cursor: pointer; line-height: 1.5; }
+
+  /* ══ Improve card ══ */
+  .improve-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+  .improve-card + .improve-card { border-top: none; border-radius: 0 0 var(--radius) var(--radius); margin-top: -12px; }
+
+  .export-bar { display:flex; gap:10px; margin-bottom:16px; padding:12px 16px; background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); align-items:center; flex-wrap:wrap; }
+  .export-bar .bar-title { font-size:13px; font-weight:600; color:var(--gray-700); margin-right:auto; }
+  .hidden { display: none !important; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--gray-900); color: #fff;
+    padding: 10px 18px; border-radius: var(--radius);
+    font-size: 13px; font-weight: 600;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.3s; z-index: 999;
+    pointer-events: none;
+  }
+  .restore-banner {
+    display: none;
+    background: var(--amber-light);
+    border-bottom: 1px solid #d97706;
+    padding: 10px 32px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--amber);
+  }
+  .restore-banner strong { font-weight: 700; }
+  .restore-banner .btn-restore {
+    background: var(--amber); color: #fff;
+    border: none; border-radius: var(--radius-sm);
+    padding: 5px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .restore-banner .btn-dismiss {
+    background: none; border: none;
+    color: var(--amber); font-size: 13px;
+    cursor: pointer; font-family: inherit; text-decoration: underline;
+  }
+  .save-btns { display: flex; gap: 8px; align-items: center; }
+  .save-btns button {
+    padding: 6px 14px; border-radius: var(--radius-sm);
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all 0.12s;
+  }
+  .btn-save { background: var(--blue); color: #fff; border: none; }
+  .btn-save:hover { background: var(--blue-dark); }
+  .btn-load { background: #fff; color: var(--gray-500); border: 1.5px solid var(--gray-200); }
+  .btn-load:hover { background: var(--gray-50); }
+  .btn-clear { background: none; color: var(--gray-400); border: none; font-size: 11px; text-decoration: underline; cursor: pointer; }
+
+
+
+
+  @media print {
+    .sidebar, .topbar, .btn-row, .export-bar, .save-btns, .restore-banner,
+    button, .btn, .progress-pill { display: none !important; }
+    .main { margin-left: 0 !important; }
+    .page-content { padding: 4px 10px !important; max-width: 100% !important; margin-top: 0 !important; }
+    .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 8px !important; }
+    .flow-step-card { break-inside: avoid; }
+    body { font-size: 11pt; background: #fff; margin: 0 !important; }
+    .chip { border: 1px solid #ccc !important; }
+    .chip.selected { background: #eaf1fb !important; border-color: #1a5fa8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    input, textarea, select { border: 1px solid #ccc !important; background: #fff !important; }
+    .app-shell { display: block !important; }
+    /* 전체 출력 모드: 모든 단계 표시 */
+    body.print-mode .hidden { display: block !important; }
+    body.print-mode #step1,
+    body.print-mode #step2,
+    body.print-mode #step3,
+    body.print-mode #step4 { display: block !important; }
+    /* 단계 구분선 */
+    body.print-mode .step-divider { display: block !important; border: none; border-top: 2px solid #1a5fa8; margin: 10px 0 4px; }
+    body.print-mode .step-print-title {
+      display: block !important;
+      font-size: 12pt; font-weight: bold;
+      color: #fff; background: #1a5fa8;
+      padding: 5px 10px; margin-bottom: 8px;
+      break-after: avoid;   /* 제목 뒤에서 페이지 나눔 방지 */
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    /* 제목 바로 뒤 카드는 페이지 앞에서 안 끊기게 */
+    body.print-mode .step-print-title + .card { break-before: avoid; }
+  }
+  /* 화면에서는 숨김 */
+  .step-divider, .step-print-title { display: none; }
 </style>
 </head>
 <body>
 
-<div class="toolbar no-print">
-  <div class="toolbar-title">QPS위원회 회의록</div>
-  <div class="toolbar-btns">
-    <button class="btn btn-gray" id="tab-상반기" onclick="switchType('상반기')">상반기 정기</button>
-    <button class="btn btn-gray" id="tab-하반기" onclick="switchType('하반기')">하반기 정기</button>
-    <button class="btn btn-gray" id="tab-임시" onclick="switchType('임시')">임시회의</button>
-    <span style="color:rgba(255,255,255,0.3);margin:0 4px">|</span>
-    <button class="btn btn-white" onclick="window.print()">🖨️ PDF 출력</button>
-    <button class="btn btn-white" onclick="downloadWord()">📄 Word</button>
-    <button class="btn btn-green" onclick="saveJSON()">💾 저장</button>
-    <button class="btn btn-gray" onclick="document.getElementById('loadFile').click()">📂 불러오기</button>
-    <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadJSON(event)">
-    <button class="btn btn-gray" onclick="resetAll()">🔄 새 회의록</button>
-  </div>
-</div>
+<div class="app-shell">
 
-<div class="doc-wrap">
-<div class="doc">
+  <!-- ══ Sidebar ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="badge">KoSQIN</div>
+      <div class="name">근본원인분석<br>작성 도구</div>
+    </div>
 
-<!-- ① 제목 — 위 테두리 담당 -->
-<table class="title-table">
-  <tr>
-    <td style="text-align:center;padding:10px 8px 8px;">
-      <div id="docTitle" contenteditable="true" style="font-size:18px;font-weight:800;color:#1B3A6B;outline:none;">2026년 제&nbsp;&nbsp;회 QPS위원회 회의록</div>
-    </td>
-  </tr>
-</table>
-
-<!-- ② 기본정보 -->
-<table class="sec-table">
-  <tr>
-    <td class="lbl">회의일시</td>
-    <td><div class="editable" id="meetingDate" contenteditable="true">2026년 &nbsp;&nbsp;월 &nbsp;&nbsp;일( &nbsp;) &nbsp;&nbsp;:&nbsp;&nbsp; ~ &nbsp;&nbsp;:&nbsp;&nbsp;</div></td>
-    <td class="lbl" style="width:50px">장소</td>
-    <td><div class="editable" id="meetingPlace" contenteditable="true">신관 8층 대회의실</div></td>
-  </tr>
-  <tr>
-    <td class="lbl">참석대상</td>
-    <td><div class="editable" id="attendees" contenteditable="true">QPS위원회 위원_출석부 참조</div></td>
-    <td class="lbl">간사</td>
-    <td><div class="editable" id="secretary" contenteditable="true">QPS팀장 권정아</div></td>
-  </tr>
-  <tr>
-    <td class="lbl">회의구분</td>
-    <td colspan="3">
-      <div class="check-row">
-        <label class="check-item" onclick="setMeetingType('정기')"><span id="chk-정기" style="font-size:14px">■</span> 정기회의</label>
-        <label class="check-item" onclick="setMeetingType('임시')"><span id="chk-임시" style="font-size:14px">□</span> 임시회의</label>
-      </div>
-    </td>
-  </tr>
-</table>
-
-<!-- ③ 회의사진 -->
-<table class="sec-table">
-  <tr>
-    <td class="lbl">회의사진</td>
-    <td style="padding:0">
-      <div class="photo-grid">
-        <div>
-          <div class="photo-slot" id="slot1" onclick="document.getElementById('photo1').click()">
-            <span style="font-size:22px;color:#CBD5E1">📷</span>
-            <span class="photo-hint no-print">사진 1 클릭하여 첨부</span>
-          </div>
-          <input type="file" id="photo1" accept="image/*" style="display:none" onchange="setPhoto(1,event)">
-        </div>
-        <div>
-          <div class="photo-slot" id="slot2" onclick="document.getElementById('photo2').click()">
-            <span style="font-size:22px;color:#CBD5E1">📷</span>
-            <span class="photo-hint no-print">사진 2 클릭하여 첨부</span>
-          </div>
-          <input type="file" id="photo2" accept="image/*" style="display:none" onchange="setPhoto(2,event)">
+    <nav class="sidebar-steps">
+      <div class="sidebar-step active" id="nav1" onclick="tryGoStep(1)">
+        <div class="step-num" id="sn1">1</div>
+        <div class="step-info">
+          <div class="step-name">준비</div>
+          <div class="step-desc">사고 보고서 · 팀 구성</div>
         </div>
       </div>
-    </td>
-  </tr>
-</table>
+      <div class="sidebar-step" id="nav2" onclick="tryGoStep(2)">
+        <div class="step-num" id="sn2">2</div>
+        <div class="step-info">
+          <div class="step-name">기여요인(CF)</div>
+          <div class="step-desc">발생 단계 · 위험요인</div>
+        </div>
+      </div>
+      <div class="sidebar-step" id="nav3" onclick="tryGoStep(3)">
+        <div class="step-num" id="sn3">3</div>
+        <div class="step-info">
+          <div class="step-name">근본원인</div>
+          <div class="step-desc">9개 분석수준 + 개선불가 영역 탐색</div>
+        </div>
+      </div>
+      <div class="sidebar-step" id="nav4" onclick="tryGoStep(4)">
+        <div class="step-num" id="sn4">4</div>
+        <div class="step-info">
+          <div class="step-name">개선계획</div>
+          <div class="step-desc">개선전략 · 담당자</div>
+        </div>
+      </div>
+    </nav>
 
-<!-- ④ 안건 -->
-<table class="sec-table">
-  <tr>
-    <td class="lbl">안&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;건</td>
-    <td style="padding:0">
-      <div id="agendaList"></div>
-      <button class="add-btn no-print" onclick="addAgenda()">+ 안건 추가</button>
-    </td>
-  </tr>
-</table>
+    <div class="sidebar-footer">환자안전법 제12조 기반</div>
+  </aside>
 
-<!-- ⑤ 회의내용 — 개회선언 -->
-<table class="sec-table">
-  <tr>
-    <td class="sec-lbl">회의내용<br>및<br>의결사항</td>
-    <td>
-      <div class="editable" id="opening" contenteditable="true" style="white-space:pre-wrap;">○ 회칙 제 8조에 의거 재적 위원&nbsp;&nbsp;&nbsp;명 중&nbsp;&nbsp;&nbsp;명 참석, 결석&nbsp;&nbsp;&nbsp;명으로 과반수가 참석하였으므로 성원이 되어 QPS실장이 개회를 선언함&#10;○ 전 회의록 낭독</div>
-    </td>
-  </tr>
-</table>
+  <!-- ══ Main ══ -->
+  <div class="main">
 
-<!-- ⑥ 회의내용 — 보고/논의 (rowspan 없이 독립 테이블) -->
-<table class="sec-table">
-  <tr>
-    <td style="padding:0" colspan="1">
-      <div id="contentList"></div>
-      <button class="add-btn no-print" onclick="addContent()">+ 보고사항 추가</button>
-      <button class="add-btn no-print add-btn-dark" onclick="addDiscussion()">+ 논의사항(표) 추가</button>
-    </td>
-  </tr>
-</table>
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">1단계 — 근본원인 분석 준비</div>
+        <div class="topbar-sub" id="topbarSub">환자안전사고 보고서 및 팀 구성</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="save-btns">
+          <button class="btn-save" onclick="manualSave()">💾 파일로 저장</button>
+          <button class="btn-load" onclick="loadSave()">📂 파일 불러오기</button>
+          <button class="btn-clear" onclick="clearSave()">초기화</button>
+        </div>
+        <div class="progress-pill">
+          <div class="progress-dot"></div>
+          <span id="stepBadge">1 / 4단계</span>
+        </div>
+      </div>
+    </div>
 
-<!-- ⑦ 건의사항 — 항상 2페이지 시작 -->
-<table class="sec-table" id="suggest-table">
-  <tr>
-    <td class="sec-lbl">건의사항<br>및<br>기타의견</td>
-    <td style="padding:0">
-      <div id="suggestList"></div>
-      <button class="add-btn no-print" onclick="addSuggest()">+ 의견 추가</button>
-    </td>
-  </tr>
-</table>
+    <!-- 불러오기 배너 -->
+    <div class="restore-banner" id="restore-banner">
+      <span>💾 저장된 작업 내용이 있습니다 (<strong id="restore-time"></strong>)</span>
+      <button class="btn-restore" onclick="loadSave(); document.getElementById('restore-banner').style.display='none';">불러오기</button>
+      <button class="btn-dismiss" onclick="document.getElementById('restore-banner').style.display='none';">무시</button>
+    </div>
 
-<!-- ⑧ 붙임자료 — 아래 테두리 담당 -->
-<table class="sec-table last-table">
-  <tr>
-    <td class="lbl" style="vertical-align:top;padding-top:6px;">붙임자료</td>
-    <td style="padding:0">
-      <div id="attachList"></div>
-      <button class="add-btn no-print" onclick="addAttach()">+ 붙임자료 추가</button>
-    </td>
-  </tr>
-</table>
+    <div class="page-content">
 
-<div class="print-pagenum">좋은삼선병원 QPS팀</div>
-</div>
-</div>
+      <!-- ── STEP 1 ── -->
+      <div id="step1">
+        <div class="step-print-title">1단계 — 사고 기본 정보 · 팀 구성</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-eyebrow">환자안전사고 보고서</div>
+            <div class="card-title">사고 기본 정보</div>
+            <div class="card-desc">육하원칙에 따라 사고 내용을 작성합니다.</div>
+          </div>
+
+          <div class="grid2 field">
+            <div>
+              <label>발생일시</label>
+              <input type="datetime-local" id="acc_date">
+            </div>
+            <div>
+              <label>보고일시</label>
+              <input type="datetime-local" id="rep_date">
+            </div>
+          </div>
+
+          <div class="grid2 field">
+            <div>
+              <label>성별</label>
+              <select id="gender">
+                <option value="">선택</option>
+                <option>남</option><option>여</option>
+              </select>
+            </div>
+            <div>
+              <label>연령</label>
+              <input type="text" id="age" placeholder="예) 65세">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>사고 발생 장소</label>
+            <div class="chip-group">
+              <label class="chip"><input type="radio" name="place" value="외래" onchange="onChip(this)"> 외래</label>
+              <label class="chip"><input type="radio" name="place" value="병동" onchange="onChip(this)"> 병동</label>
+              <label class="chip"><input type="radio" name="place" value="수술실/회복실" onchange="onChip(this)"> 수술실/회복실</label>
+              <label class="chip"><input type="radio" name="place" value="응급실" onchange="onChip(this)"> 응급실</label>
+              <label class="chip"><input type="radio" name="place" value="중환자실" onchange="onChip(this)"> 중환자실</label>
+              <label class="chip"><input type="radio" name="place" value="검사실" onchange="onChip(this)"> 검사실</label>
+              <label class="chip"><input type="radio" name="place" value="기타" onchange="onChip(this)"> 기타</label>
+            </div>
+            <div class="other-input" id="place_other_wrap">
+              <input type="text" id="place_other" placeholder="장소를 직접 입력하세요">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>사고분류</label>
+            <div class="chip-group">
+              <label class="chip"><input type="radio" name="acctype" value="검사" onchange="onChip(this)"> 검사</label>
+              <label class="chip"><input type="radio" name="acctype" value="낙상" onchange="onChip(this)"> 낙상</label>
+              <label class="chip"><input type="radio" name="acctype" value="마취/진정" onchange="onChip(this)"> 마취/진정</label>
+              <label class="chip"><input type="radio" name="acctype" value="수술" onchange="onChip(this)"> 수술</label>
+              <label class="chip"><input type="radio" name="acctype" value="수혈" onchange="onChip(this)"> 수혈</label>
+              <label class="chip"><input type="radio" name="acctype" value="투약" onchange="onChip(this)"> 투약</label>
+              <label class="chip"><input type="radio" name="acctype" value="기타" onchange="onChip(this)"> 기타</label>
+            </div>
+            <div class="other-input" id="acctype_other_wrap">
+              <input type="text" id="acctype_other" placeholder="사고 분류를 직접 입력하세요">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>사고 위해정도</label>
+            <div class="chip-group">
+              <label class="chip"><input type="radio" name="severity" value="근접오류" onchange="onChip(this)"> 근접오류</label>
+              <label class="chip"><input type="radio" name="severity" value="위해없음" onchange="onChip(this)"> 위해없음</label>
+              <label class="chip"><input type="radio" name="severity" value="일시적 손상" onchange="onChip(this)"> 일시적 손상</label>
+              <label class="chip"><input type="radio" name="severity" value="장기적 손상" onchange="onChip(this)"> 장기적 손상</label>
+              <label class="chip"><input type="radio" name="severity" value="영구적 손상" onchange="onChip(this)"> 영구적 손상</label>
+              <label class="chip"><input type="radio" name="severity" value="사망" onchange="onChip(this)"> 사망</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>사고내용 <span class="opt">— 육하원칙에 따라 항목별로 입력하세요</span></label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">👤 누가 (관련 직원/환자)</div>
+                <input type="text" id="w_who" placeholder="예) 간호사 A, 환자 B(65세 남)" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">📍 어디서 (발생 장소)</div>
+                <input type="text" id="w_where" placeholder="예) 6병동 처치실" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">❓ 무엇을 (사고 내용)</div>
+                <input type="text" id="w_what" placeholder="예) 투약 오류가 발생함" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">🔧 어떻게 (경위/상황)</div>
+                <input type="text" id="w_how" placeholder="예) 유사 약품명 혼동으로 잘못된 약을 투약" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">💡 왜 (원인)</div>
+                <input type="text" id="w_why" placeholder="예) 바쁜 업무환경, 이중확인 미시행" oninput="composeContent()">
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--blue); margin-bottom:4px;">📋 추가 내용 (기타)</div>
+                <input type="text" id="w_etc" placeholder="예) 즉시 주치의 보고, 활력징후 확인" oninput="composeContent()">
+              </div>
+            </div>
+            <div style="font-size:12px; color:var(--gray-400); margin-bottom:4px;">▼ 자동 조합된 사고내용</div>
+            <textarea id="acc_content" placeholder="위 항목을 입력하면 자동으로 조합됩니다. 직접 수정도 가능합니다." style="min-height:80px;"></textarea>
+          </div>
+
+          <div class="field">
+            <label>사고 후 조치</label>
+            <textarea id="acc_action" placeholder="사고 후 취해진 조치 내용을 작성하세요."></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-eyebrow">문제정의</div>
+            <div class="card-title">무엇이 일어났는가?</div>
+          </div>
+          <div class="field">
+            <label>간단 요약
+              <button type="button" id="aiSumBtn" onclick="aiSummarize()" style="margin-left:10px; padding:4px 12px; font-size:12px; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:600;">⚡ 자동 요약</button>
+            </label>
+            <div style="font-size:12px; color:var(--gray-400); margin-bottom:6px;">위 항목 입력 후 버튼을 누르면 6하원칙 형식으로 자동 정리됩니다.</div>
+            <textarea id="prob_def" placeholder="자동 요약 버튼을 누르거나 직접 입력하세요."></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-eyebrow">팀 구성</div>
+            <div class="card-title">RCA 분석팀</div>
+            <div class="card-desc">10명 이내. 팀장(의사결정권자), 간사(환자안전전담자), 팀원 포함.</div>
+          </div>
+          <div id="team-list">
+            <div class="member-row">
+              <select><option>팀장</option><option>간사</option><option>팀원</option></select>
+              <input type="text" placeholder="소속부서/직위">
+              <input type="text" placeholder="이름">
+            </div>
+            <div class="member-row">
+              <select><option>간사</option><option>팀장</option><option>팀원</option></select>
+              <input type="text" placeholder="소속부서/직위">
+              <input type="text" placeholder="이름">
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="addMember()" style="margin-top:10px;">+ 팀원 추가</button>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="validateStep1()">다음 단계 →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2 ── -->
+      <div id="step2" class="hidden">
+        <div class="step-divider"></div>
+        <div class="step-print-title">2단계 — 기여요인(CF) 분석</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-eyebrow">2단계 — 프로세스 분석</div>
+            <div class="card-title">기여요인(CF) 찾기</div>
+            <div class="card-desc">시간 흐름에 따라 사고 발생 단계를 정리하고, 각 단계별로 분석 내용과 위험요인(CF)을 기록하세요.</div>
+          </div>
+
+          <div id="flow-steps" class="flow-step-list"></div>
+
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button class="btn btn-ghost btn-sm" onclick="addFlowStep()">+ 단계 추가</button>
+            <button class="btn btn-ghost btn-sm" onclick="removeFlowStep()" style="color:var(--red);">- 마지막 단계 삭제</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goStep(1)">← 이전</button>
+          <button class="btn btn-primary" onclick="goStep(3)">다음 단계 →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3 ── -->
+      <div id="step3" class="hidden">
+        <div class="step-divider"></div>
+        <div class="step-print-title">3단계 — 근본원인 도출</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-eyebrow">3단계 — 원인 분석</div>
+            <div class="card-title">분석수준별 근본원인 찾기</div>
+            <div class="card-desc">각 분석수준을 순서대로 검토하세요. 예/아니오를 선택하면 안내에 따라 진행됩니다.</div>
+          </div>
+          <div class="level-nav" id="levelNav"></div>
+          <div id="levelContent"></div>
+        </div>
+
+        <div id="selectedRootsCard" class="card hidden">
+          <div class="root-panel-title">도출된 근본원인</div>
+          <div id="rootList"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goStep(2)">← 이전</button>
+          <button class="btn btn-primary" onclick="goStep(4)">다음 단계 →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4 ── -->
+      <div id="step4" class="hidden">
+        <div class="step-divider"></div>
+        <div class="step-print-title">4단계 — 개선활동 계획</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-eyebrow">4단계 — 개선활동</div>
+            <div class="card-title">개선활동 계획 수립</div>
+            <div class="card-desc">도출된 근본원인별로 개선전략과 구체적 개선활동 계획을 수립합니다.</div>
+          </div>
+          <div id="improvePlan"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addImprove()" style="margin-top:10px;">+ 개선활동 추가</button>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goStep(3)">← 이전</button>
+        </div>
+
+        <!-- 내보내기 바 -->
+        <div class="export-bar" style="margin-top:8px;">
+          <span class="bar-title">📊 완료 — 데이터 내보내기</span>
+          <button class="btn btn-ghost btn-sm" onclick="downloadRCAWord()">📄 Word 다운로드</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyRCAToSheet()">📋 구글 시트에 복사</button>
+          <button class="btn btn-ghost btn-sm" onclick="printReport()">🖨 PDF 출력 (전체)</button>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
 
 <script>
-const photoData={1:null,2:null};
-let meetingType='정기';
+// ── Chip ──
+function onChip(input) {
+  input.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  input.closest('.chip').classList.add('selected');
+  const wrap = document.getElementById(input.name + '_other_wrap');
+  if (wrap) {
+    wrap.classList.toggle('visible', input.value === '기타');
+    if (input.value === '기타') wrap.querySelector('input').focus();
+  }
+}
 
-function switchType(type){
-  ['상반기','하반기','임시'].forEach(t=>{
-    const btn=document.getElementById('tab-'+t);
-    if(btn) btn.classList.toggle('btn-tab-active', t===type);
+// ── Step navigation ──
+const topTitles = [
+  '1단계 — 근본원인 분석 준비',
+  '2단계 — 프로세스 기여요인 분석',
+  '3단계 — 분석수준별 근본원인 탐색',
+  '4단계 — 개선활동 계획 수립'
+];
+const topSubs = [
+  '환자안전사고 보고서 및 팀 구성',
+  '사고 발생 단계와 위험요인(CF) 기록',
+  '9개 분석수준 + 개선불가 영역을 통한 근본원인 도출',
+  '근본원인별 개선전략과 담당자 지정'
+];
+
+function tryGoStep(n) { goStep(n); }
+
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step'+i).classList.add('hidden');
+    const nav = document.getElementById('nav'+i);
+    const sn = document.getElementById('sn'+i);
+    nav.className = 'sidebar-step';
+    if (i < n) { nav.classList.add('done'); sn.textContent = '✓'; }
+    else if (i === n) { nav.classList.add('active'); sn.textContent = i; }
+    else { sn.textContent = i; }
   });
-  setMeetingType(type==='임시'?'임시':'정기');
-  loadTemplate(type);
-  document.getElementById('meetingDate').innerHTML='2026년 &nbsp;&nbsp;월 &nbsp;&nbsp;일( &nbsp;) &nbsp;&nbsp;:&nbsp;&nbsp; ~ &nbsp;&nbsp;:&nbsp;&nbsp;';
-  document.getElementById('opening').textContent='○ 회칙 제 8조에 의거 재적 위원   명 중   명 참석, 결석   명으로 과반수가 참석하였으므로 성원이 되어 QPS실장이 개회를 선언함\n○ 전 회의록 낭독';
+  document.getElementById('step'+n).classList.remove('hidden');
+  document.getElementById('stepBadge').textContent = n + ' / 4단계';
+  document.getElementById('topbarTitle').textContent = topTitles[n-1];
+  document.getElementById('topbarSub').textContent = topSubs[n-1];
+  if (n === 3) { initLevelNav(); renderLevel(); }
+  if (n === 4) { initImprove(); }
+  window.scrollTo(0,0);
 }
 
-function setMeetingType(t){
-  meetingType=t;
-  document.getElementById('chk-정기').textContent=t==='정기'?'■':'□';
-  document.getElementById('chk-임시').textContent=t==='임시'?'■':'□';
+// ── Team ──
+function addMember() {
+  const list = document.getElementById('team-list');
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  row.innerHTML = `<select><option>팀원</option><option>팀장</option><option>간사</option></select><input type="text" placeholder="소속부서/직위"><input type="text" placeholder="이름">`;
+  list.appendChild(row);
 }
 
-function setPhoto(num,e){
-  const file=e.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    photoData[num]=ev.target.result;
-    const s=document.getElementById('slot'+num);
-    s.innerHTML=`<img src="${ev.target.result}"><button class="photo-del no-print" onclick="clearPhoto(${num})">✕ 삭제</button>`;
-    s.onclick=null;
-  };
-  r.readAsDataURL(file);
-}
-function clearPhoto(num){
-  photoData[num]=null;
-  const s=document.getElementById('slot'+num);
-  s.innerHTML=`<span style="font-size:22px;color:#CBD5E1">📷</span><span class="photo-hint no-print">사진 ${num} 클릭하여 첨부</span>`;
-  s.onclick=()=>document.getElementById('photo'+num).click();
-  document.getElementById('photo'+num).value='';
-}
-
-let agCnt=0;
-function addAgenda(text=''){
-  agCnt++;
-  const d=document.getElementById('agendaList');
-  const div=document.createElement('div');
-  div.className='item-row';
-  div.innerHTML=`<span class="item-num">${agCnt}.</span>
-    <div class="item-text" contenteditable="true" data-placeholder="안건 제목">${text}</div>
-    <button class="item-del no-print" onclick="this.closest('.item-row').remove();renumAg()">✕</button>`;
-  d.appendChild(div);
-}
-function renumAg(){
-  document.querySelectorAll('#agendaList .item-num').forEach((el,i)=>el.textContent=(i+1)+'.');
-  agCnt=document.querySelectorAll('#agendaList .item-row').length;
-}
-
-// ── 페이지 나누기 토글 ──
-function togglePageBreak(btn){
-  const row=btn.closest('.content-row');
-  row.classList.toggle('manual-pgbreak');
-  btn.classList.toggle('active');
-  btn.textContent = row.classList.contains('manual-pgbreak') ? '✓ 여기서 페이지 나뉨' : '⤓ 페이지 나눔';
-  autoSave();
+// ── 사고 발생 단계 (시간순 카드) ──
+function flowStepCardHTML(n, time='', step='') {
+  return `
+  <div class="flow-step-card" data-step="${n}">
+    <div class="flow-step-card-head">
+      <span class="flow-step-num">${n}</span>
+      <div class="flow-time-wrap">
+        <div class="flow-mini-label">시간</div>
+        <input class="flow-time-input" type="text" placeholder="예: 10:00" value="${time}">
+      </div>
+      <div class="flow-step-wrap">
+        <div class="flow-mini-label">단계명</div>
+        <input class="flow-input" type="text" placeholder="예: 병실" value="${step}">
+      </div>
+      <button class="flow-step-del" onclick="removeFlowStepCard(this)" title="이 단계 삭제">✕</button>
+    </div>
+    <div class="flow-step-body">
+      <div class="field">
+        <label>사고 분석 주요 사항</label>
+        <textarea class="step-main" placeholder="이 단계에서 사고 분석에 필요한 주요 사항을 기술하세요."></textarea>
+      </div>
+      <div class="field">
+        <label>관련 직원</label>
+        <input type="text" class="step-staff" placeholder="예) 간호사, 수간호사, 담당 주치의, 간병인">
+      </div>
+      <div class="field">
+        <label>위험요인 상세기술 <span class="opt">— 사고에 결정적 영향을 준 항목에 CF 체크</span></label>
+        <div class="step-cf-list">
+          <div class="cf-item"><input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 1 상세 내용"><span class="cf-badge">CF</span><button class="cf-del" onclick="removeCFItem(this)" title="이 위험요인 삭제">✕</button></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="addCF(this)" style="margin-top:8px;">+ 위험요인 추가</button>
+      </div>
+    </div>
+  </div>`;
 }
 
-function addContent(title='',body=''){
-  const d=document.getElementById('contentList');
-  const div=document.createElement('div');
-  div.className='content-row';
-  div.innerHTML=`<button class="row-del no-print" onclick="this.closest('.content-row').remove()">✕</button>
-    <button class="pgbreak-btn no-print" onclick="togglePageBreak(this)" title="이 항목 앞에서 페이지 나누기">⤓ 페이지 나눔</button>
-    <div class="content-title" contenteditable="true" data-placeholder="소제목 (예: 1. 보고사항)">${title}</div>
-    <div class="content-body" contenteditable="true" data-placeholder="내용...">${body}</div>`;
-  d.appendChild(div);
+function addFlowStep() {
+  const list = document.getElementById('flow-steps');
+  const n = list.children.length + 1;
+  list.insertAdjacentHTML('beforeend', flowStepCardHTML(n));
 }
 
-function addDiscussion(title='',status='',decision='',action='',owner='',due=''){
-  const d=document.getElementById('contentList');
-  const div=document.createElement('div');
-  div.className='content-row';
-  div.dataset.type='disc';
-  div.innerHTML=`<button class="row-del no-print" onclick="this.closest('.content-row').remove()">✕</button>
-    <button class="pgbreak-btn no-print" onclick="togglePageBreak(this)" title="이 항목 앞에서 페이지 나누기">⤓ 페이지 나눔</button>
-    <table class="disc-table">
-      <tr><td colspan="4" class="disc-title" contenteditable="true" data-placeholder="[논의] 안건 제목">${title}</td></tr>
-      <tr>
-        <td class="disc-lbl">현황</td>
-        <td colspan="3" class="disc-val" contenteditable="true" data-placeholder="현황...">${status}</td>
-      </tr>
-      <tr>
-        <td class="disc-lbl">의결내용</td>
-        <td colspan="3" class="disc-val" contenteditable="true" data-placeholder="재적위원   명 중   명 찬성하여 원안대로 승인함">${decision}</td>
-      </tr>
-      <tr>
-        <td class="disc-lbl">이행사항</td>
-        <td class="disc-val" contenteditable="true" data-placeholder="이행 내용...">${action}</td>
-        <td class="disc-lbl2">담당</td>
-        <td class="disc-val2" contenteditable="true" data-placeholder="담당자">${owner}</td>
-      </tr>
-      <tr>
-        <td class="disc-lbl">완료예정</td>
-        <td colspan="3" class="disc-val" contenteditable="true" data-placeholder="완료 예정일">${due}</td>
-      </tr>
-    </table>`;
-  d.appendChild(div);
+function removeFlowStep() {
+  const list = document.getElementById('flow-steps');
+  if (list.children.length > 1) list.removeChild(list.lastChild);
 }
 
-function addSuggest(who='',text=''){
-  const d=document.getElementById('suggestList');
-  const div=document.createElement('div');
-  div.className='suggest-row';
-  div.innerHTML=`<div class="suggest-who" contenteditable="true">${who}</div>
-    <div class="suggest-text" contenteditable="true" data-placeholder="발언 내용...">${text}</div>
-    <button class="row-del no-print" style="padding:6px 6px;flex-shrink:0;" onclick="this.closest('.suggest-row').remove()">✕</button>`;
-  d.appendChild(div);
+function removeFlowStepCard(btn) {
+  const list = document.getElementById('flow-steps');
+  if (list.children.length <= 1) { alert('최소 1개 단계는 있어야 해요.'); return; }
+  btn.closest('.flow-step-card').remove();
+  // 번호 재정렬
+  [...list.children].forEach((card, i) => {
+    card.dataset.step = i + 1;
+    card.querySelector('.flow-step-num').textContent = i + 1;
+  });
 }
 
-let atCnt=0;
-function addAttach(text=''){
-  atCnt++;
-  const d=document.getElementById('attachList');
-  const div=document.createElement('div');
-  div.className='item-row';
-  div.innerHTML=`<span class="item-num">${atCnt}.</span>
-    <div class="item-text" contenteditable="true" data-placeholder="붙임자료명">${text}</div>
-    <button class="item-del no-print" onclick="this.closest('.item-row').remove();renumAt()">✕</button>`;
-  d.appendChild(div);
-}
-function renumAt(){
-  document.querySelectorAll('#attachList .item-num').forEach((el,i)=>el.textContent=(i+1)+'.');
-  atCnt=document.querySelectorAll('#attachList .item-row').length;
+function initFlowSteps() {
+  const list = document.getElementById('flow-steps');
+  if (!list || list.children.length) return;
+  for (let i = 1; i <= 5; i++) list.insertAdjacentHTML('beforeend', flowStepCardHTML(i));
 }
 
-// ── 템플릿 ──
-const TPL={
-  상반기:{
-    title:'2026년 제1회 QPS위원회 회의록',
-    agendas:['전년도 사업시행결과 보고','당해연도 사업계획(안) 및 예산(안) 보고','질 향상 활동 및 지표관리 선정 주제에 대한 심의 및 승인','위험도 평가-FMEA 주제 선정','환자안전 관리 활동 보고','외부 평가 관련 보고','기타'],
-    contents:[
-      {type:'text',title:'1. 전년도 사업시행결과 보고',body:'  [붙임자료1]의 주요사업결과 요약보고를 중심으로 PPT 자료화면을 통해 보고함'},
-      {type:'text',title:'2. 당해연도 사업계획(안)',body:'  [붙임자료2]를 참조하여 당해연도 사업계획(안)에 대한 설명함\n  발 표:    명 찬성(거수로 가부 확인)하여 사업계획(안)이 통과됨'},
-      {type:'text',title:'3. 질 향상 활동 주제 심의 및 승인',body:'  ○    개 팀 지원 ☞ [붙임자료3] 우선순위표 참조\n  ○ 부서별 QI 운영: 부서 1순위 주제와 병원 전략에 부합하는 Bottom-up 주제를 수행'},
-      {type:'text',title:'4. 위험도 평가-FMEA 주제 선정',body:'  ☞ 주제: \n  [붙임자료4] 참조'},
-      {type:'text',title:'5. 환자안전 관리 활동 보고',body:'  PPT 및 [붙임자료5]를 참조하여 보고함'},
+// ── CF (단계별) ──
+function addCF(btn) {
+  const cfList = btn.previousElementSibling; // .step-cf-list
+  const n = cfList.children.length + 1;
+  const item = document.createElement('div');
+  item.className = 'cf-item';
+  item.innerHTML = `<input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 ${n} 상세 내용"><span class="cf-badge">CF</span><button class="cf-del" onclick="removeCFItem(this)" title="이 위험요인 삭제">✕</button>`;
+  cfList.appendChild(item);
+}
+
+function removeCFItem(btn) {
+  const cfList = btn.closest('.step-cf-list');
+  if (cfList.children.length <= 1) {
+    // 마지막 1개는 삭제하지 않고 내용만 초기화
+    const item = btn.closest('.cf-item');
+    item.querySelector('.cf-check').checked = false;
+    item.querySelector('.cf-text').value = '';
+    return;
+  }
+  btn.closest('.cf-item').remove();
+}
+
+// ── Level data ──
+const levels = [
+  { id:1, name:"업무절차", note:"낙상예방, 투약, 수혈 등 관련 규정·지침·절차의 존재와 적용 여부를 검토합니다.",
+    special:"tree", tree:"workProcedure" },
+  { id:2, name:"교육/훈련", note:"사고와 관련된 직원·환자·보호자 교육/훈련 프로그램의 존재와 효과를 검토합니다.",
+    special:"tree", tree:"education" },
+  { id:3, name:"의사소통", note:"직원 간, 직원-환자/보호자 간 의사소통 체계와 실제 소통 여부를 검토합니다. (인수인계, 처방전달 등)",
+    special:"tree", tree:"communication" },
+  { id:4, name:"업무수행", note:"사고와 관련된 직원의 실제 업무수행 방식과 문제를 검토합니다. (간호사, 의사, 간병인 등 관련 직원의 행동)",
+    special:"tree", tree:"performance" },
+  { id:5, name:"부서관리", note:"사고가 발생한 해당 부서(병동, 외래 등)의 수간호사/부서장 차원의 관리를 검토합니다. QPS·경영진은 6단계(리더십)에서 검토합니다.",
+    special:"tree", tree:"deptMgmt" },
+  { id:6, name:"리더십", note:"병원 경영진·QPS(환자안전팀)·간호부 등 조직 리더십 차원의 환자안전 지원과 참여를 검토합니다.",
+    special:"tree", tree:"leadership" },
+  { id:7, name:"인간공학", note:"업무 시스템·환경이 사람의 실수를 유발하거나 발견을 어렵게 만드는 요인을 검토합니다. (EMR 설계, 반복 동작, 작업 환경 등)",
+    special:"tree", tree:"ergonomics" },
+  { id:8, name:"의료기기", note:"사고와 관련된 의료기기·장비의 설계, 유지보수, 사용 문제를 검토합니다. 낙상 등 의료기기와 무관한 사고는 '미해당' 선택.",
+    special:"tree", tree:"equipment" },
+  { id:9, name:"시설/환경", note:"사고가 발생한 물리적 환경(화장실, 복도, 병실 등)의 시설·안전 문제를 검토합니다. 낙상의 경우 화장실 안전바, 바닥 상태 등이 해당. 이 단계는 1차 질문 결과와 무관하게 2차 질문(시설/환경요인 문제 여부)도 함께 검토합니다.",
+    special:"facility",
+    q1:"관련 법을 준수하여 시설/환경 관리를 하였습니까?",
+    q1yesMsg:"법적 기준은 준수한 것으로 확인됨 — 아래 시설/환경요인 문제 여부를 계속 검토하세요.",
+    q1noMsg:"법적 기준 미준수 확인 — 근본원인: 9.1 시설 및 환경 관련 법 미준수. 아래 시설/환경요인 문제 여부도 계속 검토하세요.",
+    q2:"시설 및 환경요인에 문제가 있었습니까?",
+    q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
+    q2yesMsg:"시설/환경 문제 있음 — 근접원인을 선택하세요.",
+    q2noMsg:"이 분석수준에서 추가 근본원인 없음. 마지막으로 10. 개선불가 영역을 점검하세요.",
+    roots:["9.1 시설 및 환경 관련 법 미준수","9.2 업무환경 안전관리 미흡","9.3 시설 및 환경 위험관리 미흡","9.4 재난관리시스템 미흡","9.5 환자 및 환자 보호자의 환자안전활동 참여 미흡"],
+    proxies:["관련 법 미준수","소음, 조도, 공간/시설 문제","위험관리 미수행","재난 시 대응 체계 없음"] },
+  { id:10, name:"개선불가 영역", note:"1~9번 분석수준으로 근본원인을 하나도 찾지 못한 경우, 시스템 개선으로 예방하기 어려운 사고인지 마지막으로 확인합니다.",
+    special:"unimprovable",
+    unimprovableQuestions:[
+      { q:"관련된 환자안전사고가 분석수준 1~9번까지 진행하였으나 원인을 파악할 수 없는 사고였습니까?", reason:"근본원인 분석 종료 (원인불명)" },
+      { q:"관련된 환자안전사고가 분석수준 1~9번까지 진행하였으나 불가항력적 환자 요인으로 인한 사고였습니까? (예: 낙상 평가 및 예방활동을 시행했음에도 불구하고 환자의 다리에 힘이 풀려 낙상함)", reason:"근본원인 분석 종료 (불가항력적 사고)" },
+      { q:"관련된 환자안전사고가 환자 및 환자 보호자가 의도적으로 참여/치료를 거절하여 발생하였습니까?", reason:"근본원인 분석 종료 (환자 및 환자 보호자 참여/치료 거절)" },
+      { q:"치료선택 모두 환자에게 부담이 되는 경우 질환의 특성과 치료 장단점을 고려하여 제한적인 상황에서 의료진이 최선을 선택한 상황이었습니까? (설명: 환자 상태가 안 좋아 치료방법 A를 선택하나 B를 선택해도 상태가 안 좋아질 것이라고 예상되는 상황에서 둘 중 하나를 선택함)", reason:"근본원인 분석 종료 (최선의 선택)" },
+      { q:"직원이 환자안전사고를 고의적으로 발생시켰습니까? (예: 처방 없이 고의적으로 안락사 시킴, 수혈처방이 되었으나 직원의 종교적 신념으로 환자에게 수혈하지 않아 사망함 등)", reason:"근본원인 분석 종료 (고의적 환자안전사고/징계 위원회 상정)" }
     ],
-    suggests:[{who:'병원장',text:''},{who:'QPS실장',text:''},{who:'사무국장',text:''}],
-    attaches:['전년도 결과보고서 1부','당해연도 사업계획서 1부','QI활동 주제 심의서 1부','위험평가 1부','발표자료 PPT 1부']
+    finalMessage:"분석수준 1~10번까지 선택된 내용이 없으면 다시 한번 차근차근 절차를 밟아 근본원인을 분석해 보십시오.",
+    roots:["10. 개선불가 영역(시스템 개선으로 예방 곤란)"] }
+];
+
+const levelState = {};
+const selectedRoots = [];
+let curLevel = 1;
+
+// ══════════════════════════════════════════
+// Decision Tree 데이터 — KoSQIN RCA Toolkit V2.0 Flow
+// 노드 기반: 각 노드는 question, yes/no 시 동작(next 노드 / root 부여 / checklist 표시)을 가짐
+// ══════════════════════════════════════════
+const decisionTrees = {
+  workProcedure: {
+    startNode: 'q1',
+    nextLevel: 2, // 종료 후 이동할 분석수준 id
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련된 규정/지침/절차 등이 있습니까?',
+        yes: { next: 'q2' },
+        no: {
+          message: '관련 규정이나 절차 자체가 존재하지 않는 경우입니다.',
+          proxy: '규정/지침/절차 없음',
+          root: '1.1 규정/지침/절차 부재',
+          end: true
+        }
+      },
+      q2: {
+        question: '환자안전사고와 관련된 규정/지침/절차에 따라 모두 적용하였습니까?',
+        yes: {
+          message: '규정도 있었고 실제 업무에서도 모두 적용되었습니다. 업무절차에는 문제가 없는 것으로 판단합니다.',
+          end: true
+        },
+        no: { next: 'q3', message: '규정은 있었지만 적용되지 않았습니다. 왜 적용되지 않았는지 확인합니다.' }
+      },
+      q3: {
+        question: '환자안전사고와 관련된 규정/지침/절차가 있는지 몰라 적용하지 않았습니까?',
+        checklist: ['규정/지침/절차의 제·개정을 공지하지 않음','규정/지침/절차의 제·개정 이력을 잘못 공지함','규정/지침/절차 교육을 받지 못함','과도하거나 복잡한 참조로 규정/지침/절차를 찾기 어려움'],
+        checklistRoot: '1.2 규정/지침/절차 관리 미흡',
+        yes: { next: 'q4' }, no: { next: 'q4' }
+      },
+      q4: {
+        question: '환자안전사고와 관련된 규정/지침/절차가 있는지 알았지만 적용하지 않았습니까?',
+        checklist: ['규정/지침/절차가 관련 법이나 근거에 맞지 않음','규정/지침/절차가 현장 실무와 맞지 않음','규정/지침/절차가 이해하기 어려움','규정/지침/절차에 잘못된 업무절차가 있음'],
+        checklistRoot: '1.2 규정/지침/절차 관리 미흡',
+        yes: { next: 'q5' }, no: { next: 'q5' }
+      },
+      q5: {
+        question: '환자안전사고와 관련된 규정/지침/절차를 부분 적용하였거나 적용을 잘못하였습니까?',
+        checklist: ['규정/지침/절차 안에 포함된 양식, 표 등이 본문 내용과 다름','규정/지침/절차에 업무 수행에 필요한 내용이 일부 누락되어 있음','규정/지침/절차 수행의 주체 및 시기가 명확하지 않음','규정/지침/절차의 내용이 달라지는 오탈자, 자료, 계산방법 등이 있음'],
+        checklistRoot: '1.2 규정/지침/절차 관리 미흡',
+        checklistEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
   },
-  하반기:{
-    title:'2026년 하반기 QPS위원회 회의록',
-    agendas:['하반기 QPS실 사업 실적 보고','QPS 위원회 위원 구성 변경 건','표준진료지침(CP) 관리 모니터링 결과 보고 및 갱신(폐기) 여부 심의','환자안전 관리 활동 보고','환자안전문화 설문조사 결과 보고','QI경진대회 결과 보고','논의사항 및 기타의견'],
-    contents:[
-      {type:'text',title:'1. 하반기 사업 실적 보고',body:'  PPT 자료화면을 통해 개요 설명\n  ① 지표 현황:\n  ② QI활동:\n  ③ 환자안전사고:\n  ④ 외부평가 현황:'},
-      {type:'text',title:'2. 위원 변경 건',body:'  ① 위촉:\n  ② 해임(퇴사일, 부서발령일):\n  ③ 연임:   명'},
-      {type:'text',title:'3. CP 관리 모니터링',body:'  § PPT 자료화면을 통해 개요 및 모니터링 결과 설명\n  § 적용률 및 완료율:\n  § 갱신(폐기) 여부:'},
-      {type:'text',title:'4. 환자안전 관리 활동 보고',body:'  ① 환자안전주의경보:  건\n  ② 환자안전사고 보고:\n     - 낙상:   건 / 욕창:   건 / 투약:   건 / 근접오류:   건\n  ③ 환자안전 우수부서:'},
-      {type:'text',title:'5. 환자안전문화 설문조사 결과',body:'  ① 응답자:   명(   %)\n  ② 종합: 안전태도(   %) / 안전업무수행(   %)\n  ③ 집중 관리 대상 / 개선 과제:'},
-      {type:'text',title:'6. QI경진대회 결과',body:'  일시: / 발표 팀 수:   개 팀 / 수상 내역:'},
-    ],
-    suggests:[{who:'병원장',text:''},{who:'QPS실장',text:''},{who:'사무국장',text:''},{who:'간호부장',text:''}],
-    attaches:['하반기 실적보고서 1부','위원 변경 관련 서류 1부','CP 모니터링 결과 1부','환자안전문화 설문조사 결과 1부','발표자료 PPT 1부']
+
+  education: {
+    startNode: 'q1',
+    nextLevel: 3,
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련된 교육/훈련 프로그램이 있습니까?',
+        yes: { next: 'q2' },
+        no: { message: '교육/훈련 체계 자체가 존재하지 않는 경우입니다.', root: '2.1 교육/훈련 체계 부재', end: true }
+      },
+      q2: {
+        question: '직원이 환자안전사고와 관련된 교육/훈련을 충분히 받았습니까?',
+        yes: { message: '교육/훈련 프로그램이 있었고 충분히 받았습니다. 인적요인_교육/훈련에는 문제가 없는 것으로 판단합니다.', end: true },
+        no: { next: 'q2a', message: '교육/훈련이 충분하지 않았던 경우입니다. 아래 세부 질문에 모두 답해주세요.' }
+      },
+      q2a: {
+        question: '직원이 받은 교육/훈련 내용이 적절하지 않았습니까?',
+        chainItems: ['업무분석 미흡하여 교육/훈련 과정에 반영되지 않거나 미흡함','환자안전사고와 관련된 교육 요구는 있으나 교육/훈련에 반영하지 않음','환자안전사고와 관련된 교육/훈련 목표가 미흡하거나 없음'],
+        chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '직원이 받은 교육/훈련 방법이 적절하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련 방법이 미흡하거나 없음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '직원이 받은 교육/훈련 시간은 충분하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련 시간이 충분하지 않음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '직원이 받은 교육/훈련에 대해 평가를 하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련 평가가 미흡하거나 없음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '직원은 환자안전사고와 관련 교육/훈련을 지속해서 받지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련의 지속 또는 반복 교육/훈련이 없음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
   },
-  임시:{
-    title:'2026년 제  회 QPS위원회 회의록',
-    agendas:['QI·지표·CP·환자안전·외부평가 현황 보고','논의사항','기타'],
-    contents:[
-      {type:'text',title:'1. 보고사항',body:'  ① QI:\n  ② 지표(  분기):\n  ③ CP: 적용률   % / 완료율   %\n  ④ 환자안전: 낙상   건 욕창   건 투약   건 근접   건\n  ⑤ 외부평가:'},
-      {type:'disc',title:'[논의 1] ',status:'',decision:'재적위원    명 중    명 찬성(거수로 가부 확인)하여 원안대로 승인함',action:'',owner:'',due:''},
-      {type:'disc',title:'[논의 2] ',status:'',decision:'재적위원    명 중    명 찬성(거수로 가부 확인)하여 원안대로 승인함',action:'',owner:'',due:''},
-      {type:'disc',title:'[논의 3] ',status:'',decision:'재적위원    명 중    명 찬성(거수로 가부 확인)하여 원안대로 승인함',action:'',owner:'',due:''},
-    ],
-    suggests:[{who:'병원장',text:''},{who:'QPS실장',text:''},{who:'간호부장',text:''}],
-    attaches:['발표자료 PPT 1부']
+
+  communication: {
+    startNode: 'q1',
+    nextLevel: 4,
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련하여 필요한 의사소통이 있었습니까?',
+        yes: { next: 'q2' },
+        no: { message: '의사소통이 필요한 상황이 아니었습니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2: {
+        question: '의사소통에 문제가 있었습니까?',
+        yes: { next: 'q2a', message: '의사소통 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
+        no: { message: '의사소통에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '환자안전사고와 관련하여 필요한 의사소통을 하지 않았습니까?',
+        chainItems: ['의사소통을 위한 체계가 없음(의사소통 방법, 내용, 시기, 공유 등)','의사소통을 위한 체계가 있으나 실무와 맞지 않아 사용되지 않음','환자안전사고와 관련하여 의사소통 시 의도한 내용과 다르게 상대방이 이해함','환자안전사고와 관련하여 의사소통 시 의도한 내용과 다르게 전달함','표준화되지 않은 약어나 용어를 사용함'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '환자안전사고와 관련하여 의사소통 시기에 문제가 있었습니까?',
+        chainItems: ['환자안전사고와 관련하여 의사소통 시기가 늦음'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '환자안전사고와 관련하여 구두지시에 문제가 있었습니까?',
+        chainItems: ['규정상 허용하지 않는 상황에서 구두지시함','구두지시 과정에서 재확인 절차를 누락함(예: Repeat back, read back)'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '환자안전사고와 관련하여 인수인계에 문제가 있었습니까?',
+        chainItems: ['인수인계 기준이 없음','환자안전사고와 관련된 인수인계가 불명확하거나 누락됨'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '의사소통의 위험요소가 있었습니까?',
+        chainItems: ['의사소통을 위한 체계가 있으나 안전하지 않은 의사소통 분위기로 의사소통하지 않음(동료와 대화하기 꺼림, 의견제시가 어려움, 의사소통 장애 시 극복하기 위한 노력 부족)'],
+        chainRoot: '3.2 안전한 의사소통을 위한 환자안전문화 인식 저하',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
+  },
+
+  performance: {
+    startNode: 'q1',
+    nextLevel: 5,
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련한 업무수행이 있었습니까?',
+        yes: { next: 'q2' },
+        no: { message: '직원의 업무수행과 직접 관련이 없습니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2: {
+        question: '직원이 규정/지침/절차에 따라 정확하게 수행하는 데 문제가 있었습니까?',
+        yes: { next: 'q2a', message: '업무수행에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
+        no: { message: '업무수행에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '확인 절차를 누락하였습니까?',
+        chainItems: ['확인 절차를 누락함'], chainRoot: '4.1 규정/지침/절차에 따른 업무 불이행 또는 부적절한 수행',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '수행 방법에 오류가 있었습니까?',
+        chainItems: ['수행 방법에 오류가 있음'], chainRoot: '4.1 규정/지침/절차에 따른 업무 불이행 또는 부적절한 수행',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '업무에 미숙(경험·숙련도 부족)하였습니까?',
+        chainItems: ['업무에 미숙함(경험·숙련도 부족)'], chainRoot: '4.2 개인적 요인에 의한 업무 불이행',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '주의가 분산되어 집중하지 못하였습니까?',
+        chainItems: ['주의가 분산되어 집중하지 못함'], chainRoot: '4.2 개인적 요인에 의한 업무 불이행',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '과중한 업무로 인한 피로·부주의가 있었습니까?',
+        chainItems: ['과중한 업무로 인한 피로·부주의'], chainRoot: '4.3 부적절한 업무 배분',
+        yes: { next: 'q2f' }, no: { next: 'q2f' }
+      },
+      q2f: {
+        question: '역할과 책임이 혼동되었습니까?',
+        chainItems: ['역할과 책임이 혼동됨'], chainRoot: '4.4 불충분한 업무 지원',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
+  },
+
+  deptMgmt: {
+    startNode: 'q1',
+    nextLevel: 6,
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련된 부서관리가 있었습니까?',
+        yes: { next: 'q2' },
+        no: { message: '부서관리와 관련이 없습니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2: {
+        question: '부서관리에 문제가 있었습니까?',
+        yes: { next: 'q2a', message: '부서관리에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
+        no: { message: '부서관리에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '부서장은 환자안전사고와 관련되어 적절하게 인력관리를 하지 못했습니까?',
+        chainItems: ['관련 법과 의료기관 규정에 적합한 자격을 갖춘 인력이 배치되지 않음','환자안전사고와 관련되어 근무 인원수, 경력자, 환자 중증도 등을 고려한 인력을 배치하지 않음','부서장은 비상 상황(파업, 원내·외 위기상황 등)에서 적시에 직원 배치계획을 수립하지 않음'],
+        chainRoot: '5.1 부적절한 인력관리',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '부서장은 환자안전사고와 관련된 직원의 업무역량을 파악하고, 수행도 평가, 피드백, 재교육/훈련 등을 관리하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 직원의 업무역량을 파악하고, 수행도 평가, 피드백, 재교육/훈련 등을 관리하지 않음'],
+        chainRoot: '5.1 부적절한 인력관리',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '부서장은 환자안전사고와 관련된 업무 규정/지침/절차/매뉴얼을 관리하지 않았습니까?',
+        chainItems: ['부서장은 환자안전사고와 관련된 업무 규정/지침/절차를 관련 법과 최신동향을 반영하여 관리하지 않음','부서장은 환자안전사고와 관련된 업무 매뉴얼을 관리하지 않음','부서장은 규정/지침/절차/매뉴얼에 따라 업무를 수행할 수 있도록 필요한 자료/정보를 제공하지 않음'],
+        chainRoot: '5.2 부서장의 규정/지침/절차/매뉴얼 관리 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '부서장은 환자안전사고 발생 후 지속적인 관리를 하지 않았습니까?',
+        chainItems: ['부서장은 환자안전사고 발생 후 지속해서 개선활동을 유지관리하지 않음','부서장은 동일하거나 유사한 환자안전사고를 반복적으로 일으키거나 고의로 환자안전사고를 발생시킨 직원에게 적절한 주의경고를 주지 않음'],
+        chainRoot: '5.3 부서장의 환자안전사고 관리 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '부서장은 위험관리를 하지 않았습니까?',
+        chainItems: ['환자안전사고 위험이 높은 상태나 직원들의 바람직하지 않은 행동을 관리·감독하지 않음'],
+        chainRoot: '5.4 부서장의 위험관리 미흡',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
+  },
+
+  leadership: {
+    startNode: 'q1',
+    nextLevel: 7,
+    nodes: {
+      q1: {
+        question: '리더십이 환자안전사고 감소 및 예방을 최우선 순위에 두고 있습니까?',
+        yes: { next: 'q2' },
+        no: { message: '조직 차원에서 환자안전이 우선순위로 다뤄지지 않은 경우입니다.', root: '6.1 리더십의 환자안전문화 인식 부족', end: true }
+      },
+      q2: {
+        question: '리더십이 환자안전사고 감소 및 예방을 위해 관심을 가지고 지원과 참여를 하였습니까?',
+        yes: { message: '리더십에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true },
+        no: { next: 'q2a', message: '리더십의 지원과 참여가 부족했던 경우입니다. 세부 사항을 확인합니다.' }
+      },
+      q2a: {
+        question: '리더십이 환자안전향상을 위한 직원들의 의견을 경청하거나 고려하지 않습니까?',
+        chainItems: ['리더십은 위험상황이나 문제 영역에 대한 직원 경고를 지지하지 않음(예: 직원이 위험상황을 알리는 것을 독려하거나 지지하지 않는다)','리더십은 환자안전을 위한 직원의 제안을 받아들이지 않음(예: 사고는 발생하지는 않았으나 발생 가능성이 있는 위험문제에 대한 직원 제안에 관심을 갖지 않는다)','리더십이 조직 구성원들의 환자안전문화 인식 수준에 대해 관심이 없음(직원들의 환자안전문화 인식 수준을 알려고 하지 않는다)'],
+        chainRoot: '6.2 리더십과 직원 간 소통 부재',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '리더십이 환자안전 향상을 위한 충분한 자원을 제공하지 않습니까?',
+        chainItems: ['환자안전사고와 연관된 직원을 지원하는 체계(예: 심리상담, 정서지지 프로그램 등)를 갖고 있지 않음','안전하게 업무를 수행하는데 필요한 예산을 지원하지 않음','안전하게 업무를 수행할 수 있는 적정한 인력이 배치되어 있지 않음','안전하게 업무를 수행하는데 필요한 장비를 적절하게 보유하고 있지 않음'],
+        chainRoot: '6.3 리더십의 자원 지원 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '리더십이 인지된 환자안전 이슈에 대하여 적시에 지원 또는 지지를 하지 않았습니까?',
+        chainItems: ['리더십이 인지된 환자안전 이슈에 대하여 적시에 지원 또는 지지를 하지 않음'],
+        chainRoot: '6.4 리더십의 인지된 환자안전 이슈에 대한 지원 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '리더십이 환자안전 및 의료 질 관리·감독을 통해 문제를 확인하지 않았습니까?',
+        chainItems: ['리더십이 환자안전 및 의료 질 관리·감독을 통해 문제를 확인하지 않음','리더십이 환자안전 및 의료 질 향상에 필요한 지원을 하지 않음','리더십이 환자안전 및 의료 질 사업에 대한 관리·감독을 하지 않음'],
+        chainRoot: '6.5 리더십의 환자안전 및 의료 질 관리·감독 부재',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
+  },
+
+  ergonomics: {
+    startNode: 'q1',
+    nextLevel: 8,
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련된 인간공학 요인이 있었습니까?',
+        yes: { next: 'q2' },
+        no: { message: '인간공학 요인은 해당 사고와 관련이 없습니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2: {
+        question: '인간공학 요인에 문제가 있었습니까?',
+        yes: { next: 'q2a', message: '인간공학 요인에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
+        no: { message: '인간공학 요인에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '환자안전사고와 관련된 직원에게 영향을 미치는 복잡하거나 느슨한 시스템이 있었습니까?',
+        chainItems: ['환자안전사고와 관련된 직원에게 영향을 미치는 복잡한 시스템이 있음(예: 많은 항목 모니터링, 복잡한 의사결정단계, 부서 간 업무 차이 많음)','환자안전사고와 관련된 직원에게 영향을 미치는 느슨한 시스템이 있음(예: 오류가 발견 안 됨, 환자안전사고를 보고하지 않음, 오류 회복/복구 불가능 등)'],
+        chainRoot: '7.1 환자안전 시스템 관리 부재',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '환자안전사고와 관련된 직원에게 영향을 미치는 물리적 작업요인이 있었습니까?',
+        chainItems: ['환자안전사고와 관련된 직원에게 영향을 미치는 물리적 작업요인이 있음(예: 반복적인 움직임, 불편한 자세, 무거운 물건을 들어 올리는 것, 진동, 활동에 제한을 주는 보호구 착용, 동선 배치 문제 등)'],
+        chainRoot: '7.2 물리적 작업요인 관리 부재',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
+  },
+
+  equipment: {
+    startNode: 'q1',
+    nextLevel: 9,
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련하여 의료기기 요인이 있었습니까?',
+        yes: { next: 'q2' },
+        no: { message: '의료기기와 관련이 없는 사고입니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2: {
+        question: '의료기기에 문제가 있었습니까?',
+        yes: { next: 'q2a', message: '의료기기에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
+        no: { message: '의료기기에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '환자안전사고 예방을 고려하지 않은 의료기기의 설계가 있었습니까?',
+        chainItems: ['환자안전사고 예방을 고려하지 않은 의료기기의 설계가 있음(알람 시스템 부재, 전원 공급 중단시 재부팅 과정에서 알람이 셋팅과 달리 초기화, 전원 공급 중단시 배터리로 전환될 수 있는 이중 전원장치 부재 등)','의료기기 결함으로 환자안전사고와 관련된 의료기기의 알람은 셋팅 되었으나 알람이 울리지 않음'],
+        chainRoot: '8.1 의료기기 안전 설계 미흡',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '환자안전사고 관련 노후 등 예견 가능한 의료기기의 고장이었습니까?',
+        chainItems: ['노후 등 예견 가능한 고장에 대해 조치하지 않음','환자안전사고와 관련된 의료기기의 고장이 반복됨','의료기기 고장 상태로 사용하지 못함'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '환자안전사고와 관련된 의료기기의 예방/유지보수가 규정에 따라 수행되지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 의료기기의 예방/유지보수가 수행되지 않음','환자안전사고와 관련된 의료기기의 예방/유지보수가 일부 항목만 수행됨'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '의료기기 안전한 사용을 위한 운영관리가 이루어지지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 의료기기의 사양이 다양함','환자안전사고와 관련된 의료기기의 안전장치가 복잡함(예: 안내판, 라벨, 알람, 제어장치, 장비 부족 또는 부적절한 운영 등)'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '의료기기 사용 관련 직원 요인이 있었습니까?',
+        chainItems: ['환자안전사고와 관련된 직원 요인이 있음(직원의 부주의한 의료기기 사용, 의료기기 알람 시스템은 있었으나 직원은 환자안전사고 관련 알람을 셋팅하지 않았음 등)','직원은 환자안전사고에 영향을 미친 의료기기의 오류를 발견하지 못함(예: 기기 전원코드가 연결되지 않은 것을 발견하지 못함 등)'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
+      }
+    }
   }
 };
 
-function loadTemplate(type){
-  const t=TPL[type];
-  document.getElementById('docTitle').textContent=t.title;
-  document.getElementById('agendaList').innerHTML=''; agCnt=0;
-  t.agendas.forEach(a=>addAgenda(a));
-  document.getElementById('contentList').innerHTML='';
-  t.contents.forEach(c=>{
-    if(c.type==='disc') addDiscussion(c.title,c.status||'',c.decision||'',c.action||'',c.owner||'',c.due||'');
-    else addContent(c.title,c.body||'');
-  });
-  document.getElementById('suggestList').innerHTML='';
-  (t.suggests||[]).forEach(s=>addSuggest(s.who,s.text));
-  document.getElementById('attachList').innerHTML=''; atCnt=0;
-  t.attaches.forEach(a=>addAttach(a));
+// 트리 진행 상태: { [levelId]: { path:[nodeId,...], current:nodeId, answers:{nodeId:'yes'|'no'}, checks:{nodeId:[...]}, freeText, finished:bool } }
+const treeState = {};
+
+function getTreeState(levelId) {
+  if (!treeState[levelId]) treeState[levelId] = { current: null, answers: {}, checks: {}, freeText: '', finished: false, finalRoot: null };
+  return treeState[levelId];
 }
 
-function getData(){
-  return{
-    meetingType,
-    title:document.getElementById('docTitle').textContent,
-    meetingDate:document.getElementById('meetingDate').innerHTML,
-    meetingPlace:document.getElementById('meetingPlace').textContent,
-    attendees:document.getElementById('attendees').textContent,
-    secretary:document.getElementById('secretary').textContent,
-    opening:document.getElementById('opening').textContent,
-    agendas:[...document.querySelectorAll('#agendaList .item-text')].map(el=>el.innerHTML),
-    contents:[...document.querySelectorAll('#contentList .content-row')].map(el=>{
-      const pgbreak=el.classList.contains('manual-pgbreak');
-      if(el.dataset.type==='disc'){
-        return{
-          type:'disc',pgbreak,
-          title:el.querySelector('.disc-title')?.innerHTML||'',
-          status:el.querySelector('tr:nth-child(2) .disc-val')?.innerHTML||'',
-          decision:el.querySelector('tr:nth-child(3) .disc-val')?.innerHTML||'',
-          action:el.querySelector('tr:nth-child(4) .disc-val')?.innerHTML||'',
-          owner:el.querySelector('tr:nth-child(4) .disc-val2')?.innerHTML||'',
-          due:el.querySelector('tr:nth-child(5) .disc-val')?.innerHTML||''
-        };
+function startTree(levelId, treeKey) {
+  const ts = getTreeState(levelId);
+  if (!ts.current) ts.current = decisionTrees[treeKey].startNode;
+  return ts;
+}
+
+function answerTreeNode(levelId, treeKey, nodeId, val) {
+  const tree = decisionTrees[treeKey];
+  const ts = getTreeState(levelId);
+  ts.answers[nodeId] = val;
+  const node = tree.nodes[nodeId];
+  const branch = node[val];
+
+  // chainItems를 가진 노드들은 모두 서로 독립적으로 동시에 펼쳐지므로
+  // 한 노드 답변이 다른 노드 답변을 초기화하지 않음 (1단계 q3~q5, 2~8단계 q2a~q2x 등)
+  const isChainNode = !!node.chainItems;
+  const isWorkProcGroup = treeKey === 'workProcedure' && ['q3','q4','q5'].includes(nodeId);
+  const isIndependentGroup = isChainNode || isWorkProcGroup;
+
+  if (!isIndependentGroup) {
+    // 이전에 이 노드 이후 진행된 답변/체크/루트 초기화 (분기 변경 대응)
+    const nodeOrder = Object.keys(tree.nodes);
+    const idx = nodeOrder.indexOf(nodeId);
+    nodeOrder.slice(idx+1).forEach(n => { delete ts.answers[n]; });
+  }
+
+  // chain 방식 노드: '예'일 때 chainItems 전체를 기본 체크 상태로 등록(개별 해제 가능)
+  if (node.chainItems) {
+    if (!ts.chainChecks) ts.chainChecks = {};
+    if (val === 'yes') {
+      ts.chainChecks[nodeId] = { items: [...node.chainItems], root: node.chainRoot };
+    } else {
+      delete ts.chainChecks[nodeId];
+    }
+  }
+
+  // 질문형 체크리스트 노드 (1단계 q3,q4,q5): '예'일 때만 체크리스트 영역 활성화
+  if (node.checklist) {
+    if (val === 'no' && ts.checks) delete ts.checks[nodeId]; // 아니오면 체크 초기화
+  }
+
+  ts.finished = false;
+  if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
+    const i = selectedRoots.indexOf(ts.finalRoot); selectedRoots.splice(i,1);
+  }
+  if (ts.finalRoots) {
+    ts.finalRoots.forEach(r => { const i = selectedRoots.indexOf(r); if (i > -1) selectedRoots.splice(i,1); });
+  }
+  ts.finalRoot = null;
+  ts.finalRoots = null;
+
+  if (isWorkProcGroup) {
+    // q3,q4,q5 중 하나라도 답변되면 즉시 전체 체크 상태 재평가
+    ts.finished = (ts.answers.q3 && ts.answers.q4 && ts.answers.q5) ? true : false;
+    updateChecklistRootStatus(levelId, 'workProcedure');
+  } else if (isChainNode) {
+    // chainItems 노드 그룹(2~8단계): 모든 노드가 답변되면 근본원인 집계 (여러 개 가능)
+    const chainNodeIds = Object.keys(tree.nodes).filter(n => tree.nodes[n].chainItems);
+    const allAnswered = chainNodeIds.every(n => ts.answers[n]);
+    ts.finished = allAnswered;
+    if (allAnswered) {
+      const checkedGroups = Object.values(ts.chainChecks || {}).filter(g => g.items.length > 0);
+      const roots = [...new Set(checkedGroups.map(g => g.root))];
+      ts.finalRoots = roots;
+      ts.finalRoot = roots[0] || null; // 하위호환용
+      roots.forEach(root => { if (!selectedRoots.includes(root)) selectedRoots.push(root); });
+    }
+  } else if (branch.end) {
+    ts.finished = true;
+    ts.current = nodeId;
+    if (branch.root && !branch.checklist) {
+      ts.finalRoot = branch.root;
+      if (!selectedRoots.includes(branch.root)) selectedRoots.push(branch.root);
+    }
+    // checklist가 있으면 root는 toggleTreeCheck에서 체크 시 부여
+  } else if (branch.next) {
+    ts.current = branch.next;
+  }
+  renderLevel();
+}
+
+// chainItems 배열 내 개별 항목 체크/해제 (2-2-1처럼 한 질문에 근접원인이 여러 개인 경우)
+function toggleChainItem(levelId, treeKey, nodeId, item, checked) {
+  const ts = getTreeState(levelId);
+  const tree = decisionTrees[treeKey];
+  const node = tree.nodes[nodeId];
+  if (!ts.chainChecks) ts.chainChecks = {};
+  if (!ts.chainChecks[nodeId]) ts.chainChecks[nodeId] = { items: [], root: node.chainRoot };
+
+  const items = ts.chainChecks[nodeId].items;
+  if (checked) { if (!items.includes(item)) items.push(item); }
+  else { const i = items.indexOf(item); if (i > -1) items.splice(i, 1); }
+
+  // 전체 재집계 (여러 근본원인 가능)
+  const chainNodeIds = Object.keys(tree.nodes).filter(n => tree.nodes[n].chainItems);
+  const allAnswered = chainNodeIds.every(n => ts.answers[n]);
+  if (allAnswered) {
+    // 이전 등록된 root들 제거
+    if (ts.finalRoots) {
+      ts.finalRoots.forEach(r => { const i = selectedRoots.indexOf(r); if (i > -1) selectedRoots.splice(i,1); });
+    }
+    const checkedGroups = Object.values(ts.chainChecks || {}).filter(g => g.items.length > 0);
+    const roots = [...new Set(checkedGroups.map(g => g.root))];
+    ts.finalRoots = roots;
+    ts.finalRoot = roots[0] || null;
+    roots.forEach(root => { if (!selectedRoots.includes(root)) selectedRoots.push(root); });
+  }
+  renderLevel();
+}
+
+function toggleTreeCheck(levelId, treeKey, nodeId, item, checked) {
+  const ts = getTreeState(levelId);
+  if (!ts.checks[nodeId]) ts.checks[nodeId] = [];
+  if (checked) { if (!ts.checks[nodeId].includes(item)) ts.checks[nodeId].push(item); }
+  else ts.checks[nodeId] = ts.checks[nodeId].filter(x => x !== item);
+
+  const tree = decisionTrees[treeKey];
+  const node = tree.nodes[nodeId];
+
+  // 노드 레벨 checklist (1단계 q3,q4,q5 패턴): 같은 트리 내 모든 체크 통합 판단
+  if (node.checklist && node.checklistRoot) {
+    updateChecklistRootStatus(levelId, treeKey);
+    renderLevel();
+    return;
+  }
+
+  // 기존 branch 레벨 checklist 패턴 (2~8단계 등)
+  const branch = node[ts.answers[nodeId]];
+  if (branch && branch.root) {
+    if (ts.checks[nodeId].length > 0) {
+      if (!selectedRoots.includes(branch.root)) selectedRoots.push(branch.root);
+      ts.finalRoot = branch.root;
+    } else {
+      const i = selectedRoots.indexOf(branch.root);
+      if (i > -1) selectedRoots.splice(i, 1);
+      ts.finalRoot = null;
+    }
+  }
+  renderLevel();
+}
+
+// 1단계처럼 여러 노드(q3,q4,q5)에 걸쳐 체크가 누적되는 경우, 전체를 보고 근본원인 부여 여부 판단
+function updateChecklistRootStatus(levelId, treeKey) {
+  const ts = getTreeState(levelId);
+  const tree = decisionTrees[treeKey];
+  const nodeIds = Object.keys(tree.nodes);
+  // checklistRoot를 공유하는 모든 노드 찾기
+  const checklistNodes = nodeIds.filter(n => tree.nodes[n].checklist && tree.nodes[n].checklistRoot);
+  if (checklistNodes.length === 0) return;
+  const root = tree.nodes[checklistNodes[0]].checklistRoot;
+
+  const anyChecked = checklistNodes.some(n => (ts.checks[n] && ts.checks[n].length > 0));
+  const anyCustom = checklistNodes.some(n => (ts.checkCustom && ts.checkCustom[n] && ts.checkCustom[n].trim()));
+
+  if (anyChecked || anyCustom) {
+    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+    ts.finalRoot = root;
+  } else {
+    const i = selectedRoots.indexOf(root);
+    if (i > -1) selectedRoots.splice(i, 1);
+    if (ts.finalRoot === root) ts.finalRoot = null;
+  }
+}
+
+function setTreeCheckCustom(levelId, nodeId, root, text) {
+  const ts = getTreeState(levelId);
+  if (!ts.checkCustom) ts.checkCustom = {};
+  ts.checkCustom[nodeId] = text;
+  // 체크박스 항목처럼 취급: 텍스트 있으면 checks 배열에 'custom:텍스트' 형태로 반영
+  if (!ts.checks[nodeId]) ts.checks[nodeId] = [];
+  const customEntries = ts.checks[nodeId].filter(c => c.startsWith('custom:'));
+  ts.checks[nodeId] = ts.checks[nodeId].filter(c => !c.startsWith('custom:'));
+  if (text.trim()) ts.checks[nodeId].push('custom:' + text.trim());
+
+  if (ts.checks[nodeId].length > 0) {
+    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+    ts.finalRoot = root;
+  } else {
+    const i = selectedRoots.indexOf(root);
+    if (i > -1) selectedRoots.splice(i, 1);
+    ts.finalRoot = null;
+  }
+  updateRootPanel();
+}
+
+function setTreeFreeText(levelId, text) {
+  const ts = getTreeState(levelId);
+  ts.freeText = text;
+  if (text.trim()) {
+    const root = '기타: ' + text.trim();
+    // 이전 자유입력 근본원인 제거 후 재추가
+    const prevRoot = ts.finalRoot;
+    if (prevRoot && prevRoot.startsWith('기타: ') && selectedRoots.includes(prevRoot)) {
+      selectedRoots.splice(selectedRoots.indexOf(prevRoot), 1);
+    }
+    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+    ts.finalRoot = root;
+  } else if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
+    selectedRoots.splice(selectedRoots.indexOf(ts.finalRoot), 1);
+    ts.finalRoot = null;
+  }
+  updateRootPanel();
+}
+
+function resetTreeFrom(levelId, treeKey, nodeId) {
+  // 특정 노드부터 다시 답변하도록 되돌리기(분기 변경)
+  const ts = getTreeState(levelId);
+  const tree = decisionTrees[treeKey];
+  const nodeOrder = Object.keys(tree.nodes);
+  const idx = nodeOrder.indexOf(nodeId);
+  nodeOrder.slice(idx).forEach(n => {
+    delete ts.answers[n];
+    delete ts.checks[n];
+    if (ts.chainChecks) delete ts.chainChecks[n];
+  });
+  if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
+    selectedRoots.splice(selectedRoots.indexOf(ts.finalRoot), 1);
+  }
+  ts.finalRoot = null;
+  ts.finished = false;
+  ts.current = nodeId;
+  renderLevel();
+}
+
+// ── 1단계(업무절차) 전용 렌더 — 1-3,1-4,1-5는 동시에 펼쳐서 각각 독립 답변 ──
+function renderWorkProcedureLevel(l, state) {
+  const tree = decisionTrees.workProcedure;
+  const ts = startTree(l.id, 'workProcedure');
+
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  // 1-1
+  const a1 = ts.answers.q1;
+  html += `<div class="q-box">
+    <div class="q-label">질문 1-1</div>
+    <div class="q-text">${tree.nodes.q1.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a1==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'workProcedure','q1','yes')">예</button>
+      <button class="q-btn ${a1==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'workProcedure','q1','no')">아니오</button>
+    </div>
+    ${a1 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'workProcedure','q1')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  if (a1 === 'no') {
+    html += `<div class="alert alert-warn">→ 근본원인: <strong>${tree.nodes.q1.no.root}</strong></div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    return html + treeNavButtons(l);
+  }
+  if (a1 !== 'yes') return html + treeNavButtons(l);
+
+  // 1-2
+  const a2 = ts.answers.q2;
+  html += `<div class="q-box">
+    <div class="q-label">질문 1-2</div>
+    <div class="q-text">${tree.nodes.q2.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a2==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'workProcedure','q2','yes')">예</button>
+      <button class="q-btn ${a2==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'workProcedure','q2','no')">아니오</button>
+    </div>
+    ${a2 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'workProcedure','q2')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  if (a2 === 'yes') {
+    html += `<div class="alert alert-success">→ ${tree.nodes.q2.yes.message}</div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    return html + treeNavButtons(l);
+  }
+  if (a2 !== 'no') return html + treeNavButtons(l);
+
+  html += `<div class="alert alert-warn">→ ${tree.nodes.q2.no.message}</div>
+  <div style="font-size:12px; color:var(--gray-500); margin:10px 0 8px 4px;">아래 1-2의 세부 질문(1-2-1 ~ 1-2-3)에 각각 답해주세요. 해당하는 질문에 "예"를 누르면 근접원인을 체크할 수 있습니다.</div>`;
+
+  // 1-2-1, 1-2-2, 1-2-3 동시 펼침 — 각자 독립적으로 예/아니오 + 체크리스트
+  ['q3','q4','q5'].forEach((nodeId, i) => {
+    const node = tree.nodes[nodeId];
+    const answered = ts.answers[nodeId];
+    const stepLabel = `1-2-${i+1}`;
+
+    html += `<div class="q-box" style="margin-left:14px;border-left:3px solid var(--blue-mid);">
+      <div class="q-label">질문 ${stepLabel}</div>
+      <div class="q-text">${node.question}</div>
+      <div class="q-btns">
+        <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'workProcedure','${nodeId}','yes')">예</button>
+        <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'workProcedure','${nodeId}','no')">아니오</button>
+      </div>
+    </div>`;
+
+    const checks = ts.checks[nodeId] || [];
+    const active = answered === 'yes';
+    html += `<div class="q-box" style="${active?'':'opacity:0.45;'}margin-top:-8px;margin-left:14px;">
+      <div class="q-label">근접원인 (해당되면 체크)</div>
+      ${node.checklist.map((item,j)=>`<div class="proxy-item"><input type="checkbox" id="tc_${l.id}_${nodeId}_${j}" ${checks.includes(item)?'checked':''} ${active?'':'disabled'} onchange="toggleTreeCheck(${l.id},'workProcedure','${nodeId}','${item.replace(/'/g,"\\'")}',this.checked)"><label for="tc_${l.id}_${nodeId}_${j}">${item}</label></div>`).join('')}
+    </div>`;
+  });
+
+  // 전체 체크 결과 + 근본원인
+  const allCheckedItems = [];
+  ['q3','q4','q5'].forEach(n => { (ts.checks[n]||[]).forEach(item => allCheckedItems.push(item)); });
+
+  if (allCheckedItems.length > 0) {
+    html += `<div class="q-box">
+      <div class="q-label">체크된 근접원인 (${allCheckedItems.length}개)</div>
+      ${allCheckedItems.map(item=>`<div class="proxy-item"><input type="checkbox" checked disabled><label>${item}</label></div>`).join('')}
+    </div>
+    <div class="alert alert-warn">→ 근본원인: <strong>1.2 규정/지침/절차 관리 미흡</strong></div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  } else if (ts.answers.q3==='no' && ts.answers.q4==='no' && ts.answers.q5==='no') {
+    html += `<div class="q-box">
+      <div class="q-label">기타 근접원인 입력</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">위 항목에 모두 해당하지 않는 경우, 의료기관 사정에 맞게 직접 입력하세요.</div>
+      <input type="text" value="${ts.freeText||''}" placeholder="해당하는 원인을 직접 입력하세요" oninput="setTreeFreeText(${l.id},this.value)" style="width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:inherit;">
+    </div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  }
+
+  return html + treeNavButtons(l);
+}
+
+function treeNavButtons(l) {
+  return `<div style="display:flex; gap:8px; margin-top:8px;">
+    ${l.id < 10 ? `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>` : ''}
+    ${l.id > 1 ? `<button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>` : ''}
+  </div>`;
+}
+
+// ── Decision Tree 렌더링 (2~8단계) ──
+function renderTreeLevel(l, state) {
+  const treeKey = l.tree;
+  if (treeKey === 'workProcedure') return renderWorkProcedureLevel(l, state);
+  const tree = decisionTrees[treeKey];
+  const ts = startTree(l.id, treeKey);
+
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  // q1, q2를 순차로 처리하고, 세부질문(chainItems 노드) 키 목록을 뽑아냄
+  const chainNodeIds = Object.keys(tree.nodes).filter(n => tree.nodes[n].chainItems);
+
+  // ── q1 ──
+  const a1 = ts.answers.q1;
+  html += `<div class="q-box">
+    <div class="q-label">질문 ${l.id}-1</div>
+    <div class="q-text">${tree.nodes.q1.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a1==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q1','yes')">예</button>
+      <button class="q-btn ${a1==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q1','no')">아니오</button>
+    </div>
+    ${a1 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'${treeKey}','q1')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  const q1branch = a1 ? tree.nodes.q1[a1] : null;
+  if (q1branch && q1branch.message) {
+    html += `<div class="alert ${q1branch.root ? 'alert-warn' : 'alert-success'}">→ ${q1branch.message}</div>`;
+  }
+  if (q1branch && q1branch.root) {
+    html += `<div class="alert alert-warn">→ 근본원인: <strong>${q1branch.root}</strong></div>`;
+  }
+  if (!a1 || (q1branch && q1branch.end)) {
+    if (a1 && q1branch.end) {
+      html += `<div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    }
+    return html + treeNavButtons(l);
+  }
+
+  // ── q2 ──
+  const a2 = ts.answers.q2;
+  html += `<div class="q-box">
+    <div class="q-label">질문 ${l.id}-2</div>
+    <div class="q-text">${tree.nodes.q2.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a2==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q2','yes')">예</button>
+      <button class="q-btn ${a2==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q2','no')">아니오</button>
+    </div>
+    ${a2 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'${treeKey}','q2')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  if (!a2) return html + treeNavButtons(l);
+
+  const q2branch = tree.nodes.q2[a2];
+  // q2 답변이 세부질문으로 이어지지 않는 경우(end:true) — 바로 종료
+  if (q2branch.end) {
+    html += `<div class="alert ${q2branch.root ? 'alert-warn' : 'alert-success'}">→ ${q2branch.message}</div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    return html + treeNavButtons(l);
+  }
+
+  // q2가 세부질문으로 이어지는 경우(next 존재) — 세부질문 전체 동시 펼침
+  html += `<div class="alert alert-warn">→ ${q2branch.message||''}</div>
+  <div style="font-size:12px; color:var(--gray-500); margin:10px 0 8px 4px;">아래 ${l.id}-2의 세부 질문에 각각 답해주세요. 해당하는 질문에 "예"를 누르면 근접원인이 체크됩니다.</div>`;
+
+  chainNodeIds.forEach((nodeId, i) => {
+    const node = tree.nodes[nodeId];
+    const answered = ts.answers[nodeId];
+    const stepLabel = `${l.id}-2-${i+1}`;
+    const active = answered === 'yes';
+    const checkedItems = (ts.chainChecks && ts.chainChecks[nodeId] && ts.chainChecks[nodeId].items) || [];
+
+    html += `<div class="q-box" style="margin-left:14px;border-left:3px solid var(--blue-mid);">
+      <div class="q-label">질문 ${stepLabel}</div>
+      <div class="q-text">${node.question}</div>
+      <div class="q-btns">
+        <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','${nodeId}','yes')">예</button>
+        <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','${nodeId}','no')">아니오</button>
+      </div>
+    </div>
+    <div class="q-box" style="${active?'':'opacity:0.45;'}margin-top:-8px;margin-left:14px;">
+      <div class="q-label">근접원인 (해당되면 체크)</div>
+      ${node.chainItems.map((item,j)=>`<div class="proxy-item"><input type="checkbox" id="ci_${l.id}_${nodeId}_${j}" ${checkedItems.includes(item)?'checked':''} ${active?'':'disabled'} onchange="toggleChainItem(${l.id},'${treeKey}','${nodeId}','${item.replace(/'/g,"\\'")}',this.checked)"><label for="ci_${l.id}_${nodeId}_${j}">${item}</label></div>`).join('')}
+    </div>`;
+  });
+
+  // 전체 체크 결과 집계
+  const checkedItems = [];
+  Object.values(ts.chainChecks || {}).forEach(g => { (g.items||[]).forEach(item => checkedItems.push(item)); });
+  const allAnswered = chainNodeIds.every(n => ts.answers[n]);
+
+  if (checkedItems.length > 0) {
+    const roots = ts.finalRoots && ts.finalRoots.length ? ts.finalRoots : (ts.finalRoot ? [ts.finalRoot] : []);
+    html += `<div class="q-box">
+      <div class="q-label">체크된 근접원인 (${checkedItems.length}개)</div>
+      ${checkedItems.map(item=>`<div class="proxy-item"><input type="checkbox" checked disabled><label>${item}</label></div>`).join('')}
+    </div>
+    <div class="alert alert-warn">→ 근본원인: <strong>${roots.join(', ')}</strong></div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  } else if (allAnswered) {
+    html += `<div class="q-box">
+      <div class="q-label">기타 근접원인 입력</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">위 항목에 모두 해당하지 않는 경우, 의료기관 사정에 맞게 직접 입력하세요.</div>
+      <input type="text" value="${ts.freeText||''}" placeholder="해당하는 원인을 직접 입력하세요" oninput="setTreeFreeText(${l.id},this.value)" style="width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:inherit;">
+    </div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  }
+
+  return html + treeNavButtons(l);
+}
+
+
+function initLevelNav() {
+  const nav = document.getElementById('levelNav');
+  nav.innerHTML = '';
+  levels.forEach(l => {
+    const btn = document.createElement('button');
+    const state = levelState[l.id] || {};
+    btn.className = 'level-btn' + (l.id === curLevel ? ' active' : (state.q1 ? ' done' : ''));
+    btn.textContent = l.id + '. ' + l.name;
+    btn.onclick = () => { curLevel = l.id; renderLevel(); };
+    nav.appendChild(btn);
+  });
+}
+
+function renderLevel() {
+  initLevelNav();
+  const l = levels[curLevel - 1];
+  const state = levelState[curLevel] || {};
+  const c = document.getElementById('levelContent');
+
+  if (l.special === 'facility') { c.innerHTML = renderFacilityLevel(l, state); updateRootPanel(); return; }
+  if (l.special === 'unimprovable') { c.innerHTML = renderUnimprovableLevel(l, state); updateRootPanel(); return; }
+  if (l.special === 'tree') { c.innerHTML = renderTreeLevel(l, state); updateRootPanel(); return; }
+
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  html += `<div class="q-box">
+    <div class="q-label">질문 1</div>
+    <div class="q-text">${l.q1}</div>
+    <div class="q-btns">
+      <button class="q-btn ${state.q1==='yes'?'q-yes':''}" onclick="setQ(${l.id},1,'yes')">예</button>
+      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오 (부재/미흡)</button>
+      <button class="q-btn ${state.q1==='na'?'q-na':''}" onclick="setQ(${l.id},1,'na')">미해당</button>
+    </div>
+  </div>`;
+
+  if (state.q1 === 'no') {
+    if (!selectedRoots.includes(l.roots[0])) selectedRoots.push(l.roots[0]);
+    html += `<div class="alert alert-warn">→ 근본원인: <strong>${l.roots[0]}</strong> — 다음 분석수준으로 이동하세요.</div>`;
+  }
+
+  if (state.q1 === 'na') {
+    html += `<div class="alert alert-success">→ 이 분석수준은 해당 사고와 관련 없음. 다음 분석수준으로 이동하세요.</div>`;
+  }
+
+  if (state.q1 === 'yes') {
+    html += `<div class="q-box">
+      <div class="q-label">질문 2</div>
+      <div class="q-text">${l.q2}</div>
+      <div class="q-btns">
+        <button class="q-btn ${state.q2==='yes'?'q-bad':''}" onclick="setQ(${l.id},2,'yes')">${l.q2yes}</button>
+        <button class="q-btn ${state.q2==='no'?'q-bad':''}" onclick="setQ(${l.id},2,'no')">${l.q2no}</button>
+      </div>
+    </div>`;
+
+    if (state.q2 === 'no') {
+      const isNoOk = l.q2noMsg.includes('근본원인 없음');
+      html += `<div class="alert ${isNoOk ? 'alert-success' : 'alert-warn'}">→ ${l.q2noMsg}</div>`;
+    }
+
+    if (state.q2 === 'yes' || state.q2 === 'no') {
+      const showProxy = state.q2 === 'yes' || !l.q2noMsg.includes('근본원인 없음');
+      if (showProxy) {
+        html += `<div class="q-box">
+          <div class="q-label">근접원인 선택 (해당 항목 모두 체크)</div>
+          ${l.proxies.map((p,i)=>`<div class="proxy-item"><input type="checkbox" id="px${l.id}_${i}" ${state.proxies&&state.proxies.includes(p)?'checked':''} onchange="setProxy(${l.id},'${p.replace(/'/g,"\\'")}',this.checked)"><label for="px${l.id}_${i}">${p}</label></div>`).join('')}
+        </div>
+        <div class="q-box">
+          <div class="q-label">근본원인 선택</div>
+          ${l.roots.slice(1).map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="rt${l.id}_${i}" ${selectedRoots.includes(r)?'checked':''} onchange="toggleRoot('${r.replace(/'/g,"\\'")}',this.checked)"><label for="rt${l.id}_${i}">${r}</label></div>`).join('')}
+        </div>`;
       }
-      return{type:'text',pgbreak,title:el.querySelector('.content-title')?.innerHTML||'',body:el.querySelector('.content-body')?.innerHTML||''};
-    }),
-    suggests:[...document.querySelectorAll('#suggestList .suggest-row')].map(el=>({
-      who:el.querySelector('.suggest-who')?.textContent||'',
-      text:el.querySelector('.suggest-text')?.innerHTML||''
-    })),
-    attaches:[...document.querySelectorAll('#attachList .item-text')].map(el=>el.innerHTML),
-    photo1:photoData[1],photo2:photoData[2]
-  };
-}
-
-function saveJSON(){
-  const d=getData();
-  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(b); a.download=`${d.title||'회의록'}.json`; a.click();
-}
-
-function loadJSON(e){
-  const file=e.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    try{ applyData(JSON.parse(ev.target.result)); }
-    catch(err){ alert('파일을 읽을 수 없어요.'); }
-  };
-  r.readAsText(file);
-}
-
-function applyData(d){
-  const type=d.meetingType==='임시'?'임시':d.title&&d.title.includes('하반기')?'하반기':'상반기';
-  ['상반기','하반기','임시'].forEach(t=>{
-    const btn=document.getElementById('tab-'+t);
-    if(btn) btn.classList.toggle('btn-tab-active', t===type);
-  });
-  setMeetingType(d.meetingType||'정기');
-  document.getElementById('docTitle').textContent=d.title||'';
-  document.getElementById('meetingDate').innerHTML=d.meetingDate||'';
-  document.getElementById('meetingPlace').textContent=d.meetingPlace||'';
-  document.getElementById('attendees').textContent=d.attendees||'';
-  document.getElementById('secretary').textContent=d.secretary||'';
-  document.getElementById('opening').textContent=d.opening||'';
-  document.getElementById('agendaList').innerHTML=''; agCnt=0;
-  (d.agendas||[]).forEach(a=>addAgenda(a));
-  document.getElementById('contentList').innerHTML='';
-  (d.contents||[]).forEach(c=>{
-    if(c.type==='disc') addDiscussion(c.title,c.status||'',c.decision||'',c.action||'',c.owner||'',c.due||'');
-    else addContent(c.title,c.body||'');
-    if(c.pgbreak){
-      const list=document.getElementById('contentList');
-      const lastRow=list.lastElementChild;
-      lastRow.classList.add('manual-pgbreak');
-      const btn=lastRow.querySelector('.pgbreak-btn');
-      if(btn){ btn.classList.add('active'); btn.textContent='✓ 여기서 페이지 나뉨'; }
+      if (state.q2 === 'yes' && l.q2yesMsg) {
+        html += `<div class="alert alert-warn" style="margin-top:8px;">→ ${l.q2yesMsg}</div>`;
+      }
     }
+  }
+
+  html += `<div style="display:flex; gap:8px; margin-top:8px;">`;
+  if (curLevel < 10) html += `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>`;
+  if (curLevel > 1) html += `<button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>`;
+  html += `</div>`;
+
+  c.innerHTML = html;
+  updateRootPanel();
+}
+
+// ── 9. 시설/환경 전용 렌더 (q1 결과와 무관하게 q2까지 항상 진행) ──
+function renderFacilityLevel(l, state) {
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  html += `<div class="q-box">
+    <div class="q-label">질문 1</div>
+    <div class="q-text">${l.q1}</div>
+    <div class="q-btns">
+      <button class="q-btn ${state.q1==='yes'?'q-yes':''}" onclick="setQ(${l.id},1,'yes')">예 (준수함)</button>
+      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오 (미준수)</button>
+    </div>
+  </div>`;
+
+  if (state.q1 === 'yes') html += `<div class="alert alert-success">→ ${l.q1yesMsg}</div>`;
+  if (state.q1 === 'no') {
+    if (!selectedRoots.includes(l.roots[0])) selectedRoots.push(l.roots[0]);
+    html += `<div class="alert alert-warn">→ ${l.q1noMsg}</div>`;
+  }
+
+  // q1 답변 여부와 무관하게 q2는 항상 노출
+  if (state.q1 === 'yes' || state.q1 === 'no') {
+    html += `<div class="q-box">
+      <div class="q-label">질문 2</div>
+      <div class="q-text">${l.q2}</div>
+      <div class="q-btns">
+        <button class="q-btn ${state.q2==='yes'?'q-bad':''}" onclick="setQ(${l.id},2,'yes')">${l.q2yes}</button>
+        <button class="q-btn ${state.q2==='no'?'q-yes':''}" onclick="setQ(${l.id},2,'no')">${l.q2no}</button>
+      </div>
+    </div>`;
+
+    if (state.q2 === 'no') {
+      html += `<div class="alert alert-success">→ ${l.q2noMsg}</div>`;
+    }
+    if (state.q2 === 'yes') {
+      html += `<div class="q-box">
+        <div class="q-label">근접원인 선택 (해당 항목 모두 체크)</div>
+        ${l.proxies.map((p,i)=>`<div class="proxy-item"><input type="checkbox" id="px${l.id}_${i}" ${state.proxies&&state.proxies.includes(p)?'checked':''} onchange="setProxy(${l.id},'${p.replace(/'/g,"\\'")}',this.checked)"><label for="px${l.id}_${i}">${p}</label></div>`).join('')}
+      </div>
+      <div class="q-box">
+        <div class="q-label">근본원인 선택</div>
+        ${l.roots.slice(1).map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="rt${l.id}_${i}" ${selectedRoots.includes(r)?'checked':''} onchange="toggleRoot('${r.replace(/'/g,"\\'")}',this.checked)"><label for="rt${l.id}_${i}">${r}</label></div>`).join('')}
+      </div>
+      <div class="alert alert-warn">→ ${l.q2yesMsg}</div>`;
+    }
+  }
+
+  html += `<div style="display:flex; gap:8px; margin-top:8px;">
+    <button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>
+    <button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>
+  </div>`;
+  return html;
+}
+
+// ── 10. 개선불가 영역 전용 렌더 ──
+function renderUnimprovableLevel(l, state) {
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  if (selectedRoots.length > 0) {
+    html += `<div class="alert alert-success">✅ 이미 ${selectedRoots.length}개의 근본원인이 도출되었습니다. 이 단계는 참고용이며, 4단계(개선전략 수립)로 바로 이동하셔도 됩니다.</div>`;
+  }
+
+  if (!levelState[10]) levelState[10] = {};
+  const answers = levelState[10].uiAnswers || (levelState[10].uiAnswers = {});
+
+  let stop = false;
+  for (let i = 0; i < l.unimprovableQuestions.length; i++) {
+    const qObj = l.unimprovableQuestions[i];
+    const answered = answers[i];
+
+    html += `<div class="q-box">
+      <div class="q-label">질문 10-${i+1}</div>
+      <div class="q-text">${qObj.q}</div>
+      <div class="q-btns">
+        <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="setUnimprovableAnswer(${l.id},${i},'yes')">예</button>
+        <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="setUnimprovableAnswer(${l.id},${i},'no')">아니오</button>
+      </div>
+    </div>`;
+
+    if (!answered) { stop = true; break; }
+
+    if (answered === 'yes') {
+      html += `<div class="alert alert-warn">→ ${qObj.reason}</div>`;
+      if (!selectedRoots.includes(l.roots[0])) selectedRoots.push(l.roots[0]);
+      stop = true;
+      break;
+    }
+    // 'no'면 다음 질문으로 계속 진행
+  }
+
+  if (!stop) {
+    // 5개 질문 모두 '아니오'로 답한 경우
+    html += `<div class="alert alert-success">→ ${l.finalMessage}</div>`;
+    const idx = selectedRoots.indexOf(l.roots[0]);
+    if (idx > -1) selectedRoots.splice(idx, 1);
+  }
+
+  html += `<div style="display:flex; gap:8px; margin-top:8px;">
+    <button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>
+  </div>`;
+  return html;
+}
+
+function setUnimprovableAnswer(levelId, qIndex, val) {
+  if (!levelState[levelId]) levelState[levelId] = {};
+  if (!levelState[levelId].uiAnswers) levelState[levelId].uiAnswers = {};
+  levelState[levelId].uiAnswers[qIndex] = val;
+  // 이후 질문 답변 초기화 (분기 변경 대응)
+  const keys = Object.keys(levelState[levelId].uiAnswers).map(Number);
+  keys.forEach(k => { if (k > qIndex) delete levelState[levelId].uiAnswers[k]; });
+  renderLevel();
+}
+
+function setQ(id, qnum, val) {
+  if (!levelState[id]) levelState[id] = {};
+  if (qnum === 1) {
+    levelState[id].q1 = val;
+    delete levelState[id].q2;
+    delete levelState[id].proxies;
+    if (id === 10) {
+      // 10번(개선불가)은 체크박스 선택 시에만 근본원인 추가 — renderUnimprovableLevel에서 처리
+      renderLevel();
+      return;
+    }
+    // 이전 선택으로 추가됐던 roots[0] 제거 후 재처리
+    const root0 = levels[id-1].roots[0];
+    const idx = selectedRoots.indexOf(root0);
+    if (idx > -1) selectedRoots.splice(idx, 1);
+    // 아니오 → 규정/지침 부재 근본원인 추가
+    if (val === 'no') {
+      if (!selectedRoots.includes(root0)) selectedRoots.push(root0);
+    }
+    // 미해당 → 근본원인 추가 없이 통과
+  } else {
+    levelState[id].q2 = val;
+  }
+  renderLevel();
+}
+
+function setProxy(id, proxy, checked) {
+  if (!levelState[id]) levelState[id] = {};
+  if (!levelState[id].proxies) levelState[id].proxies = [];
+  if (checked) { if (!levelState[id].proxies.includes(proxy)) levelState[id].proxies.push(proxy); }
+  else levelState[id].proxies = levelState[id].proxies.filter(p => p !== proxy);
+}
+
+function toggleRoot(root, checked) {
+  if (checked) { if (!selectedRoots.includes(root)) selectedRoots.push(root); }
+  else { const i = selectedRoots.indexOf(root); if (i > -1) selectedRoots.splice(i,1); }
+  updateRootPanel();
+}
+
+function updateRootPanel() {
+  const card = document.getElementById('selectedRootsCard');
+  const list = document.getElementById('rootList');
+  if (selectedRoots.length === 0) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  list.innerHTML = `<div class="root-panel">${selectedRoots.map(r=>`<div class="root-item"><span class="root-tag">근본원인</span>${r}</div>`).join('')}</div>`;
+}
+
+function nextLevel() { if (curLevel < 10) { curLevel++; renderLevel(); } }
+function prevLevel() { if (curLevel > 1) { curLevel--; renderLevel(); } }
+
+// 분석수준명 매핑
+const levelNames = {
+  '1': '업무절차', '2': '교육/훈련', '3': '의사소통', '4': '업무수행',
+  '5': '부서관리', '6': '리더십', '7': '인간공학', '8': '의료기기', '9': '시설/환경', '10': '개선불가 영역'
+};
+
+function getLevelHeader(root) {
+  // "6.1 리더십의 환자안전문화 인식 부족" → "6. 리더십 / 6.1 리더십의 환자안전문화 인식 부족"
+  const match = root.match(/^(\d+)\./);
+  if (match) {
+    const num = match[1];
+    const name = levelNames[num] || '';
+    return `${num}. ${name} / ${root}`;
+  }
+  return root;
+}
+
+function addImprove() {
+  const plan = document.getElementById('improvePlan');
+  const div = document.createElement('div');
+  div.className = 'improve-card';
+  div.innerHTML = `
+    <div class="field"><label>분석수준 / 근본원인</label><input type="text" placeholder="예) 2. 교육훈련 / 2.2 교육훈련 계획 운영 미흡"></div>
+    <div class="field"><label>개선전략</label><textarea placeholder="해당 근본원인에 대한 개선전략을 작성하세요."></textarea></div>
+    <div class="grid3">
+      <div class="field"><label>담당자</label><input type="text" placeholder="담당자명"></div>
+      <div class="field"><label>완료예정일</label><input type="text" placeholder="예) 6개월 이내"></div>
+      <div class="field"><label>효과측정지표</label><input type="text" placeholder="예) 교육이수율"></div>
+    </div>`;
+  plan.appendChild(div);
+}
+
+function initImprove() {
+  const plan = document.getElementById('improvePlan');
+  // 이미 근본원인 기반으로 채워진 경우 유지, 비어있거나 예시만 있으면 재생성
+  if (plan.innerHTML !== '' && plan.querySelector('input[style*="color"]')) return;
+
+  // 초기화 후 재생성
+  plan.innerHTML = '';
+  if (selectedRoots.length > 0) {
+    selectedRoots.forEach(r => {
+      const header = getLevelHeader(r);
+      const div = document.createElement('div');
+      div.className = 'improve-card';
+      div.innerHTML = `
+        <div class="field">
+          <label>분석수준 / 근본원인</label>
+          <input type="text" value="${header}" style="color:var(--blue); font-weight:600;">
+        </div>
+        <div class="field"><label>개선전략</label><textarea placeholder="해당 근본원인에 대한 개선전략을 작성하세요."></textarea></div>
+        <div class="grid3">
+          <div class="field"><label>담당자</label><input type="text" placeholder="담당자명"></div>
+          <div class="field"><label>완료예정일</label><input type="text" placeholder="예) 6개월 이내"></div>
+          <div class="field"><label>효과측정지표</label><input type="text" placeholder="예) 교육이수율"></div>
+        </div>`;
+      plan.appendChild(div);
+    });
+  } else {
+    addImprove();
+  }
+}
+
+// 6하원칙 자동 조합
+function composeContent() {
+  const who   = document.getElementById('w_who')?.value.trim() || '';
+  const where = document.getElementById('w_where')?.value.trim() || '';
+  const what  = document.getElementById('w_what')?.value.trim() || '';
+  const how   = document.getElementById('w_how')?.value.trim() || '';
+  const why   = document.getElementById('w_why')?.value.trim() || '';
+  const etc   = document.getElementById('w_etc')?.value.trim() || '';
+
+  const accDate = document.getElementById('acc_date')?.value || '';
+  let dateStr = '';
+  if (accDate) {
+    const d = new Date(accDate);
+    if (!isNaN(d)) {
+      dateStr = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${d.getHours().toString().padStart(2,'0')}시 ${d.getMinutes().toString().padStart(2,'0')}분`;
+    }
+  }
+
+  const parts = [];
+  if (dateStr) parts.push(dateStr);
+  if (where) parts.push(where + '에서');
+  if (who) parts.push(who + '이(가)');
+  if (what) parts.push(what);
+  if (how) parts.push(how);
+  if (why) parts.push('(원인: ' + why + ')');
+  if (etc) parts.push(etc);
+
+  const composed = parts.join(', ') + (parts.length > 0 ? '.' : '');
+  document.getElementById('acc_content').value = composed;
+}
+
+function aiSummarize() {
+  const who   = document.getElementById('w_who')?.value.trim() || '';
+  const where = document.getElementById('w_where')?.value.trim() || '';
+  const what  = document.getElementById('w_what')?.value.trim() || '';
+  const how   = document.getElementById('w_how')?.value.trim() || '';
+  const why   = document.getElementById('w_why')?.value.trim() || '';
+
+  const place = document.querySelector('input[name="place"]:checked');
+  const acctype = document.querySelector('input[name="acctype"]:checked');
+  const severity = document.querySelector('input[name="severity"]:checked');
+
+  const placeVal = place?.value === '기타' ? document.getElementById('place_other').value : place?.value || '';
+  const typeVal  = acctype?.value === '기타' ? document.getElementById('acctype_other').value : acctype?.value || '';
+  const sevVal   = severity?.value || '';
+
+  if (!who && !what && !where) {
+    alert('먼저 누가/무엇을/어디서 항목을 입력해주세요.');
+    return;
+  }
+
+  let summary = '';
+  if (placeVal || typeVal) summary += `${placeVal ? placeVal + ' ' : ''}${typeVal ? typeVal + ' 관련 ' : ''}사고가 발생하였습니다. `;
+  if (who) summary += `${who}이(가) `;
+  if (where) summary += `${where}에서 `;
+  if (what) summary += `${what}. `;
+  if (how) summary += `${how}. `;
+  if (why) summary += `발생 원인은 ${why}으로 파악됩니다. `;
+  if (sevVal) summary += `사고의 위해정도는 "${sevVal}"로 분류됩니다.`;
+
+  document.getElementById('prob_def').value = summary.trim();
+}
+
+// 전체 PDF 출력
+function printReport() {
+  // 모든 단계 표시
+  document.body.classList.add('print-mode');
+  ['step1','step2','step3','step4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
   });
-  document.getElementById('suggestList').innerHTML='';
-  (d.suggests||[]).forEach(s=>addSuggest(s.who,s.text));
-  document.getElementById('attachList').innerHTML=''; atCnt=0;
-  (d.attaches||[]).forEach(a=>addAttach(a));
-  if(d.photo1){photoData[1]=d.photo1;const s=document.getElementById('slot1');s.innerHTML=`<img src="${d.photo1}"><button class="photo-del no-print" onclick="clearPhoto(1)">✕ 삭제</button>`;s.onclick=null;}
-  if(d.photo2){photoData[2]=d.photo2;const s=document.getElementById('slot2');s.innerHTML=`<img src="${d.photo2}"><button class="photo-del no-print" onclick="clearPhoto(2)">✕ 삭제</button>`;s.onclick=null;}
+  // 잠깐 후 인쇄 (렌더링 대기)
+  setTimeout(() => {
+    window.print();
+    // 인쇄 후 원래 상태로 복원
+    setTimeout(() => {
+      document.body.classList.remove('print-mode');
+      // 현재 활성 단계만 다시 표시
+      const badge = document.getElementById('stepBadge');
+      const cur = badge ? parseInt(badge.textContent.split('/')[0].trim()) : 4;
+      ['step1','step2','step3','step4'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el && i + 1 !== cur) el.classList.add('hidden');
+      });
+    }, 500);
+  }, 300);
 }
 
-function resetAll(){
-  if(!confirm('새 회의록을 작성할까요? 현재 내용은 사라져요.')) return;
-  localStorage.removeItem('qps_minutes_auto');
-  clearPhoto(1); clearPhoto(2);
-  switchType('임시');
+function formatDate(val) {
+  if (!val) return '';
+  const d = new Date(val);
+  if (isNaN(d)) return val;
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${d.getHours().toString().padStart(2,'0')}시 ${d.getMinutes().toString().padStart(2,'0')}분`;
 }
 
-function downloadWord(){
-  const d=getData();
-  const now=new Date();
-  const ds=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
-  const tl=d.meetingType==='임시'?'□ 정기회의　■ 임시회의':'■ 정기회의　□ 임시회의';
+function downloadRCAWord() {
+  const accDate = formatDate(document.getElementById('acc_date')?.value);
+  const repDate = formatDate(document.getElementById('rep_date')?.value);
+  const gender = document.getElementById('gender')?.value || '';
+  const age = document.getElementById('age')?.value || '';
+  const place = document.querySelector('input[name="place"]:checked')?.value || '';
+  const acctype = document.querySelector('input[name="acctype"]:checked')?.value || '';
+  const severity = document.querySelector('input[name="severity"]:checked')?.value || '';
+  const who = document.getElementById('w_who')?.value || '';
+  const where = document.getElementById('w_where')?.value || '';
+  const what = document.getElementById('w_what')?.value || '';
+  const how = document.getElementById('w_how')?.value || '';
+  const why = document.getElementById('w_why')?.value || '';
+  const etc = document.getElementById('w_etc')?.value || '';
+  const content = document.getElementById('acc_content')?.value || '';
+  const action = document.getElementById('acc_action')?.value || '';
+  const probDef = document.getElementById('prob_def')?.value || '';
+  const s2main = document.getElementById('s2_main')?.value || '';
+  const s2staff = document.getElementById('s2_staff')?.value || '';
 
-  // Word HTML 임포터는 클래스 선택자를 무시하는 경우가 있어 모든 스타일을 인라인으로 처리
-  const S_TD = 'border:1pt solid #94A3B8;padding:3pt 5pt;vertical-align:top;line-height:1.5;font-size:10pt;font-family:\'나눔고딕\',\'Nanum Gothic\',\'맑은 고딕\',sans-serif;';
-  const S_LBL = S_TD+'font-weight:bold;color:#1B3A6B;width:52pt;text-align:center;vertical-align:middle;white-space:nowrap;border-right:1.5pt solid #1B3A6B;';
-  const S_SEC = S_TD+'font-weight:bold;color:#1B3A6B;text-align:center;width:52pt;vertical-align:top;white-space:nowrap;border-right:1.5pt solid #1B3A6B;padding-top:5pt;';
-  const S_INNER_TD = 'border:1pt solid #94A3B8;padding:2pt 5pt;line-height:1.5;font-size:10pt;font-family:\'나눔고딕\',\'Nanum Gothic\',\'맑은 고딕\',sans-serif;';
+  // 팀 구성
+  let teamRows = '';
+  document.querySelectorAll('#team-list .member-row').forEach(row => {
+    const role = row.querySelector('select')?.value || '';
+    const dept = row.querySelectorAll('input')[0]?.value || '';
+    const name = row.querySelectorAll('input')[1]?.value || '';
+    teamRows += `<tr><td>${role}</td><td>${dept}</td><td>${name}</td></tr>`;
+  });
 
-  // 안건 행
-  const agRows=(d.agendas||[]).map((a,i)=>
-    `<tr><td style="width:16pt;text-align:left;border:none;padding:1pt 2pt;font-weight:bold;">${i+1}.</td><td style="border:none;padding:1pt 3pt;">${a}</td></tr>`
+  // 사고 발생 단계 — 단계별 카드 데이터 수집 (가로 표 형식)
+  const flowCards = [...document.querySelectorAll('#flow-steps .flow-step-card')].map(card => ({
+    time: card.querySelector('.flow-time-input')?.value || '',
+    step: card.querySelector('.flow-input')?.value || '',
+    main: card.querySelector('.step-main')?.value || '',
+    staff: card.querySelector('.step-staff')?.value || '',
+    cf: [...card.querySelectorAll('.cf-item')]
+      .map(item => ({ checked: item.querySelector('.cf-check')?.checked, text: item.querySelector('.cf-text')?.value || '' }))
+      .filter(cf => cf.text)
+  })).filter(c => c.time || c.step || c.main || c.staff || c.cf.length);
+
+  const flowSteps = flowCards.map(c => (c.time ? c.time + ' ' : '') + (c.step || '')).filter(v=>v.trim()).join(' → ');
+
+  // 근본원인
+  const rootsHtml = selectedRoots.map(r =>
+    `<tr><td style="background:#eaf1fb; color:#1a5fa8; font-weight:bold;">${r}</td></tr>`
   ).join('');
 
-  // 회의내용 행 (보고사항 + 논의사항)
-  const ctRows=(d.contents||[]).map((c,idx)=>{
-    const brk = c.pgbreak ? `<tr><td colspan="4" style="border:none;mso-special-character:line-break;page-break-before:always;height:0;padding:0;line-height:0;">&nbsp;</td></tr>` : '';
-    // 블록 사이 구분 여백 (첫 항목 제외)
-    const sep = idx>0 && !c.pgbreak ? `<tr><td colspan="4" style="border:none;height:6pt;padding:0;line-height:0;">&nbsp;</td></tr>` : '';
-    if(c.type==='disc'){
-      // disc 블록은 별도 미니 테이블로 감싸서 페이지 중간에 끊기지 않도록 함
-      const discTable = `<table style="border-collapse:collapse;width:100%;mso-table-overlap:never;" cellspacing="0">
-<tr>
-  <td colspan="4" style="font-weight:bold;color:#1B3A6B;padding:4pt 6pt;border:1pt solid #94A3B8;border-bottom:none;background:#F0F4FF;">${c.title||''}</td>
-</tr>
-<tr>
-  <td style="width:52pt;font-weight:bold;color:#1B3A6B;text-align:center;border:1pt solid #94A3B8;padding:2pt 4pt;">현황</td>
-  <td colspan="3" style="border:1pt solid #94A3B8;padding:2pt 4pt;white-space:pre-wrap;">${c.status||'　'}</td>
-</tr>
-<tr>
-  <td style="font-weight:bold;color:#1B3A6B;text-align:center;border:1pt solid #94A3B8;padding:2pt 4pt;">의결내용</td>
-  <td colspan="3" style="border:1pt solid #94A3B8;padding:2pt 4pt;white-space:pre-wrap;">${c.decision||'　'}</td>
-</tr>
-<tr>
-  <td style="font-weight:bold;color:#1B3A6B;text-align:center;border:1pt solid #94A3B8;padding:2pt 4pt;">이행사항</td>
-  <td style="border:1pt solid #94A3B8;padding:2pt 4pt;white-space:pre-wrap;">${c.action||'　'}</td>
-  <td style="width:28pt;font-weight:bold;color:#1B3A6B;text-align:center;border:1pt solid #94A3B8;padding:2pt 4pt;">담당</td>
-  <td style="width:52pt;border:1pt solid #94A3B8;padding:2pt 4pt;">${c.owner||'　'}</td>
-</tr>
-<tr>
-  <td style="font-weight:bold;color:#1B3A6B;text-align:center;border:1pt solid #94A3B8;padding:2pt 4pt;">완료예정</td>
-  <td colspan="3" style="border:1pt solid #94A3B8;padding:2pt 4pt;">${c.due||'　'}</td>
-</tr>
-</table>`;
-      return sep+brk+`<tr><td colspan="4" style="border:none;padding:0;">${discTable}</td></tr>`;
-    }
-    return sep+brk+`<tr>
-  <td colspan="4" style="font-weight:bold;color:#1B3A6B;padding:3pt 2pt;border:none;border-bottom:1pt solid #94A3B8;">${c.title||''}</td>
-</tr>
-<tr>
-  <td colspan="4" style="padding:2pt 2pt 4pt 2pt;border:none;white-space:pre-wrap;line-height:1.5;">${c.body||'　'}</td>
-</tr>`;
-  }).join('');
+  // 개선활동
+  let improveRows = '';
+  document.querySelectorAll('#improvePlan .improve-card').forEach(card => {
+    const inputs = card.querySelectorAll('input[type=text]');
+    const ta = card.querySelector('textarea')?.value || '';
+    const level = inputs[0]?.value || '';
+    const manager = inputs[1]?.value || '';
+    const deadline = inputs[2]?.value || '';
+    const kpi = inputs[3]?.value || '';
+    improveRows += `<tr><td>${level}</td><td>${ta}</td><td>${manager}</td><td>${deadline}</td><td>${kpi}</td></tr>`;
+  });
 
-  // 건의사항 행
-  const sgRows=(d.suggests||[]).map(s=>
-    `<tr><td style="width:52pt;font-weight:bold;text-align:center;vertical-align:top;border:1pt solid #94A3B8;padding:2pt 4pt;">${s.who||''}</td><td style="border:1pt solid #94A3B8;padding:2pt 4pt;white-space:pre-wrap;">${s.text||'　'}</td></tr>`
-  ).join('') || `<tr><td style="border:none;padding:14pt 4pt;">&nbsp;</td></tr>`;
-
-  // 붙임자료 행
-  const atRows=(d.attaches||[]).map((a,i)=>
-    `<tr><td style="width:16pt;text-align:left;border:none;padding:1pt 2pt;font-weight:bold;">${i+1}.</td><td style="border:none;padding:1pt 3pt;">${a}</td></tr>`
-  ).join('');
-
-  // 사진 — Word HTML 임포터에서 base64 이미지가 깨지는 문제가 있어
-  // 워드 파일에는 빈 칸 2개만 만들고, 사용자가 워드에서 직접 사진을 삽입하도록 안내
-  const phRow=`
-<tr>
-  <td style="${S_LBL}vertical-align:middle;">회의사진</td>
-  <td colspan="3" style="${S_TD}padding:6pt;">
-    <table style="border:none;width:100%;border-collapse:collapse;"><tr>
-      <td style="border:1pt solid #CBD5E1;text-align:center;color:#9199a8;font-size:8.5pt;padding:18pt 4pt;width:50%;">(사진 1 삽입 — 삽입 ▸ 그림)</td>
-      <td style="border:none;width:8pt;"></td>
-      <td style="border:1pt solid #CBD5E1;text-align:center;color:#9199a8;font-size:8.5pt;padding:18pt 4pt;width:50%;">(사진 2 삽입 — 삽입 ▸ 그림)</td>
-    </tr></table>
-  </td>
-</tr>`;
-
-  const html=`<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-<head>
-<meta charset='utf-8'>
-<xml>
-  <w:WordDocument>
-    <w:View>Print</w:View>
-    <w:Zoom>100</w:Zoom>
-    <w:DoNotOptimizeForBrowser/>
-  </w:WordDocument>
-</xml>
+  const html = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset='utf-8'>
 <style>
-@page Section1{
-  size:21cm 29.7cm;
-  margin:20mm 18mm 22mm 18mm;
-  mso-header-margin:10mm;
-  mso-footer-margin:10mm;
-}
-div.Section1{page:Section1;}
+  body { font-family: '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; margin: 2.5cm; line-height: 1.6; }
+  h1 { font-size: 18pt; color: #0f4080; border-bottom: 3px solid #1a5fa8; padding-bottom: 8px; margin-bottom: 20px; text-align: center; }
+  h2 { font-size: 11pt; color: #ffffff; background: #1a5fa8; padding: 6px 14px; margin-top: 24px; margin-bottom: 10px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 10pt; page-break-inside: avoid; }
+  th { background: #1a5fa8; color: white; padding: 7px 10px; text-align: left; font-weight: bold; border: 1px solid #1a5fa8; }
+  td { border: 1px solid #c4cad5; padding: 6px 10px; vertical-align: top; }
+  .lbl { font-weight: bold; color: #374151; background: #eceef2; width: 100px; }
+  .footer { margin-top: 30px; border-top: 1px solid #dde1e9; padding-top: 10px; font-size: 9pt; color: #9199a8; text-align: center; }
 
-body{
-  font-family:'나눔고딕','Nanum Gothic','맑은 고딕',sans-serif;
-  font-size:10pt;
-  line-height:1.5;
-  color:#1E293B;
-}
-
-h1{
-  font-family:'나눔고딕','Nanum Gothic','맑은 고딕',sans-serif;
-  font-size:14pt;
-  font-weight:bold;
-  color:#1B3A6B;
-  text-align:center;
-  padding-bottom:6pt;
-  margin-bottom:0;
-  border-bottom:2pt solid #1B3A6B;
-}
-
-/* 메인 표 */
-table.main{
-  border-collapse:collapse;
-  width:100%;
-  font-size:10pt;
-  border:2pt solid #1B3A6B;
-  font-family:'나눔고딕','Nanum Gothic','맑은 고딕',sans-serif;
-}
-table.main td{
-  border:1pt solid #94A3B8;
-  padding:3pt 5pt;
-  vertical-align:top;
-  line-height:1.5;
-  font-size:10pt;
-}
-
-/* 레이블 셀 */
-.lbl{
-  font-weight:bold;
-  color:#1B3A6B;
-  width:52pt;
-  text-align:center;
-  vertical-align:middle;
-  white-space:nowrap;
-  border-right:1.5pt solid #1B3A6B;
-}
-.sec{
-  color:#1B3A6B;
-  font-weight:bold;
-  text-align:center;
-  width:52pt;
-  vertical-align:top;
-  white-space:nowrap;
-  border-right:1.5pt solid #1B3A6B;
-  padding-top:5pt;
-}
-
-/* 내부 표 (안건/붙임) */
-table.inner{
-  border-collapse:collapse;
-  width:100%;
-  font-size:10pt;
-  font-family:'나눔고딕','Nanum Gothic','맑은 고딕',sans-serif;
-}
-
-/* 논의사항 내부 표 */
-table.disc{
-  border-collapse:collapse;
-  width:100%;
-  font-size:10pt;
-  margin-bottom:4pt;
-  font-family:'나눔고딕','Nanum Gothic','맑은 고딕',sans-serif;
-}
-
-/* 2페이지 강제 */
-.page-break{
-  page-break-before:always;
-  mso-break-type:section-break;
-}
-
-.footer{
-  margin-top:8pt;
-  font-size:8pt;
-  color:#94A3B8;
-  border-top:1pt solid #E2E8F0;
-  padding-top:3pt;
-  text-align:right;
-}
-
-/* 행 단위로 페이지가 끊기지 않도록(셀 중간에서 잘려서 테두리가 끊기는 문제 방지) */
-tr{
-  page-break-inside:avoid;
-  mso-yfti-irow:0;
-}
-table{
-  page-break-inside:auto;
-}
+  /* 2단계 사고흐름 가로 표 — 10pt 유지, 레이아웃만 컴팩트 */
+  table.flow-analysis-table { table-layout: fixed; font-size:10pt; }
+  table.flow-analysis-table td { text-align:center; font-size:10pt; padding:5px 6px; line-height:1.45; vertical-align:top; }
+  table.flow-analysis-table .lbl { text-align:left; font-size:9.5pt; width:80px; vertical-align:middle; line-height:1.35; }
+  table.flow-analysis-table .flow-col-head { background:#fdf6e3; vertical-align:middle; }
+  table.flow-analysis-table .flow-time { font-size:9pt; color:#b8860b; font-weight:bold; margin-bottom:2px; }
+  table.flow-analysis-table .flow-step-name { font-weight:bold; color:#1a5fa8; font-size:10pt; }
+  table.flow-analysis-table .flow-arrow { border:none; background:none; width:12px; text-align:center; font-size:11pt; color:#9199a8; padding:0; }
+  table.flow-analysis-table .flow-staff-cell { background:#fdf6e3; font-size:9.5pt; }
+  table.flow-analysis-table .cf-line { font-size:9.5pt; margin-bottom:3px; line-height:1.4; text-align:left; }
 </style>
 </head>
 <body>
-<div class="Section1">
+<h1>근본원인분석(RCA) 보고서</h1>
+<p style="text-align:center; color:#6b7280; font-size:9.5pt; margin-bottom:24px;">KoSQIN · 환자안전법 제12조 기반 · 작성일: ${new Date().toLocaleDateString('ko-KR')}</p>
 
-<h1 style="font-family:'나눔고딕','Nanum Gothic','맑은 고딕',sans-serif;font-size:14pt;font-weight:bold;color:#1B3A6B;text-align:center;padding-bottom:8pt;margin-bottom:10pt;border-bottom:2pt solid #1B3A6B;">${d.title||'QPS위원회 회의록'}</h1>
-
-<table style="border-collapse:collapse;width:100%;mso-table-overlap:never;">
-  <tr>
-    <td style="${S_LBL}border-top:2pt solid #1B3A6B;border-left:2pt solid #1B3A6B;">회의일시</td>
-    <td style="${S_TD}border-top:2pt solid #1B3A6B;">${d.meetingDate||''}</td>
-    <td style="${S_LBL}width:36pt;border-top:2pt solid #1B3A6B;">장소</td>
-    <td style="${S_TD}border-top:2pt solid #1B3A6B;border-right:2pt solid #1B3A6B;">${d.meetingPlace||''}</td>
-  </tr>
-  <tr>
-    <td style="${S_LBL}border-left:2pt solid #1B3A6B;">참석대상</td>
-    <td style="${S_TD}">${d.attendees||''}</td>
-    <td style="${S_LBL}">간사</td>
-    <td style="${S_TD}border-right:2pt solid #1B3A6B;">${d.secretary||''}</td>
-  </tr>
-  <tr>
-    <td style="${S_LBL}border-left:2pt solid #1B3A6B;">회의구분</td>
-    <td colspan="3" style="${S_TD}border-right:2pt solid #1B3A6B;">${tl}</td>
-  </tr>
-  ${phRow}
-  <tr>
-    <td style="${S_LBL}vertical-align:top;padding-top:4pt;border-left:2pt solid #1B3A6B;">안&nbsp;&nbsp;&nbsp;&nbsp;건</td>
-    <td colspan="3" style="${S_TD}padding:2pt 4pt;border-right:2pt solid #1B3A6B;">
-      <table style="border-collapse:collapse;width:100%;mso-table-overlap:never;"><tbody>${agRows}</tbody></table>
-    </td>
-  </tr>
-  <tr>
-    <td rowspan="2" style="${S_SEC}border-left:2pt solid #1B3A6B;">회의내용<br>및<br>의결사항</td>
-    <td colspan="3" style="${S_TD}white-space:pre-wrap;padding:4pt 6pt;border-right:2pt solid #1B3A6B;">${d.opening||''}</td>
-  </tr>
-  <tr>
-    <td colspan="3" style="${S_TD}padding:4pt 6pt;border-right:2pt solid #1B3A6B;border-bottom:2pt solid #1B3A6B;">
-      <table style="border-collapse:collapse;width:100%;margin-bottom:4pt;"><tbody>${ctRows}</tbody></table>
-    </td>
-  </tr>
+<h2>1단계 — 사고 기본 정보</h2>
+<table>
+  <colgroup><col style="width:18%"><col style="width:32%"><col style="width:18%"><col style="width:32%"></colgroup>
+  <tr><td class="lbl">발생일시</td><td>${accDate}</td><td class="lbl">보고일시</td><td>${repDate}</td></tr>
+  <tr><td class="lbl">성별</td><td>${gender}</td><td class="lbl">연령</td><td>${age}</td></tr>
+  <tr><td class="lbl">사고 발생 장소</td><td>${place}</td><td class="lbl">사고분류</td><td>${acctype}</td></tr>
+  <tr><td class="lbl">사고 위해정도</td><td colspan="3">${severity}</td></tr>
 </table>
 
-<!-- 2페이지 시작 -->
-<br class="page-break">
-
-<table style="border-collapse:collapse;width:100%;mso-table-overlap:never;">
-  <tr>
-    <td style="${S_SEC}border-top:2pt solid #1B3A6B;border-left:2pt solid #1B3A6B;">건의사항<br>및<br>기타의견</td>
-    <td style="${S_TD}padding:0pt;border-top:2pt solid #1B3A6B;border-right:2pt solid #1B3A6B;">
-      <table style="border-collapse:collapse;width:100%;mso-table-overlap:never;"><tbody>${sgRows}</tbody></table>
-    </td>
-  </tr>
-  <tr>
-    <td style="${S_LBL}vertical-align:top;padding-top:4pt;border-left:2pt solid #1B3A6B;border-bottom:2pt solid #1B3A6B;">붙임자료</td>
-    <td style="${S_TD}padding:2pt 4pt;border-right:2pt solid #1B3A6B;border-bottom:2pt solid #1B3A6B;">
-      <table style="border-collapse:collapse;width:100%;mso-table-overlap:never;"><tbody>${atRows}</tbody></table>
-    </td>
-  </tr>
+<table>
+  <tr><th width="15%">6하원칙</th><th>내용</th></tr>
+  <tr><td class="lbl">누가</td><td>${who}</td></tr>
+  <tr><td class="lbl">어디서</td><td>${where}</td></tr>
+  <tr><td class="lbl">무엇을</td><td>${what}</td></tr>
+  <tr><td class="lbl">어떻게</td><td>${how}</td></tr>
+  <tr><td class="lbl">왜 (원인)</td><td>${why}</td></tr>
+  <tr><td class="lbl">추가내용</td><td>${etc}</td></tr>
 </table>
 
-<div class="footer">작성일: ${ds}&nbsp;&nbsp;|&nbsp;&nbsp;좋은삼선병원 QPS팀</div>
+<table>
+  <tr><th>사고내용 (자동 조합)</th></tr>
+  <tr><td style="line-height:1.8;">${content}</td></tr>
+</table>
 
+<table>
+  <tr><th>사고 후 조치</th></tr>
+  <tr><td style="line-height:1.8;">${action}</td></tr>
+</table>
+
+<table>
+  <tr><th>문제정의 (간단 요약)</th></tr>
+  <tr><td style="line-height:1.8;">${probDef}</td></tr>
+</table>
+
+<h2>팀 구성</h2>
+<table>
+  <colgroup><col style="width:15%"><col style="width:50%"><col style="width:35%"></colgroup>
+  <tr><th>역할</th><th>소속부서/직위</th><th>이름</th></tr>
+  ${teamRows || '<tr><td colspan="3">-</td></tr>'}
+</table>
+
+<h2>2단계 — 기여요인(CF) 분석</h2>
+<table class="flow-analysis-table">
+  <tr>
+    <td class="lbl">사고발생<br>주요 흐름 단계</td>
+    ${flowCards.map(c => `<td class="flow-col-head">${c.time ? `<div class="flow-time">${c.time}</div>` : ''}<div class="flow-step-name">${c.step || '-'}</div></td>`).join('<td class="flow-arrow">→</td>')}
+  </tr>
+  <tr>
+    <td class="lbl">사고 분석을<br>위한 주요 사항</td>
+    ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:9.5pt;">${c.main || '-'}</td>`).join('<td></td>')}
+  </tr>
+  <tr>
+    <td class="lbl">사고발생 흐름<br>단계에 관련된 직원</td>
+    ${flowCards.map(c => `<td class="flow-staff-cell">${c.staff || '-'}</td>`).join('<td></td>')}
+  </tr>
+  <tr>
+    <td class="lbl">위험요인<br>상세기술</td>
+    ${flowCards.map(c => `<td style="text-align:left;">${
+      c.cf.length
+        ? c.cf.map(cf => `<div class="cf-line"${cf.checked ? ' style="font-weight:bold;color:#b8860b;"' : ''}>${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
+        : '-'
+    }</td>`).join('<td></td>')}
+  </tr>
+</table>
+<p style="font-size:9pt; color:#6b7280; margin-top:-10px; margin-bottom:16px;">🔶 CF (Causal Factor) : 사건을 예방할 수 있거나 유효하게 감소시킬 수 있는 문제</p>
+
+<h2>3단계 — 도출된 근본원인</h2>
+<table>
+  <tr><th>근본원인</th></tr>
+  ${rootsHtml || '<tr><td>-</td></tr>'}
+</table>
+
+<h2>4단계 — 개선활동 계획</h2>
+<table>
+  <colgroup><col style="width:25%"><col style="width:32%"><col style="width:15%"><col style="width:13%"><col style="width:15%"></colgroup>
+  <tr><th>분석수준 / 근본원인</th><th>개선전략</th><th>담당자</th><th>완료예정일</th><th>효과측정지표</th></tr>
+  ${improveRows || '<tr><td colspan="5">-</td></tr>'}
+</table>
+
+<div class="footer">
+  본 보고서는 KoSQIN RCA 작성 도구를 통해 작성되었습니다. | samsun-rca-tool.vercel.app
 </div>
 </body></html>`;
 
-  const b=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(b);
-  a.download=`${d.title||'회의록'}_${ds}.doc`;
+  const blob = new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','');
+  a.download = `RCA_보고서_${dateStr}.doc`;
   a.click();
+  URL.revokeObjectURL(url);
 }
 
-// ── 자동저장 ──
-function autoSave(){
-  try{ localStorage.setItem('qps_minutes_auto', JSON.stringify(getData())); showAutoSaveStatus('자동저장'); }
-  catch(e){}
+function copyRCAToSheet() {
+  let tsv = '항목\t내용\n';
+  tsv += `발생일시\t${document.getElementById('acc_date')?.value || ''}\n`;
+  tsv += `보고일시\t${document.getElementById('rep_date')?.value || ''}\n`;
+  tsv += `성별\t${document.getElementById('gender')?.value || ''}\n`;
+  tsv += `연령\t${document.getElementById('age')?.value || ''}\n`;
+  tsv += `사고장소\t${document.querySelector('input[name="place"]:checked')?.value || ''}\n`;
+  tsv += `사고분류\t${document.querySelector('input[name="acctype"]:checked')?.value || ''}\n`;
+  tsv += `위해정도\t${document.querySelector('input[name="severity"]:checked')?.value || ''}\n`;
+  tsv += `사고내용\t${document.getElementById('acc_content')?.value || ''}\n`;
+  tsv += `사고후조치\t${document.getElementById('acc_action')?.value || ''}\n`;
+  tsv += `문제정의\t${document.getElementById('prob_def')?.value || ''}\n\n`;
+
+  tsv += '근본원인\n';
+  selectedRoots.forEach(r => { tsv += `\t${r}\n`; });
+  tsv += '\n분석수준/근본원인\t개선전략\t담당자\t완료예정일\t효과측정지표\n';
+  document.querySelectorAll('#improvePlan .improve-card').forEach(card => {
+    const inputs = card.querySelectorAll('input[type=text]');
+    const ta = card.querySelector('textarea')?.value || '';
+    tsv += `${inputs[0]?.value||''}\t${ta}\t${inputs[1]?.value||''}\t${inputs[2]?.value||''}\t${inputs[3]?.value||''}\n`;
+  });
+
+  navigator.clipboard.writeText(tsv).then(() => {
+    alert('✅ 클립보드에 복사되었습니다!\n구글 시트 또는 엑셀을 열고 Ctrl+V로 붙여넣으세요.');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = tsv; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('✅ 복사되었습니다! 구글 시트에서 Ctrl+V로 붙여넣으세요.');
+  });
 }
-function showAutoSaveStatus(msg){
-  let el=document.getElementById('autosave-status');
-  if(!el){
-    el=document.createElement('span'); el.id='autosave-status';
-    el.style.cssText='font-size:11px;color:rgba(255,255,255,0.5);margin-left:8px;';
-    document.querySelector('.toolbar-title').after(el);
+
+function exportSummary() {
+  const roots = selectedRoots.length > 0 ? selectedRoots.join(', ') : '없음';
+  if (typeof sendPrompt === 'function') sendPrompt(`RCA 결과를 요약해주세요. 도출된 근본원인: ${roots}`);
+  else alert('도출된 근본원인:\n' + (selectedRoots.length ? selectedRoots.join('\n') : '없음'));
+}
+
+// ── 필수값 검사 ──
+function validateStep1() {
+  const missing = [];
+
+  // 날짜 논리 검증
+  const accDate = document.getElementById('acc_date').value;
+  const repDate = document.getElementById('rep_date').value;
+  if (accDate && repDate) {
+    if (new Date(accDate) > new Date(repDate)) {
+      const accEl = document.getElementById('acc_date');
+      const repEl = document.getElementById('rep_date');
+      accEl.style.borderColor = '#b03030';
+      accEl.style.boxShadow = '0 0 0 3px rgba(176,48,48,0.15)';
+      repEl.style.borderColor = '#b03030';
+      repEl.style.boxShadow = '0 0 0 3px rgba(176,48,48,0.15)';
+      alert('⚠️ 보고일시가 발생일시보다 앞에 있습니다.\n발생일시와 보고일시를 다시 확인해주세요.');
+      repEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
   }
-  el.textContent=msg; setTimeout(()=>el.textContent='',3000);
-}
-setInterval(autoSave,30000);
-document.querySelector('.doc').addEventListener('input',()=>{
-  clearTimeout(window._ast); window._ast=setTimeout(autoSave,2000);
-});
 
-// ── 초기화 ──
-const _saved=localStorage.getItem('qps_minutes_auto');
-if(_saved){
-  try{ applyData(JSON.parse(_saved)); showAutoSaveStatus('자동저장 복원'); }
-  catch(e){ switchType('임시'); }
-}else{ switchType('임시'); }
+  // 필수 항목 체크
+  if (!document.getElementById('acc_date').value)
+    missing.push({ msg: '발생일시', id: 'acc_date' });
+  if (!document.getElementById('rep_date').value)
+    missing.push({ msg: '보고일시', id: 'rep_date' });
+  if (!document.getElementById('gender').value)
+    missing.push({ msg: '성별', id: 'gender' });
+  if (!document.getElementById('age').value)
+    missing.push({ msg: '연령', id: 'age' });
+  if (!document.querySelector('input[name="place"]:checked'))
+    missing.push({ msg: '사고 발생 장소', id: 'w_who' });
+  if (!document.querySelector('input[name="acctype"]:checked'))
+    missing.push({ msg: '사고분류', id: 'w_who' });
+  if (!document.querySelector('input[name="severity"]:checked'))
+    missing.push({ msg: '사고 위해정도', id: 'w_who' });
+  if (!document.getElementById('w_who').value)
+    missing.push({ msg: '사고내용 — 누가', id: 'w_who' });
+  if (!document.getElementById('w_where').value)
+    missing.push({ msg: '사고내용 — 어디서', id: 'w_where' });
+  if (!document.getElementById('w_what').value)
+    missing.push({ msg: '사고내용 — 무엇을', id: 'w_what' });
+  if (!document.getElementById('acc_action').value)
+    missing.push({ msg: '사고 후 조치', id: 'acc_action' });
+
+  if (missing.length > 0) {
+    // 누락 항목 하이라이트
+    clearHighlights();
+    missing.forEach(m => {
+      const el = document.getElementById(m.id);
+      if (el) {
+        el.style.borderColor = '#b03030';
+        el.style.boxShadow = '0 0 0 3px rgba(176,48,48,0.15)';
+      }
+    });
+
+    // 팝업 메시지
+    const list = missing.map(m => `• ${m.msg}`).join('\n');
+    alert(`⚠️ 다음 항목이 누락되었습니다:\n\n${list}\n\n입력 후 다음 단계로 진행해주세요.`);
+
+    // 첫 번째 누락 항목으로 스크롤
+    const firstEl = document.getElementById(missing[0].id);
+    if (firstEl) firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  clearHighlights();
+  goStep(2);
+}
+
+function clearHighlights() {
+  ['acc_date','rep_date','gender','age','acc_action','w_who','w_where','w_what','w_how','w_why'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
+  });
+}
+const SAVE_KEY = 'rca_temp_save';
+
+function collectData() {
+  const data = {
+    savedAt: new Date().toLocaleString('ko-KR'),
+    // 1단계
+    acc_date: document.getElementById('acc_date')?.value || '',
+    rep_date: document.getElementById('rep_date')?.value || '',
+    gender: document.getElementById('gender')?.value || '',
+    age: document.getElementById('age')?.value || '',
+    place: document.querySelector('input[name="place"]:checked')?.value || '',
+    place_other: document.getElementById('place_other')?.value || '',
+    acctype: document.querySelector('input[name="acctype"]:checked')?.value || '',
+    acctype_other: document.getElementById('acctype_other')?.value || '',
+    severity: document.querySelector('input[name="severity"]:checked')?.value || '',
+    acc_content: document.getElementById('acc_content')?.value || '',
+    acc_action: document.getElementById('acc_action')?.value || '',
+    prob_def: document.getElementById('prob_def')?.value || '',
+    w_who: document.getElementById('w_who')?.value || '',
+    w_where: document.getElementById('w_where')?.value || '',
+    w_what: document.getElementById('w_what')?.value || '',
+    w_how: document.getElementById('w_how')?.value || '',
+    w_why: document.getElementById('w_why')?.value || '',
+    w_etc: document.getElementById('w_etc')?.value || '',
+    // 팀 구성
+    team: [...document.querySelectorAll('#team-list .member-row')].map(row => ({
+      role: row.querySelector('select')?.value || '',
+      dept: row.querySelectorAll('input')[0]?.value || '',
+      name: row.querySelectorAll('input')[1]?.value || ''
+    })),
+    // 2단계 — 단계별 카드 구조
+    flow_steps: [...document.querySelectorAll('#flow-steps .flow-step-card')].map(card => ({
+      time: card.querySelector('.flow-time-input')?.value || '',
+      step: card.querySelector('.flow-input')?.value || '',
+      main: card.querySelector('.step-main')?.value || '',
+      staff: card.querySelector('.step-staff')?.value || '',
+      cf: [...card.querySelectorAll('.cf-item')].map(item => ({
+        checked: item.querySelector('.cf-check')?.checked || false,
+        text: item.querySelector('.cf-text')?.value || ''
+      }))
+    })),
+    // 3단계
+    levelState: JSON.parse(JSON.stringify(levelState)),
+    treeState: JSON.parse(JSON.stringify(treeState)),
+    selectedRoots: [...selectedRoots],
+    curLevel,
+  };
+  return data;
+}
+
+function restoreData(data) {
+  // 1단계
+  if (data.acc_date) document.getElementById('acc_date').value = data.acc_date;
+  if (data.rep_date) document.getElementById('rep_date').value = data.rep_date;
+  if (data.gender) document.getElementById('gender').value = data.gender;
+  if (data.age) document.getElementById('age').value = data.age;
+
+  // 라디오 칩 복원
+  function restoreChip(name, value, otherId) {
+    if (!value) return;
+    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (radio) {
+      radio.checked = true;
+      radio.closest('.chip')?.classList.add('selected');
+      if (value === '기타' && otherId) {
+        const wrap = document.getElementById(otherId + '_wrap');
+        if (wrap) wrap.classList.add('visible');
+      }
+    }
+  }
+  restoreChip('place', data.place, 'place_other');
+  if (data.place_other) document.getElementById('place_other').value = data.place_other;
+  restoreChip('acctype', data.acctype, 'acctype_other');
+  if (data.acctype_other) document.getElementById('acctype_other').value = data.acctype_other;
+  restoreChip('severity', data.severity);
+
+  if (data.acc_content) document.getElementById('acc_content').value = data.acc_content;
+  if (data.acc_action) document.getElementById('acc_action').value = data.acc_action;
+  if (data.prob_def) document.getElementById('prob_def').value = data.prob_def;
+  if (data.w_who) document.getElementById('w_who').value = data.w_who;
+  if (data.w_where) document.getElementById('w_where').value = data.w_where;
+  if (data.w_what) document.getElementById('w_what').value = data.w_what;
+  if (data.w_how) document.getElementById('w_how').value = data.w_how;
+  if (data.w_why) document.getElementById('w_why').value = data.w_why;
+  if (data.w_etc) document.getElementById('w_etc').value = data.w_etc;
+
+  // 팀 구성
+  if (data.team && data.team.length > 0) {
+    const list = document.getElementById('team-list');
+    list.innerHTML = '';
+    data.team.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'member-row';
+      row.innerHTML = `<select><option${m.role==='팀장'?' selected':''}>팀장</option><option${m.role==='간사'?' selected':''}>간사</option><option${m.role==='팀원'?' selected':''}>팀원</option></select><input type="text" value="${m.dept}" placeholder="소속부서/직위"><input type="text" value="${m.name}" placeholder="이름">`;
+      list.appendChild(row);
+    });
+  }
+
+  // 2단계 — 단계별 카드 구조
+  if (data.flow_steps && data.flow_steps.length > 0) {
+    const list = document.getElementById('flow-steps');
+    list.innerHTML = '';
+    data.flow_steps.forEach((fs, i) => {
+      list.insertAdjacentHTML('beforeend', flowStepCardHTML(i+1, fs.time||'', fs.step||''));
+      const card = list.lastElementChild;
+      if (fs.main) card.querySelector('.step-main').value = fs.main;
+      if (fs.staff) card.querySelector('.step-staff').value = fs.staff;
+      if (fs.cf && fs.cf.length) {
+        const cfList = card.querySelector('.step-cf-list');
+        cfList.innerHTML = '';
+        fs.cf.forEach((cf, j) => {
+          const div = document.createElement('div');
+          div.className = 'cf-item';
+          div.innerHTML = `<input type="checkbox" class="cf-check"${cf.checked?' checked':''}><input type="text" class="cf-text" value="${cf.text||''}" placeholder="위험요인 ${j+1} 상세 내용"><span class="cf-badge">CF</span><button class="cf-del" onclick="removeCFItem(this)" title="이 위험요인 삭제">✕</button>`;
+          cfList.appendChild(div);
+        });
+      }
+    });
+  } else {
+    initFlowSteps();
+  }
+
+  // 3단계
+  if (data.levelState) Object.assign(levelState, data.levelState);
+  if (data.treeState) Object.assign(treeState, data.treeState);
+  if (data.selectedRoots) { selectedRoots.length = 0; data.selectedRoots.forEach(r => selectedRoots.push(r)); }
+  if (data.curLevel) curLevel = data.curLevel;
+}
+
+function autoSave() {
+  // JSON 파일 방식에서는 자동저장 없음 (수동 저장)
+}
+
+function manualSave() {
+  // 날짜 논리 검증
+  const accDate = document.getElementById('acc_date').value;
+  const repDate = document.getElementById('rep_date').value;
+  if (accDate && repDate && new Date(accDate) > new Date(repDate)) {
+    alert('⚠️ 보고일시가 발생일시보다 앞에 있습니다.\n날짜를 확인 후 저장해주세요.');
+    return;
+  }
+  const data = collectData();
+  const dateStr = new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','');
+  const defaultName = `RCA_${dateStr}`;
+
+  const customName = prompt('저장할 파일명을 입력하세요 (.json 자동 추가)\n예) RCA_낙상예방_V1', defaultName);
+  if (customName === null) return;
+
+  const finalName = (customName.trim() || defaultName) + '.json';
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = finalName;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`💾 "${finalName}" 저장 완료!`);
+}
+
+function loadSave() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (confirm(`"${file.name}" 파일을 불러올까요?\n저장 시각: ${data.savedAt}\n\n현재 입력 중인 내용은 사라집니다.`)) {
+          restoreData(data);
+          showToast(`✅ "${file.name}" 불러오기 완료!`);
+        }
+      } catch(e) {
+        alert('파일을 읽을 수 없습니다. RCA 저장 파일(.json)인지 확인해주세요.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearSave() {
+  if (confirm('현재 입력된 내용을 모두 초기화할까요?')) {
+    location.reload();
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(20px)'; }, 3000);
+}
+
+// 자동저장 제거 (JSON 파일 방식)
+// 페이지 로드 시 배너 숨김 + 초기 단계 카드 생성
+window.addEventListener('load', () => {
+  const banner = document.getElementById('restore-banner');
+  if (banner) banner.style.display = 'none';
+  initFlowSteps();
+});
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>
