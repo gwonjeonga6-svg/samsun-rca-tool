@@ -2272,7 +2272,8 @@ function downloadRCAWord() {
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset='utf-8'>
 <style>
-  body { font-family: '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; margin: 2.5cm; line-height: 1.6; }
+  @page { size: 21cm 29.7cm; margin: 1.5cm; }
+  body { font-family: '나눔고딕', 'Nanum Gothic', '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; line-height: 1.6; }
   h1 { font-size: 18pt; color: #0f4080; border-bottom: 3px solid #1a5fa8; padding-bottom: 8px; margin-bottom: 20px; text-align: center; }
   h2 { font-size: 11pt; color: #ffffff; background: #1a5fa8; padding: 6px 14px; margin-top: 24px; margin-bottom: 10px; }
   table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 10pt; page-break-inside: avoid; }
@@ -2339,28 +2340,41 @@ function downloadRCAWord() {
 </table>
 
 <h2>2단계 — 기여요인(CF) 분석</h2>
-<table style="table-layout:fixed;font-size:10pt;border-collapse:collapse;width:100%;">
+${(() => {
+  const n = flowCards.length || 1;
+  const lblPct = 12; // 라벨 컬럼 %
+  const arrowPct = 2; // 화살표 컬럼 %
+  const remaining = 100 - lblPct - arrowPct * (n - 1);
+  const colPct = (remaining / n).toFixed(1);
+  const colgroupCols = [`<col style="width:${lblPct}%">`];
+  flowCards.forEach((c, i) => {
+    colgroupCols.push(`<col style="width:${colPct}%">`);
+    if (i < n - 1) colgroupCols.push(`<col style="width:${arrowPct}%">`);
+  });
+  return `<table style="table-layout:fixed;font-size:9pt;border-collapse:collapse;width:100%;">
+  <colgroup>${colgroupCols.join('')}</colgroup>
   <tr>
-    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">사고발생<br>주요 흐름 단계</td>
-    ${flowCards.map(c => `<td style="text-align:center;font-size:10pt;padding:5px 6px;line-height:1.45;vertical-align:middle;background:#fdf6e3;border:1pt solid #94a3b8;">${c.time ? `<div style="font-size:9pt;color:#b8860b;font-weight:bold;margin-bottom:2px;">${c.time}</div>` : ''}<div style="font-weight:bold;color:#1a5fa8;font-size:10pt;">${c.step || '-'}</div></td>`).join('<td style="border:none;background:none;width:12px;text-align:center;font-size:11pt;color:#9199a8;padding:0;">→</td>')}
+    <td style="text-align:left;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고발생<br>주요 흐름 단계</td>
+    ${flowCards.map(c => `<td style="text-align:center;font-size:9pt;padding:4px 5px;line-height:1.3;vertical-align:middle;background:#fdf6e3;border:1pt solid #94a3b8;word-break:break-all;">${c.time ? `<div style="font-size:8pt;color:#b8860b;font-weight:bold;margin-bottom:2px;">${c.time}</div>` : ''}<div style="font-weight:bold;color:#1a5fa8;font-size:9pt;">${c.step || '-'}</div></td>`).join('<td style="border:none;background:none;text-align:center;font-size:10pt;color:#9199a8;padding:0;">→</td>')}
   </tr>
   <tr>
-    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">사고 분석을<br>위한 주요 사항</td>
-    ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:9.5pt;vertical-align:top;border:1pt solid #94a3b8;padding:5px 6px;">${c.main || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
+    <td style="text-align:left;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고 분석을<br>위한 주요 사항</td>
+    ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:8pt;vertical-align:top;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${c.main || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
   <tr>
-    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">사고발생 흐름<br>단계에 관련된 직원</td>
-    ${flowCards.map(c => `<td style="text-align:center;font-size:9.5pt;background:#fdf6e3;vertical-align:top;border:1pt solid #94a3b8;padding:5px 6px;">${c.staff || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
+    <td style="text-align:left;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고발생 흐름<br>단계에 관련된 직원</td>
+    ${flowCards.map(c => `<td style="text-align:center;font-size:8pt;background:#fdf6e3;vertical-align:top;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${c.staff || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
   <tr>
-    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">위험요인<br>상세기술</td>
-    ${flowCards.map(c => `<td style="text-align:left;vertical-align:top;border:1pt solid #94a3b8;padding:5px 6px;">${
+    <td style="text-align:left;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">위험요인<br>상세기술</td>
+    ${flowCards.map(c => `<td style="text-align:left;vertical-align:top;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${
       c.cf.length
-        ? c.cf.map(cf => `<div style="font-size:9.5pt;margin-bottom:3px;line-height:1.4;text-align:left;${cf.checked ? 'font-weight:bold;color:#b8860b;' : ''}">${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
+        ? c.cf.map(cf => `<div style="font-size:8pt;margin-bottom:2px;line-height:1.3;text-align:left;${cf.checked ? 'font-weight:bold;color:#b8860b;' : ''}">${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
         : '-'
     }</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
-</table>
+</table>`;
+})()}
 <p style="font-size:9pt; color:#6b7280; margin-top:-10px; margin-bottom:16px;">🔶 CF (Causal Factor) : 사건을 예방할 수 있거나 유효하게 감소시킬 수 있는 문제</p>
 
 <h2>3단계 — 도출된 근본원인</h2>
