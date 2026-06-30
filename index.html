@@ -940,12 +940,7 @@ function addCF(btn) {
 // ── Level data ──
 const levels = [
   { id:1, name:"업무절차", note:"낙상예방, 투약, 수혈 등 관련 규정·지침·절차의 존재와 적용 여부를 검토합니다.",
-    q1:"환자안전사고와 관련된 규정/지침/절차 등이 있습니까?", q2:"규정/지침/절차에 따라 모두 적용하였습니까?",
-    q2yes:"예 (적용함)", q2no:"아니오 (적용 안 함)",
-    q2yesMsg:"규정대로 적용했으나 사고 발생 — 규정 자체의 문제를 검토하세요.",
-    q2noMsg:"규정/지침/절차가 있으나 적용하지 않음 — 근접원인을 선택하세요.",
-    roots:["1.1 규정/지침/절차 부재","1.2 규정/지침/절차 관리 미흡"],
-    proxies:["규정/지침/절차 제·개정을 공지하지 않음","규정/지침/절차 교육을 받지 못함","규정/지침/절차가 현장 실무와 맞지 않음","규정/지침/절차에 잘못된 업무절차가 있음","수행 주체 및 시기가 명확하지 않음"] },
+    special:"tree", tree:"workProcedure" },
   { id:2, name:"교육/훈련", note:"사고와 관련된 직원·환자·보호자 교육/훈련 프로그램의 존재와 효과를 검토합니다.",
     q1:"환자안전사고와 관련된 교육/훈련 프로그램이 있습니까?", q2:"직원이 교육/훈련을 충분히 받았습니까?",
     q2yes:"예 (충분히 받음)", q2no:"아니오 (충분히 못 받음)",
@@ -1020,6 +1015,272 @@ const levelState = {};
 const selectedRoots = [];
 let curLevel = 1;
 
+// ══════════════════════════════════════════
+// Decision Tree 데이터 — KoSQIN RCA Toolkit V2.0 Flow
+// 노드 기반: 각 노드는 question, yes/no 시 동작(next 노드 / root 부여 / checklist 표시)을 가짐
+// ══════════════════════════════════════════
+const decisionTrees = {
+  workProcedure: {
+    startNode: 'q1',
+    nextLevel: 2, // 종료 후 이동할 분석수준 id
+    nodes: {
+      q1: {
+        question: '환자안전사고와 관련된 규정/지침/절차 등이 있습니까?',
+        yes: { next: 'q2' },
+        no: {
+          message: '관련 규정이나 절차 자체가 존재하지 않는 경우입니다.',
+          proxy: '규정/지침/절차 없음',
+          root: '1.1 규정/지침/절차 부재',
+          end: true
+        }
+      },
+      q2: {
+        question: '환자안전사고와 관련된 규정/지침/절차에 따라 모두 적용하였습니까?',
+        yes: {
+          message: '규정도 있었고 실제 업무에서도 모두 적용되었습니다. 업무절차에는 문제가 없는 것으로 판단합니다.',
+          end: true
+        },
+        no: { next: 'q3', message: '규정은 있었지만 적용되지 않았습니다. 왜 적용되지 않았는지 확인합니다.' }
+      },
+      q3: {
+        question: '환자안전사고와 관련된 규정/지침/절차가 있는지 몰라 적용하지 않았습니까?',
+        yes: {
+          message: '규정을 모르고 적용하지 못한 경우입니다. 해당되는 항목을 모두 선택하세요.',
+          checklist: ['규정/지침/절차의 제·개정을 공지하지 않음','규정/지침/절차의 제·개정 이력을 잘못 공지함','규정/지침/절차 교육을 받지 못함','과도하거나 복잡한 참조로 규정/지침/절차를 찾기 어려움'],
+          allowCustom: true,
+          root: '1.2 규정/지침/절차 관리 미흡',
+          end: true
+        },
+        no: { next: 'q4' }
+      },
+      q4: {
+        question: '환자안전사고와 관련된 규정/지침/절차가 있는지 알았지만 적용하지 않았습니까?',
+        yes: {
+          message: '규정은 알고 있었지만 적용하지 않은 경우입니다.',
+          checklist: ['규정/지침/절차가 관련 법이나 근거에 맞지 않음','규정/지침/절차가 현장 실무와 맞지 않음','규정/지침/절차가 이해하기 어려움','규정/지침/절차에 잘못된 업무절차가 있음'],
+          allowCustom: true,
+          root: '1.2 규정/지침/절차 관리 미흡',
+          end: true
+        },
+        no: { next: 'q5' }
+      },
+      q5: {
+        question: '환자안전사고와 관련된 규정/지침/절차를 부분 적용하였거나 적용을 잘못하였습니까?',
+        yes: {
+          message: '규정을 일부만 적용했거나 잘못 적용한 경우입니다.',
+          checklist: ['규정/지침/절차 안에 포함된 양식, 표 등이 본문 내용과 다름','규정/지침/절차에 업무 수행에 필요한 내용이 일부 누락되어 있음','규정/지침/절차 수행의 주체 및 시기가 명확하지 않음','규정/지침/절차의 내용이 달라지는 오탈자, 자료, 계산방법 등이 있음'],
+          allowCustom: true,
+          root: '1.2 규정/지침/절차 관리 미흡',
+          end: true
+        },
+        no: {
+          message: '위 항목에 해당하지 않는 다른 원인이 있는 경우입니다. 의료기관 사정에 맞게 직접 입력하세요.',
+          freeInput: true,
+          end: true
+        }
+      }
+    }
+  }
+};
+
+// 트리 진행 상태: { [levelId]: { path:[nodeId,...], current:nodeId, answers:{nodeId:'yes'|'no'}, checks:{nodeId:[...]}, freeText, finished:bool } }
+const treeState = {};
+
+function getTreeState(levelId) {
+  if (!treeState[levelId]) treeState[levelId] = { current: null, answers: {}, checks: {}, freeText: '', finished: false, finalRoot: null };
+  return treeState[levelId];
+}
+
+function startTree(levelId, treeKey) {
+  const ts = getTreeState(levelId);
+  if (!ts.current) ts.current = decisionTrees[treeKey].startNode;
+  return ts;
+}
+
+function answerTreeNode(levelId, treeKey, nodeId, val) {
+  const tree = decisionTrees[treeKey];
+  const ts = getTreeState(levelId);
+  ts.answers[nodeId] = val;
+  const branch = tree.nodes[nodeId][val];
+
+  // 이전에 이 노드 이후 진행된 답변/체크/루트 초기화 (분기 변경 대응)
+  const nodeOrder = Object.keys(tree.nodes);
+  const idx = nodeOrder.indexOf(nodeId);
+  nodeOrder.slice(idx+1).forEach(n => { delete ts.answers[n]; delete ts.checks[n]; });
+  ts.finished = false;
+  if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
+    const i = selectedRoots.indexOf(ts.finalRoot); selectedRoots.splice(i,1);
+  }
+  ts.finalRoot = null;
+
+  if (branch.end) {
+    ts.finished = true;
+    ts.current = nodeId; // 현재 노드에 머무름(체크리스트/자유입력 표시용)
+    if (branch.root && !branch.checklist) {
+      ts.finalRoot = branch.root;
+      if (!selectedRoots.includes(branch.root)) selectedRoots.push(branch.root);
+    }
+    // checklist가 있는 경우 root는 체크 완료 시 부여 (renderTreeLevel에서 처리)
+  } else if (branch.next) {
+    ts.current = branch.next;
+  }
+  renderLevel();
+}
+
+function toggleTreeCheck(levelId, treeKey, nodeId, item, checked) {
+  const ts = getTreeState(levelId);
+  if (!ts.checks[nodeId]) ts.checks[nodeId] = [];
+  if (checked) { if (!ts.checks[nodeId].includes(item)) ts.checks[nodeId].push(item); }
+  else ts.checks[nodeId] = ts.checks[nodeId].filter(x => x !== item);
+
+  // 체크리스트가 있는 노드의 root는 1개 이상 체크되었을 때만 부여
+  const tree = decisionTrees[treeKey];
+  const branch = tree.nodes[nodeId][ts.answers[nodeId]];
+  if (branch.root) {
+    if (ts.checks[nodeId].length > 0) {
+      if (!selectedRoots.includes(branch.root)) selectedRoots.push(branch.root);
+      ts.finalRoot = branch.root;
+    } else {
+      const i = selectedRoots.indexOf(branch.root);
+      if (i > -1) selectedRoots.splice(i, 1);
+      ts.finalRoot = null;
+    }
+  }
+  renderLevel();
+}
+
+function setTreeCheckCustom(levelId, nodeId, root, text) {
+  const ts = getTreeState(levelId);
+  if (!ts.checkCustom) ts.checkCustom = {};
+  ts.checkCustom[nodeId] = text;
+  // 체크박스 항목처럼 취급: 텍스트 있으면 checks 배열에 'custom:텍스트' 형태로 반영
+  if (!ts.checks[nodeId]) ts.checks[nodeId] = [];
+  const customEntries = ts.checks[nodeId].filter(c => c.startsWith('custom:'));
+  ts.checks[nodeId] = ts.checks[nodeId].filter(c => !c.startsWith('custom:'));
+  if (text.trim()) ts.checks[nodeId].push('custom:' + text.trim());
+
+  if (ts.checks[nodeId].length > 0) {
+    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+    ts.finalRoot = root;
+  } else {
+    const i = selectedRoots.indexOf(root);
+    if (i > -1) selectedRoots.splice(i, 1);
+    ts.finalRoot = null;
+  }
+  updateRootPanel();
+}
+
+function setTreeFreeText(levelId, text) {
+  const ts = getTreeState(levelId);
+  ts.freeText = text;
+  if (text.trim()) {
+    const root = '기타: ' + text.trim();
+    // 이전 자유입력 근본원인 제거 후 재추가
+    const prevRoot = ts.finalRoot;
+    if (prevRoot && prevRoot.startsWith('기타: ') && selectedRoots.includes(prevRoot)) {
+      selectedRoots.splice(selectedRoots.indexOf(prevRoot), 1);
+    }
+    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+    ts.finalRoot = root;
+  } else if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
+    selectedRoots.splice(selectedRoots.indexOf(ts.finalRoot), 1);
+    ts.finalRoot = null;
+  }
+  updateRootPanel();
+}
+
+function resetTreeFrom(levelId, treeKey, nodeId) {
+  // 특정 노드부터 다시 답변하도록 되돌리기(분기 변경)
+  const ts = getTreeState(levelId);
+  const tree = decisionTrees[treeKey];
+  const nodeOrder = Object.keys(tree.nodes);
+  const idx = nodeOrder.indexOf(nodeId);
+  nodeOrder.slice(idx).forEach(n => { delete ts.answers[n]; delete ts.checks[n]; });
+  if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
+    selectedRoots.splice(selectedRoots.indexOf(ts.finalRoot), 1);
+  }
+  ts.finalRoot = null;
+  ts.finished = false;
+  ts.current = nodeId;
+  renderLevel();
+}
+
+// ── Decision Tree 렌더링 ──
+function renderTreeLevel(l, state) {
+  const treeKey = l.tree;
+  const tree = decisionTrees[treeKey];
+  const ts = startTree(l.id, treeKey);
+
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>
+  <div style="font-size:12px; color:var(--gray-400); margin-bottom:14px;">먼저 사고와 관련된 규정, 지침 또는 절차가 있었는지 확인합니다. 질문에 따라 예 또는 아니오를 선택하면 다음 단계가 자동으로 진행됩니다.</div>`;
+
+  // 지나온 경로를 순서대로 렌더링
+  let nodeId = tree.startNode;
+  let stepNum = 1;
+  while (nodeId) {
+    const node = tree.nodes[nodeId];
+    const answered = ts.answers[nodeId];
+    const isCurrent = nodeId === ts.current && !answered;
+
+    html += `<div class="q-box" style="${answered ? 'opacity:0.9;' : ''}">
+      <div class="q-label">질문 ${l.id}-${stepNum}</div>
+      <div class="q-text">${node.question}</div>
+      <div class="q-btns">
+        <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','${nodeId}','yes')">예</button>
+        <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','${nodeId}','no')">아니오</button>
+      </div>
+      ${answered ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'${treeKey}','${nodeId}')">↺ 이 질문부터 다시 답변</button>` : ''}
+    </div>`;
+
+    if (!answered) break; // 아직 답 안 한 질문에서 멈춤
+
+    const branch = node[answered];
+    if (branch.message) {
+      html += `<div class="alert ${branch.root || branch.checklist || branch.freeInput ? 'alert-warn' : 'alert-success'}">→ ${branch.message}</div>`;
+    }
+
+    if (branch.checklist) {
+      const checks = ts.checks[nodeId] || [];
+      html += `<div class="q-box">
+        <div class="q-label">해당 항목 선택 (체크박스)</div>
+        ${branch.checklist.map((item,i)=>`<div class="proxy-item"><input type="checkbox" id="tc_${l.id}_${nodeId}_${i}" ${checks.includes(item)?'checked':''} onchange="toggleTreeCheck(${l.id},'${treeKey}','${nodeId}','${item.replace(/'/g,"\\'")}',this.checked)"><label for="tc_${l.id}_${nodeId}_${i}">${item}</label></div>`).join('')}
+        ${branch.allowCustom ? `<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--gray-500);white-space:nowrap;">기타(의료기관 사정에 맞게 추가)</span>
+          <input type="text" value="${ts.checkCustom&&ts.checkCustom[nodeId]||''}" placeholder="직접 입력" oninput="setTreeCheckCustom(${l.id},'${nodeId}','${branch.root}',this.value)" style="flex:1;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 9px;font-size:13px;font-family:inherit;">
+        </div>` : ''}
+      </div>`;
+      if (checks.length > 0) {
+        html += `<div class="alert alert-warn">→ 근본원인: <strong>${branch.root}</strong></div>`;
+      }
+    } else if (branch.root && !branch.checklist) {
+      html += `<div class="alert alert-warn">→ 근본원인: <strong>${branch.root}</strong></div>`;
+    }
+
+    if (branch.freeInput) {
+      html += `<div class="q-box">
+        <div class="q-label">기타 근접원인 입력</div>
+        <input type="text" value="${ts.freeText||''}" placeholder="해당하는 원인을 직접 입력하세요" oninput="setTreeFreeText(${l.id},this.value)" style="width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:inherit;">
+      </div>`;
+    }
+
+    if (branch.end) { nodeId = null; }
+    else { nodeId = branch.next; stepNum++; }
+  }
+
+  if (ts.finished) {
+    html += `<div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  }
+
+  html += `<div style="display:flex; gap:8px; margin-top:8px;">`;
+  if (l.id < 10) html += `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>`;
+  if (l.id > 1) html += `<button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>`;
+  html += `</div>`;
+
+  return html;
+}
+
+
 function initLevelNav() {
   const nav = document.getElementById('levelNav');
   nav.innerHTML = '';
@@ -1041,6 +1302,7 @@ function renderLevel() {
 
   if (l.special === 'facility') { c.innerHTML = renderFacilityLevel(l, state); updateRootPanel(); return; }
   if (l.special === 'unimprovable') { c.innerHTML = renderUnimprovableLevel(l, state); updateRootPanel(); return; }
+  if (l.special === 'tree') { c.innerHTML = renderTreeLevel(l, state); updateRootPanel(); return; }
 
   let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
   <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
@@ -1757,6 +2019,7 @@ function collectData() {
     })),
     // 3단계
     levelState: JSON.parse(JSON.stringify(levelState)),
+    treeState: JSON.parse(JSON.stringify(treeState)),
     selectedRoots: [...selectedRoots],
     curLevel,
   };
@@ -1837,6 +2100,7 @@ function restoreData(data) {
 
   // 3단계
   if (data.levelState) Object.assign(levelState, data.levelState);
+  if (data.treeState) Object.assign(treeState, data.treeState);
   if (data.selectedRoots) { selectedRoots.length = 0; data.selectedRoots.forEach(r => selectedRoots.push(r)); }
   if (data.curLevel) curLevel = data.curLevel;
 }
