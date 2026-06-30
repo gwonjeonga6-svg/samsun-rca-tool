@@ -966,12 +966,16 @@ const levels = [
     q2noMsg:"이 분석수준에서 추가 근본원인 없음. 마지막으로 10. 개선불가 영역을 점검하세요.",
     roots:["9.1 시설 및 환경 관련 법 미준수","9.2 업무환경 안전관리 미흡","9.3 시설 및 환경 위험관리 미흡","9.4 재난관리시스템 미흡","9.5 환자 및 환자 보호자의 환자안전활동 참여 미흡"],
     proxies:["관련 법 미준수","소음, 조도, 공간/시설 문제","위험관리 미수행","재난 시 대응 체계 없음"] },
-  { id:10, name:"개선불가 영역", note:"1~9번 분석수준으로 근본원인을 하나도 찾지 못했거나, 찾았더라도 시스템 개선으로는 예방이 어려운 사고인지 마지막으로 확인합니다.",
+  { id:10, name:"개선불가 영역", note:"1~9번 분석수준으로 근본원인을 하나도 찾지 못한 경우, 시스템 개선으로 예방하기 어려운 사고인지 마지막으로 확인합니다.",
     special:"unimprovable",
-    q1:"이 사고는 1~9번 분석수준으로 근본원인을 파악할 수 있는 사고였습니까?",
-    q1yesMsg:"근본원인 분석을 종료하고 4단계(개선전략 수립)로 이동하세요.",
-    q1noMsg:"개선불가 영역에 해당하는지 아래 사유를 확인하세요. 해당되면 RCA 분석을 종료합니다.",
-    unimprovableReasons:["현재의 시스템 개선으로 예방하기 어려운 사고","불가항력적 상황(천재지변 등)","환자의 특이 상태나 예측 불가능성이 컸던 경우","기타 시스템적 통제가 불가능한 요인"],
+    unimprovableQuestions:[
+      { q:"관련된 환자안전사고가 분석수준 1~9번까지 진행하였으나 원인을 파악할 수 없는 사고였습니까?", reason:"근본원인 분석 종료 (원인불명)" },
+      { q:"관련된 환자안전사고가 분석수준 1~9번까지 진행하였으나 불가항력적 환자 요인으로 인한 사고였습니까? (예: 낙상 평가 및 예방활동을 시행했음에도 불구하고 환자의 다리에 힘이 풀려 낙상함)", reason:"근본원인 분석 종료 (불가항력적 사고)" },
+      { q:"관련된 환자안전사고가 환자 및 환자 보호자가 의도적으로 참여/치료를 거절하여 발생하였습니까?", reason:"근본원인 분석 종료 (환자 및 환자 보호자 참여/치료 거절)" },
+      { q:"치료선택 모두 환자에게 부담이 되는 경우 질환의 특성과 치료 장단점을 고려하여 제한적인 상황에서 의료진이 최선을 선택한 상황이었습니까? (설명: 환자 상태가 안 좋아 치료방법 A를 선택하나 B를 선택해도 상태가 안 좋아질 것이라고 예상되는 상황에서 둘 중 하나를 선택함)", reason:"근본원인 분석 종료 (최선의 선택)" },
+      { q:"직원이 환자안전사고를 고의적으로 발생시켰습니까? (예: 처방 없이 고의적으로 안락사 시킴, 수혈처방이 되었으나 직원의 종교적 신념으로 환자에게 수혈하지 않아 사망함 등)", reason:"근본원인 분석 종료 (고의적 환자안전사고/징계 위원회 상정)" }
+    ],
+    finalMessage:"분석수준 1~10번까지 선택된 내용이 없으면 다시 한번 차근차근 절차를 밟아 근본원인을 분석해 보십시오.",
     roots:["10. 개선불가 영역(시스템 개선으로 예방 곤란)"] }
 ];
 
@@ -1008,40 +1012,22 @@ const decisionTrees = {
       },
       q3: {
         question: '환자안전사고와 관련된 규정/지침/절차가 있는지 몰라 적용하지 않았습니까?',
-        yes: {
-          message: '규정을 모르고 적용하지 못한 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['규정/지침/절차의 제·개정을 공지하지 않음','규정/지침/절차의 제·개정 이력을 잘못 공지함','규정/지침/절차 교육을 받지 못함','과도하거나 복잡한 참조로 규정/지침/절차를 찾기 어려움'],
-          allowCustom: true,
-          root: '1.2 규정/지침/절차 관리 미흡',
-          end: true
-        },
-        no: { next: 'q4' }
+        checklist: ['규정/지침/절차의 제·개정을 공지하지 않음','규정/지침/절차의 제·개정 이력을 잘못 공지함','규정/지침/절차 교육을 받지 못함','과도하거나 복잡한 참조로 규정/지침/절차를 찾기 어려움'],
+        checklistRoot: '1.2 규정/지침/절차 관리 미흡',
+        yes: { next: 'q4' }, no: { next: 'q4' }
       },
       q4: {
         question: '환자안전사고와 관련된 규정/지침/절차가 있는지 알았지만 적용하지 않았습니까?',
-        yes: {
-          message: '규정은 알고 있었지만 적용하지 않은 경우입니다.',
-          checklist: ['규정/지침/절차가 관련 법이나 근거에 맞지 않음','규정/지침/절차가 현장 실무와 맞지 않음','규정/지침/절차가 이해하기 어려움','규정/지침/절차에 잘못된 업무절차가 있음'],
-          allowCustom: true,
-          root: '1.2 규정/지침/절차 관리 미흡',
-          end: true
-        },
-        no: { next: 'q5' }
+        checklist: ['규정/지침/절차가 관련 법이나 근거에 맞지 않음','규정/지침/절차가 현장 실무와 맞지 않음','규정/지침/절차가 이해하기 어려움','규정/지침/절차에 잘못된 업무절차가 있음'],
+        checklistRoot: '1.2 규정/지침/절차 관리 미흡',
+        yes: { next: 'q5' }, no: { next: 'q5' }
       },
       q5: {
         question: '환자안전사고와 관련된 규정/지침/절차를 부분 적용하였거나 적용을 잘못하였습니까?',
-        yes: {
-          message: '규정을 일부만 적용했거나 잘못 적용한 경우입니다.',
-          checklist: ['규정/지침/절차 안에 포함된 양식, 표 등이 본문 내용과 다름','규정/지침/절차에 업무 수행에 필요한 내용이 일부 누락되어 있음','규정/지침/절차 수행의 주체 및 시기가 명확하지 않음','규정/지침/절차의 내용이 달라지는 오탈자, 자료, 계산방법 등이 있음'],
-          allowCustom: true,
-          root: '1.2 규정/지침/절차 관리 미흡',
-          end: true
-        },
-        no: {
-          message: '위 항목에 해당하지 않는 다른 원인이 있는 경우입니다. 의료기관 사정에 맞게 직접 입력하세요.',
-          freeInput: true,
-          end: true
-        }
+        checklist: ['규정/지침/절차 안에 포함된 양식, 표 등이 본문 내용과 다름','규정/지침/절차에 업무 수행에 필요한 내용이 일부 누락되어 있음','규정/지침/절차 수행의 주체 및 시기가 명확하지 않음','규정/지침/절차의 내용이 달라지는 오탈자, 자료, 계산방법 등이 있음'],
+        checklistRoot: '1.2 규정/지침/절차 관리 미흡',
+        checklistEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1058,13 +1044,34 @@ const decisionTrees = {
       q2: {
         question: '직원이 환자안전사고와 관련된 교육/훈련을 충분히 받았습니까?',
         yes: { message: '교육/훈련 프로그램이 있었고 충분히 받았습니다. 인적요인_교육/훈련에는 문제가 없는 것으로 판단합니다.', end: true },
-        no: {
-          message: '교육/훈련이 충분하지 않았던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['업무분석 미흡하여 교육/훈련 과정에 반영되지 않거나 미흡함','환자안전사고와 관련된 교육 요구는 있으나 교육/훈련에 반영하지 않음','환자안전사고와 관련된 교육/훈련 목표가 미흡하거나 없음','환자안전사고와 관련된 교육/훈련 방법이 미흡하거나 없음','환자안전사고와 관련된 교육/훈련 시간이 충분하지 않음','환자안전사고와 관련된 교육/훈련 평가가 미흡하거나 없음','환자안전사고와 관련된 교육/훈련의 지속 또는 반복 교육/훈련이 없음'],
-          allowCustom: true,
-          root: '2.2 교육/훈련 계획 운영 미흡',
-          end: true
-        }
+        no: { next: 'q2a', message: '교육/훈련이 충분하지 않았던 경우입니다. 아래 세부 질문에 모두 답해주세요.' }
+      },
+      q2a: {
+        question: '직원이 받은 교육/훈련 내용이 적절하지 않았습니까?',
+        chainItems: ['업무분석 미흡하여 교육/훈련 과정에 반영되지 않거나 미흡함','환자안전사고와 관련된 교육 요구는 있으나 교육/훈련에 반영하지 않음','환자안전사고와 관련된 교육/훈련 목표가 미흡하거나 없음'],
+        chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '직원이 받은 교육/훈련 방법이 적절하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련 방법이 미흡하거나 없음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '직원이 받은 교육/훈련 시간은 충분하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련 시간이 충분하지 않음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '직원이 받은 교육/훈련에 대해 평가를 하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련 평가가 미흡하거나 없음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '직원은 환자안전사고와 관련 교육/훈련을 지속해서 받지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 교육/훈련의 지속 또는 반복 교육/훈련이 없음'], chainRoot: '2.2 교육/훈련 계획 운영 미흡',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1080,14 +1087,39 @@ const decisionTrees = {
       },
       q2: {
         question: '의사소통에 문제가 있었습니까?',
-        yes: {
-          message: '의사소통 문제가 있었던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['의사소통을 위한 체계가 없음','의사소통 내용이 다르게 전달됨','표준화되지 않은 약어/용어 사용','인수인계가 불명확하거나 누락됨','구두지시에 대한 재확인이 누락됨','안전하지 않은 의사소통 분위기(의견 제시가 어려운 분위기)'],
-          allowCustom: true,
-          root: '3.1 환자안전을 위한 의사소통 체계 미흡',
-          end: true
-        },
+        yes: { next: 'q2a', message: '의사소통 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
         no: { message: '의사소통에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '환자안전사고와 관련하여 필요한 의사소통을 하지 않았습니까?',
+        chainItems: ['의사소통을 위한 체계가 없음(의사소통 방법, 내용, 시기, 공유 등)','의사소통을 위한 체계가 있으나 실무와 맞지 않아 사용되지 않음','환자안전사고와 관련하여 의사소통 시 의도한 내용과 다르게 상대방이 이해함','환자안전사고와 관련하여 의사소통 시 의도한 내용과 다르게 전달함','표준화되지 않은 약어나 용어를 사용함'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '환자안전사고와 관련하여 의사소통 시기에 문제가 있었습니까?',
+        chainItems: ['환자안전사고와 관련하여 의사소통 시기가 늦음'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '환자안전사고와 관련하여 구두지시에 문제가 있었습니까?',
+        chainItems: ['규정상 허용하지 않는 상황에서 구두지시함','구두지시 과정에서 재확인 절차를 누락함(예: Repeat back, read back)'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '환자안전사고와 관련하여 인수인계에 문제가 있었습니까?',
+        chainItems: ['인수인계 기준이 없음','환자안전사고와 관련된 인수인계가 불명확하거나 누락됨'],
+        chainRoot: '3.1 환자안전을 위한 의사소통 체계 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '의사소통의 위험요소가 있었습니까?',
+        chainItems: ['의사소통을 위한 체계가 있으나 안전하지 않은 의사소통 분위기로 의사소통하지 않음(동료와 대화하기 꺼림, 의견제시가 어려움, 의사소통 장애 시 극복하기 위한 노력 부족)'],
+        chainRoot: '3.2 안전한 의사소통을 위한 환자안전문화 인식 저하',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1103,14 +1135,39 @@ const decisionTrees = {
       },
       q2: {
         question: '직원이 규정/지침/절차에 따라 정확하게 수행하는 데 문제가 있었습니까?',
-        yes: {
-          message: '업무수행에 문제가 있었던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['확인 절차를 누락함','수행 방법에 오류가 있음','업무에 미숙함(경험·숙련도 부족)','주의가 분산되어 집중하지 못함','과중한 업무로 인한 피로·부주의','역할과 책임이 혼동됨'],
-          allowCustom: true,
-          root: '4.1 규정/지침/절차에 따른 업무 불이행 또는 부적절한 수행',
-          end: true
-        },
+        yes: { next: 'q2a', message: '업무수행에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
         no: { message: '업무수행에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '확인 절차를 누락하였습니까?',
+        chainItems: ['확인 절차를 누락함'], chainRoot: '4.1 규정/지침/절차에 따른 업무 불이행 또는 부적절한 수행',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '수행 방법에 오류가 있었습니까?',
+        chainItems: ['수행 방법에 오류가 있음'], chainRoot: '4.1 규정/지침/절차에 따른 업무 불이행 또는 부적절한 수행',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '업무에 미숙(경험·숙련도 부족)하였습니까?',
+        chainItems: ['업무에 미숙함(경험·숙련도 부족)'], chainRoot: '4.2 개인적 요인에 의한 업무 불이행',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '주의가 분산되어 집중하지 못하였습니까?',
+        chainItems: ['주의가 분산되어 집중하지 못함'], chainRoot: '4.2 개인적 요인에 의한 업무 불이행',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '과중한 업무로 인한 피로·부주의가 있었습니까?',
+        chainItems: ['과중한 업무로 인한 피로·부주의'], chainRoot: '4.3 부적절한 업무 배분',
+        yes: { next: 'q2f' }, no: { next: 'q2f' }
+      },
+      q2f: {
+        question: '역할과 책임이 혼동되었습니까?',
+        chainItems: ['역할과 책임이 혼동됨'], chainRoot: '4.4 불충분한 업무 지원',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1126,14 +1183,39 @@ const decisionTrees = {
       },
       q2: {
         question: '부서관리에 문제가 있었습니까?',
-        yes: {
-          message: '부서관리에 문제가 있었던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['자격을 갖춘 인력이 배치되지 않음(인력관리 미흡)','업무 배분이 적절하지 않음','부서 내 업무 매뉴얼을 관리하지 않음','사고 후 개선활동 유지관리가 미흡함','위험상황에 대한 관리·감독이 미흡함'],
-          allowCustom: true,
-          root: '5.1 부적절한 인력관리 또는 부서장 관리 미흡',
-          end: true
-        },
+        yes: { next: 'q2a', message: '부서관리에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
         no: { message: '부서관리에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '부서장은 환자안전사고와 관련되어 적절하게 인력관리를 하지 못했습니까?',
+        chainItems: ['관련 법과 의료기관 규정에 적합한 자격을 갖춘 인력이 배치되지 않음','환자안전사고와 관련되어 근무 인원수, 경력자, 환자 중증도 등을 고려한 인력을 배치하지 않음','부서장은 비상 상황(파업, 원내·외 위기상황 등)에서 적시에 직원 배치계획을 수립하지 않음'],
+        chainRoot: '5.1 부적절한 인력관리',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '부서장은 환자안전사고와 관련된 직원의 업무역량을 파악하고, 수행도 평가, 피드백, 재교육/훈련 등을 관리하지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 직원의 업무역량을 파악하고, 수행도 평가, 피드백, 재교육/훈련 등을 관리하지 않음'],
+        chainRoot: '5.1 부적절한 인력관리',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '부서장은 환자안전사고와 관련된 업무 규정/지침/절차/매뉴얼을 관리하지 않았습니까?',
+        chainItems: ['부서장은 환자안전사고와 관련된 업무 규정/지침/절차를 관련 법과 최신동향을 반영하여 관리하지 않음','부서장은 환자안전사고와 관련된 업무 매뉴얼을 관리하지 않음','부서장은 규정/지침/절차/매뉴얼에 따라 업무를 수행할 수 있도록 필요한 자료/정보를 제공하지 않음'],
+        chainRoot: '5.2 부서장의 규정/지침/절차/매뉴얼 관리 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '부서장은 환자안전사고 발생 후 지속적인 관리를 하지 않았습니까?',
+        chainItems: ['부서장은 환자안전사고 발생 후 지속해서 개선활동을 유지관리하지 않음','부서장은 동일하거나 유사한 환자안전사고를 반복적으로 일으키거나 고의로 환자안전사고를 발생시킨 직원에게 적절한 주의경고를 주지 않음'],
+        chainRoot: '5.3 부서장의 환자안전사고 관리 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '부서장은 위험관리를 하지 않았습니까?',
+        chainItems: ['환자안전사고 위험이 높은 상태나 직원들의 바람직하지 않은 행동을 관리·감독하지 않음'],
+        chainRoot: '5.4 부서장의 위험관리 미흡',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1150,13 +1232,32 @@ const decisionTrees = {
       q2: {
         question: '리더십이 환자안전사고 감소 및 예방을 위해 관심을 가지고 지원과 참여를 하였습니까?',
         yes: { message: '리더십에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true },
-        no: {
-          message: '리더십의 지원과 참여가 부족했던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['환자안전 활동에 대한 지원이 부족함','필요한 예산·인력·장비를 지원하지 않음','직원의 환자안전 관련 제안을 받아들이지 않음','인지된 환자안전 이슈에 적시 지원이 없음','환자안전 및 의료 질 관리·감독이 부재함'],
-          allowCustom: true,
-          root: '6.4 인지된 환자안전 이슈에 대한 지원 미흡',
-          end: true
-        }
+        no: { next: 'q2a', message: '리더십의 지원과 참여가 부족했던 경우입니다. 세부 사항을 확인합니다.' }
+      },
+      q2a: {
+        question: '리더십이 환자안전향상을 위한 직원들의 의견을 경청하거나 고려하지 않습니까?',
+        chainItems: ['리더십은 위험상황이나 문제 영역에 대한 직원 경고를 지지하지 않음(예: 직원이 위험상황을 알리는 것을 독려하거나 지지하지 않는다)','리더십은 환자안전을 위한 직원의 제안을 받아들이지 않음(예: 사고는 발생하지는 않았으나 발생 가능성이 있는 위험문제에 대한 직원 제안에 관심을 갖지 않는다)','리더십이 조직 구성원들의 환자안전문화 인식 수준에 대해 관심이 없음(직원들의 환자안전문화 인식 수준을 알려고 하지 않는다)'],
+        chainRoot: '6.2 리더십과 직원 간 소통 부재',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '리더십이 환자안전 향상을 위한 충분한 자원을 제공하지 않습니까?',
+        chainItems: ['환자안전사고와 연관된 직원을 지원하는 체계(예: 심리상담, 정서지지 프로그램 등)를 갖고 있지 않음','안전하게 업무를 수행하는데 필요한 예산을 지원하지 않음','안전하게 업무를 수행할 수 있는 적정한 인력이 배치되어 있지 않음','안전하게 업무를 수행하는데 필요한 장비를 적절하게 보유하고 있지 않음'],
+        chainRoot: '6.3 리더십의 자원 지원 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '리더십이 인지된 환자안전 이슈에 대하여 적시에 지원 또는 지지를 하지 않았습니까?',
+        chainItems: ['리더십이 인지된 환자안전 이슈에 대하여 적시에 지원 또는 지지를 하지 않음'],
+        chainRoot: '6.4 리더십의 인지된 환자안전 이슈에 대한 지원 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '리더십이 환자안전 및 의료 질 관리·감독을 통해 문제를 확인하지 않았습니까?',
+        chainItems: ['리더십이 환자안전 및 의료 질 관리·감독을 통해 문제를 확인하지 않음','리더십이 환자안전 및 의료 질 향상에 필요한 지원을 하지 않음','리더십이 환자안전 및 의료 질 사업에 대한 관리·감독을 하지 않음'],
+        chainRoot: '6.5 리더십의 환자안전 및 의료 질 관리·감독 부재',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1172,14 +1273,21 @@ const decisionTrees = {
       },
       q2: {
         question: '인간공학 요인에 문제가 있었습니까?',
-        yes: {
-          message: '인간공학 요인에 문제가 있었던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['시스템이 복잡하여 오류 발견이 어려움','시스템이 느슨하여 오류가 보고되지 않음','반복 동작, 불편한 자세 등 물리적 작업요인이 있음','화면 구성·알람이 직관적이지 않음','작업동선·공간 배치가 비효율적임','라벨/표시의 식별성이 낮음'],
-          allowCustom: true,
-          root: '7.1 환자안전 시스템 관리 부재',
-          end: true
-        },
+        yes: { next: 'q2a', message: '인간공학 요인에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
         no: { message: '인간공학 요인에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '환자안전사고와 관련된 직원에게 영향을 미치는 복잡하거나 느슨한 시스템이 있었습니까?',
+        chainItems: ['환자안전사고와 관련된 직원에게 영향을 미치는 복잡한 시스템이 있음(예: 많은 항목 모니터링, 복잡한 의사결정단계, 부서 간 업무 차이 많음)','환자안전사고와 관련된 직원에게 영향을 미치는 느슨한 시스템이 있음(예: 오류가 발견 안 됨, 환자안전사고를 보고하지 않음, 오류 회복/복구 불가능 등)'],
+        chainRoot: '7.1 환자안전 시스템 관리 부재',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '환자안전사고와 관련된 직원에게 영향을 미치는 물리적 작업요인이 있었습니까?',
+        chainItems: ['환자안전사고와 관련된 직원에게 영향을 미치는 물리적 작업요인이 있음(예: 반복적인 움직임, 불편한 자세, 무거운 물건을 들어 올리는 것, 진동, 활동에 제한을 주는 보호구 착용, 동선 배치 문제 등)'],
+        chainRoot: '7.2 물리적 작업요인 관리 부재',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   },
@@ -1195,14 +1303,39 @@ const decisionTrees = {
       },
       q2: {
         question: '의료기기에 문제가 있었습니까?',
-        yes: {
-          message: '의료기기에 문제가 있었던 경우입니다. 해당되는 항목을 모두 선택하세요.',
-          checklist: ['안전 설계를 고려하지 않은 의료기기임','노후 의료기기의 고장 예방 조치가 미흡함','예방점검/유지보수가 이행되지 않음','직원이 의료기기를 부주의하게 사용함','알람 설정에 문제가 있음','기기 표시(디스플레이)에 오류가 있음'],
-          allowCustom: true,
-          root: '8.1 의료기기 안전 설계 또는 운영관리 미흡',
-          end: true
-        },
+        yes: { next: 'q2a', message: '의료기기에 문제가 있었던 경우입니다. 세부 사항을 확인합니다.' },
         no: { message: '의료기기에는 문제가 없는 것으로 판단합니다. 다음 분석수준으로 이동합니다.', end: true }
+      },
+      q2a: {
+        question: '환자안전사고 예방을 고려하지 않은 의료기기의 설계가 있었습니까?',
+        chainItems: ['환자안전사고 예방을 고려하지 않은 의료기기의 설계가 있음(알람 시스템 부재, 전원 공급 중단시 재부팅 과정에서 알람이 셋팅과 달리 초기화, 전원 공급 중단시 배터리로 전환될 수 있는 이중 전원장치 부재 등)','의료기기 결함으로 환자안전사고와 관련된 의료기기의 알람은 셋팅 되었으나 알람이 울리지 않음'],
+        chainRoot: '8.1 의료기기 안전 설계 미흡',
+        yes: { next: 'q2b' }, no: { next: 'q2b' }
+      },
+      q2b: {
+        question: '환자안전사고 관련 노후 등 예견 가능한 의료기기의 고장이었습니까?',
+        chainItems: ['노후 등 예견 가능한 고장에 대해 조치하지 않음','환자안전사고와 관련된 의료기기의 고장이 반복됨','의료기기 고장 상태로 사용하지 못함'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        yes: { next: 'q2c' }, no: { next: 'q2c' }
+      },
+      q2c: {
+        question: '환자안전사고와 관련된 의료기기의 예방/유지보수가 규정에 따라 수행되지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 의료기기의 예방/유지보수가 수행되지 않음','환자안전사고와 관련된 의료기기의 예방/유지보수가 일부 항목만 수행됨'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        yes: { next: 'q2d' }, no: { next: 'q2d' }
+      },
+      q2d: {
+        question: '의료기기 안전한 사용을 위한 운영관리가 이루어지지 않았습니까?',
+        chainItems: ['환자안전사고와 관련된 의료기기의 사양이 다양함','환자안전사고와 관련된 의료기기의 안전장치가 복잡함(예: 안내판, 라벨, 알람, 제어장치, 장비 부족 또는 부적절한 운영 등)'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        yes: { next: 'q2e' }, no: { next: 'q2e' }
+      },
+      q2e: {
+        question: '의료기기 사용 관련 직원 요인이 있었습니까?',
+        chainItems: ['환자안전사고와 관련된 직원 요인이 있음(직원의 부주의한 의료기기 사용, 의료기기 알람 시스템은 있었으나 직원은 환자안전사고 관련 알람을 셋팅하지 않았음 등)','직원은 환자안전사고에 영향을 미친 의료기기의 오류를 발견하지 못함(예: 기기 전원코드가 연결되지 않은 것을 발견하지 못함 등)'],
+        chainRoot: '8.2 의료기기 운영관리 미흡',
+        chainEnd: true,
+        yes: { end: true }, no: { end: true }
       }
     }
   }
@@ -1226,28 +1359,102 @@ function answerTreeNode(levelId, treeKey, nodeId, val) {
   const tree = decisionTrees[treeKey];
   const ts = getTreeState(levelId);
   ts.answers[nodeId] = val;
-  const branch = tree.nodes[nodeId][val];
+  const node = tree.nodes[nodeId];
+  const branch = node[val];
 
-  // 이전에 이 노드 이후 진행된 답변/체크/루트 초기화 (분기 변경 대응)
-  const nodeOrder = Object.keys(tree.nodes);
-  const idx = nodeOrder.indexOf(nodeId);
-  nodeOrder.slice(idx+1).forEach(n => { delete ts.answers[n]; delete ts.checks[n]; });
+  // chainItems를 가진 노드들은 모두 서로 독립적으로 동시에 펼쳐지므로
+  // 한 노드 답변이 다른 노드 답변을 초기화하지 않음 (1단계 q3~q5, 2~8단계 q2a~q2x 등)
+  const isChainNode = !!node.chainItems;
+  const isWorkProcGroup = treeKey === 'workProcedure' && ['q3','q4','q5'].includes(nodeId);
+  const isIndependentGroup = isChainNode || isWorkProcGroup;
+
+  if (!isIndependentGroup) {
+    // 이전에 이 노드 이후 진행된 답변/체크/루트 초기화 (분기 변경 대응)
+    const nodeOrder = Object.keys(tree.nodes);
+    const idx = nodeOrder.indexOf(nodeId);
+    nodeOrder.slice(idx+1).forEach(n => { delete ts.answers[n]; });
+  }
+
+  // chain 방식 노드: '예'일 때 chainItems 전체를 기본 체크 상태로 등록(개별 해제 가능)
+  if (node.chainItems) {
+    if (!ts.chainChecks) ts.chainChecks = {};
+    if (val === 'yes') {
+      ts.chainChecks[nodeId] = { items: [...node.chainItems], root: node.chainRoot };
+    } else {
+      delete ts.chainChecks[nodeId];
+    }
+  }
+
+  // 질문형 체크리스트 노드 (1단계 q3,q4,q5): '예'일 때만 체크리스트 영역 활성화
+  if (node.checklist) {
+    if (val === 'no' && ts.checks) delete ts.checks[nodeId]; // 아니오면 체크 초기화
+  }
+
   ts.finished = false;
   if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
     const i = selectedRoots.indexOf(ts.finalRoot); selectedRoots.splice(i,1);
   }
+  if (ts.finalRoots) {
+    ts.finalRoots.forEach(r => { const i = selectedRoots.indexOf(r); if (i > -1) selectedRoots.splice(i,1); });
+  }
   ts.finalRoot = null;
+  ts.finalRoots = null;
 
-  if (branch.end) {
+  if (isWorkProcGroup) {
+    // q3,q4,q5 중 하나라도 답변되면 즉시 전체 체크 상태 재평가
+    ts.finished = (ts.answers.q3 && ts.answers.q4 && ts.answers.q5) ? true : false;
+    updateChecklistRootStatus(levelId, 'workProcedure');
+  } else if (isChainNode) {
+    // chainItems 노드 그룹(2~8단계): 모든 노드가 답변되면 근본원인 집계 (여러 개 가능)
+    const chainNodeIds = Object.keys(tree.nodes).filter(n => tree.nodes[n].chainItems);
+    const allAnswered = chainNodeIds.every(n => ts.answers[n]);
+    ts.finished = allAnswered;
+    if (allAnswered) {
+      const checkedGroups = Object.values(ts.chainChecks || {}).filter(g => g.items.length > 0);
+      const roots = [...new Set(checkedGroups.map(g => g.root))];
+      ts.finalRoots = roots;
+      ts.finalRoot = roots[0] || null; // 하위호환용
+      roots.forEach(root => { if (!selectedRoots.includes(root)) selectedRoots.push(root); });
+    }
+  } else if (branch.end) {
     ts.finished = true;
-    ts.current = nodeId; // 현재 노드에 머무름(체크리스트/자유입력 표시용)
+    ts.current = nodeId;
     if (branch.root && !branch.checklist) {
       ts.finalRoot = branch.root;
       if (!selectedRoots.includes(branch.root)) selectedRoots.push(branch.root);
     }
-    // checklist가 있는 경우 root는 체크 완료 시 부여 (renderTreeLevel에서 처리)
+    // checklist가 있으면 root는 toggleTreeCheck에서 체크 시 부여
   } else if (branch.next) {
     ts.current = branch.next;
+  }
+  renderLevel();
+}
+
+// chainItems 배열 내 개별 항목 체크/해제 (2-2-1처럼 한 질문에 근접원인이 여러 개인 경우)
+function toggleChainItem(levelId, treeKey, nodeId, item, checked) {
+  const ts = getTreeState(levelId);
+  const tree = decisionTrees[treeKey];
+  const node = tree.nodes[nodeId];
+  if (!ts.chainChecks) ts.chainChecks = {};
+  if (!ts.chainChecks[nodeId]) ts.chainChecks[nodeId] = { items: [], root: node.chainRoot };
+
+  const items = ts.chainChecks[nodeId].items;
+  if (checked) { if (!items.includes(item)) items.push(item); }
+  else { const i = items.indexOf(item); if (i > -1) items.splice(i, 1); }
+
+  // 전체 재집계 (여러 근본원인 가능)
+  const chainNodeIds = Object.keys(tree.nodes).filter(n => tree.nodes[n].chainItems);
+  const allAnswered = chainNodeIds.every(n => ts.answers[n]);
+  if (allAnswered) {
+    // 이전 등록된 root들 제거
+    if (ts.finalRoots) {
+      ts.finalRoots.forEach(r => { const i = selectedRoots.indexOf(r); if (i > -1) selectedRoots.splice(i,1); });
+    }
+    const checkedGroups = Object.values(ts.chainChecks || {}).filter(g => g.items.length > 0);
+    const roots = [...new Set(checkedGroups.map(g => g.root))];
+    ts.finalRoots = roots;
+    ts.finalRoot = roots[0] || null;
+    roots.forEach(root => { if (!selectedRoots.includes(root)) selectedRoots.push(root); });
   }
   renderLevel();
 }
@@ -1258,10 +1465,19 @@ function toggleTreeCheck(levelId, treeKey, nodeId, item, checked) {
   if (checked) { if (!ts.checks[nodeId].includes(item)) ts.checks[nodeId].push(item); }
   else ts.checks[nodeId] = ts.checks[nodeId].filter(x => x !== item);
 
-  // 체크리스트가 있는 노드의 root는 1개 이상 체크되었을 때만 부여
   const tree = decisionTrees[treeKey];
-  const branch = tree.nodes[nodeId][ts.answers[nodeId]];
-  if (branch.root) {
+  const node = tree.nodes[nodeId];
+
+  // 노드 레벨 checklist (1단계 q3,q4,q5 패턴): 같은 트리 내 모든 체크 통합 판단
+  if (node.checklist && node.checklistRoot) {
+    updateChecklistRootStatus(levelId, treeKey);
+    renderLevel();
+    return;
+  }
+
+  // 기존 branch 레벨 checklist 패턴 (2~8단계 등)
+  const branch = node[ts.answers[nodeId]];
+  if (branch && branch.root) {
     if (ts.checks[nodeId].length > 0) {
       if (!selectedRoots.includes(branch.root)) selectedRoots.push(branch.root);
       ts.finalRoot = branch.root;
@@ -1272,6 +1488,29 @@ function toggleTreeCheck(levelId, treeKey, nodeId, item, checked) {
     }
   }
   renderLevel();
+}
+
+// 1단계처럼 여러 노드(q3,q4,q5)에 걸쳐 체크가 누적되는 경우, 전체를 보고 근본원인 부여 여부 판단
+function updateChecklistRootStatus(levelId, treeKey) {
+  const ts = getTreeState(levelId);
+  const tree = decisionTrees[treeKey];
+  const nodeIds = Object.keys(tree.nodes);
+  // checklistRoot를 공유하는 모든 노드 찾기
+  const checklistNodes = nodeIds.filter(n => tree.nodes[n].checklist && tree.nodes[n].checklistRoot);
+  if (checklistNodes.length === 0) return;
+  const root = tree.nodes[checklistNodes[0]].checklistRoot;
+
+  const anyChecked = checklistNodes.some(n => (ts.checks[n] && ts.checks[n].length > 0));
+  const anyCustom = checklistNodes.some(n => (ts.checkCustom && ts.checkCustom[n] && ts.checkCustom[n].trim()));
+
+  if (anyChecked || anyCustom) {
+    if (!selectedRoots.includes(root)) selectedRoots.push(root);
+    ts.finalRoot = root;
+  } else {
+    const i = selectedRoots.indexOf(root);
+    if (i > -1) selectedRoots.splice(i, 1);
+    if (ts.finalRoot === root) ts.finalRoot = null;
+  }
 }
 
 function setTreeCheckCustom(levelId, nodeId, root, text) {
@@ -1320,7 +1559,11 @@ function resetTreeFrom(levelId, treeKey, nodeId) {
   const tree = decisionTrees[treeKey];
   const nodeOrder = Object.keys(tree.nodes);
   const idx = nodeOrder.indexOf(nodeId);
-  nodeOrder.slice(idx).forEach(n => { delete ts.answers[n]; delete ts.checks[n]; });
+  nodeOrder.slice(idx).forEach(n => {
+    delete ts.answers[n];
+    delete ts.checks[n];
+    if (ts.chainChecks) delete ts.chainChecks[n];
+  });
   if (ts.finalRoot && selectedRoots.includes(ts.finalRoot)) {
     selectedRoots.splice(selectedRoots.indexOf(ts.finalRoot), 1);
   }
@@ -1330,79 +1573,217 @@ function resetTreeFrom(levelId, treeKey, nodeId) {
   renderLevel();
 }
 
-// ── Decision Tree 렌더링 ──
+// ── 1단계(업무절차) 전용 렌더 — 1-3,1-4,1-5는 동시에 펼쳐서 각각 독립 답변 ──
+function renderWorkProcedureLevel(l, state) {
+  const tree = decisionTrees.workProcedure;
+  const ts = startTree(l.id, 'workProcedure');
+
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  // 1-1
+  const a1 = ts.answers.q1;
+  html += `<div class="q-box">
+    <div class="q-label">질문 1-1</div>
+    <div class="q-text">${tree.nodes.q1.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a1==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'workProcedure','q1','yes')">예</button>
+      <button class="q-btn ${a1==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'workProcedure','q1','no')">아니오</button>
+    </div>
+    ${a1 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'workProcedure','q1')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  if (a1 === 'no') {
+    html += `<div class="alert alert-warn">→ 근본원인: <strong>${tree.nodes.q1.no.root}</strong></div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    return html + treeNavButtons(l);
+  }
+  if (a1 !== 'yes') return html + treeNavButtons(l);
+
+  // 1-2
+  const a2 = ts.answers.q2;
+  html += `<div class="q-box">
+    <div class="q-label">질문 1-2</div>
+    <div class="q-text">${tree.nodes.q2.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a2==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'workProcedure','q2','yes')">예</button>
+      <button class="q-btn ${a2==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'workProcedure','q2','no')">아니오</button>
+    </div>
+    ${a2 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'workProcedure','q2')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  if (a2 === 'yes') {
+    html += `<div class="alert alert-success">→ ${tree.nodes.q2.yes.message}</div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    return html + treeNavButtons(l);
+  }
+  if (a2 !== 'no') return html + treeNavButtons(l);
+
+  html += `<div class="alert alert-warn">→ ${tree.nodes.q2.no.message}</div>
+  <div style="font-size:12px; color:var(--gray-500); margin:10px 0 8px 4px;">아래 1-2의 세부 질문(1-2-1 ~ 1-2-3)에 각각 답해주세요. 해당하는 질문에 "예"를 누르면 근접원인을 체크할 수 있습니다.</div>`;
+
+  // 1-2-1, 1-2-2, 1-2-3 동시 펼침 — 각자 독립적으로 예/아니오 + 체크리스트
+  ['q3','q4','q5'].forEach((nodeId, i) => {
+    const node = tree.nodes[nodeId];
+    const answered = ts.answers[nodeId];
+    const stepLabel = `1-2-${i+1}`;
+
+    html += `<div class="q-box" style="margin-left:14px;border-left:3px solid var(--blue-mid);">
+      <div class="q-label">질문 ${stepLabel}</div>
+      <div class="q-text">${node.question}</div>
+      <div class="q-btns">
+        <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'workProcedure','${nodeId}','yes')">예</button>
+        <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'workProcedure','${nodeId}','no')">아니오</button>
+      </div>
+    </div>`;
+
+    const checks = ts.checks[nodeId] || [];
+    const active = answered === 'yes';
+    html += `<div class="q-box" style="${active?'':'opacity:0.45;'}margin-top:-8px;margin-left:14px;">
+      <div class="q-label">근접원인 (해당되면 체크)</div>
+      ${node.checklist.map((item,j)=>`<div class="proxy-item"><input type="checkbox" id="tc_${l.id}_${nodeId}_${j}" ${checks.includes(item)?'checked':''} ${active?'':'disabled'} onchange="toggleTreeCheck(${l.id},'workProcedure','${nodeId}','${item.replace(/'/g,"\\'")}',this.checked)"><label for="tc_${l.id}_${nodeId}_${j}">${item}</label></div>`).join('')}
+    </div>`;
+  });
+
+  // 전체 체크 결과 + 근본원인
+  const allCheckedItems = [];
+  ['q3','q4','q5'].forEach(n => { (ts.checks[n]||[]).forEach(item => allCheckedItems.push(item)); });
+
+  if (allCheckedItems.length > 0) {
+    html += `<div class="q-box">
+      <div class="q-label">체크된 근접원인 (${allCheckedItems.length}개)</div>
+      ${allCheckedItems.map(item=>`<div class="proxy-item"><input type="checkbox" checked disabled><label>${item}</label></div>`).join('')}
+    </div>
+    <div class="alert alert-warn">→ 근본원인: <strong>1.2 규정/지침/절차 관리 미흡</strong></div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  } else if (ts.answers.q3==='no' && ts.answers.q4==='no' && ts.answers.q5==='no') {
+    html += `<div class="q-box">
+      <div class="q-label">기타 근접원인 입력</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">위 항목에 모두 해당하지 않는 경우, 의료기관 사정에 맞게 직접 입력하세요.</div>
+      <input type="text" value="${ts.freeText||''}" placeholder="해당하는 원인을 직접 입력하세요" oninput="setTreeFreeText(${l.id},this.value)" style="width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:inherit;">
+    </div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  }
+
+  return html + treeNavButtons(l);
+}
+
+function treeNavButtons(l) {
+  return `<div style="display:flex; gap:8px; margin-top:8px;">
+    ${l.id < 10 ? `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>` : ''}
+    ${l.id > 1 ? `<button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>` : ''}
+  </div>`;
+}
+
+// ── Decision Tree 렌더링 (2~8단계) ──
 function renderTreeLevel(l, state) {
   const treeKey = l.tree;
+  if (treeKey === 'workProcedure') return renderWorkProcedureLevel(l, state);
   const tree = decisionTrees[treeKey];
   const ts = startTree(l.id, treeKey);
 
   let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
-  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>
-  <div style="font-size:12px; color:var(--gray-400); margin-bottom:14px;">먼저 사고와 관련된 규정, 지침 또는 절차가 있었는지 확인합니다. 질문에 따라 예 또는 아니오를 선택하면 다음 단계가 자동으로 진행됩니다.</div>`;
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
 
-  // 지나온 경로를 순서대로 렌더링
-  let nodeId = tree.startNode;
-  let stepNum = 1;
-  while (nodeId) {
+  // q1, q2를 순차로 처리하고, 세부질문(chainItems 노드) 키 목록을 뽑아냄
+  const chainNodeIds = Object.keys(tree.nodes).filter(n => tree.nodes[n].chainItems);
+
+  // ── q1 ──
+  const a1 = ts.answers.q1;
+  html += `<div class="q-box">
+    <div class="q-label">질문 ${l.id}-1</div>
+    <div class="q-text">${tree.nodes.q1.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a1==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q1','yes')">예</button>
+      <button class="q-btn ${a1==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q1','no')">아니오</button>
+    </div>
+    ${a1 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'${treeKey}','q1')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  const q1branch = a1 ? tree.nodes.q1[a1] : null;
+  if (q1branch && q1branch.message) {
+    html += `<div class="alert ${q1branch.root ? 'alert-warn' : 'alert-success'}">→ ${q1branch.message}</div>`;
+  }
+  if (q1branch && q1branch.root) {
+    html += `<div class="alert alert-warn">→ 근본원인: <strong>${q1branch.root}</strong></div>`;
+  }
+  if (!a1 || (q1branch && q1branch.end)) {
+    if (a1 && q1branch.end) {
+      html += `<div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    }
+    return html + treeNavButtons(l);
+  }
+
+  // ── q2 ──
+  const a2 = ts.answers.q2;
+  html += `<div class="q-box">
+    <div class="q-label">질문 ${l.id}-2</div>
+    <div class="q-text">${tree.nodes.q2.question}</div>
+    <div class="q-btns">
+      <button class="q-btn ${a2==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q2','yes')">예</button>
+      <button class="q-btn ${a2==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','q2','no')">아니오</button>
+    </div>
+    ${a2 ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'${treeKey}','q2')">↺ 이 질문부터 다시 답변</button>` : ''}
+  </div>`;
+
+  if (!a2) return html + treeNavButtons(l);
+
+  const q2branch = tree.nodes.q2[a2];
+  // q2 답변이 세부질문으로 이어지지 않는 경우(end:true) — 바로 종료
+  if (q2branch.end) {
+    html += `<div class="alert ${q2branch.root ? 'alert-warn' : 'alert-success'}">→ ${q2branch.message}</div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+    return html + treeNavButtons(l);
+  }
+
+  // q2가 세부질문으로 이어지는 경우(next 존재) — 세부질문 전체 동시 펼침
+  html += `<div class="alert alert-warn">→ ${q2branch.message||''}</div>
+  <div style="font-size:12px; color:var(--gray-500); margin:10px 0 8px 4px;">아래 ${l.id}-2의 세부 질문에 각각 답해주세요. 해당하는 질문에 "예"를 누르면 근접원인이 체크됩니다.</div>`;
+
+  chainNodeIds.forEach((nodeId, i) => {
     const node = tree.nodes[nodeId];
     const answered = ts.answers[nodeId];
-    const isCurrent = nodeId === ts.current && !answered;
+    const stepLabel = `${l.id}-2-${i+1}`;
+    const active = answered === 'yes';
+    const checkedItems = (ts.chainChecks && ts.chainChecks[nodeId] && ts.chainChecks[nodeId].items) || [];
 
-    html += `<div class="q-box" style="${answered ? 'opacity:0.9;' : ''}">
-      <div class="q-label">질문 ${l.id}-${stepNum}</div>
+    html += `<div class="q-box" style="margin-left:14px;border-left:3px solid var(--blue-mid);">
+      <div class="q-label">질문 ${stepLabel}</div>
       <div class="q-text">${node.question}</div>
       <div class="q-btns">
         <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="answerTreeNode(${l.id},'${treeKey}','${nodeId}','yes')">예</button>
         <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="answerTreeNode(${l.id},'${treeKey}','${nodeId}','no')">아니오</button>
       </div>
-      ${answered ? `<button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;" onclick="resetTreeFrom(${l.id},'${treeKey}','${nodeId}')">↺ 이 질문부터 다시 답변</button>` : ''}
+    </div>
+    <div class="q-box" style="${active?'':'opacity:0.45;'}margin-top:-8px;margin-left:14px;">
+      <div class="q-label">근접원인 (해당되면 체크)</div>
+      ${node.chainItems.map((item,j)=>`<div class="proxy-item"><input type="checkbox" id="ci_${l.id}_${nodeId}_${j}" ${checkedItems.includes(item)?'checked':''} ${active?'':'disabled'} onchange="toggleChainItem(${l.id},'${treeKey}','${nodeId}','${item.replace(/'/g,"\\'")}',this.checked)"><label for="ci_${l.id}_${nodeId}_${j}">${item}</label></div>`).join('')}
     </div>`;
+  });
 
-    if (!answered) break; // 아직 답 안 한 질문에서 멈춤
+  // 전체 체크 결과 집계
+  const checkedItems = [];
+  Object.values(ts.chainChecks || {}).forEach(g => { (g.items||[]).forEach(item => checkedItems.push(item)); });
+  const allAnswered = chainNodeIds.every(n => ts.answers[n]);
 
-    const branch = node[answered];
-    if (branch.message) {
-      html += `<div class="alert ${branch.root || branch.checklist || branch.freeInput ? 'alert-warn' : 'alert-success'}">→ ${branch.message}</div>`;
-    }
-
-    if (branch.checklist) {
-      const checks = ts.checks[nodeId] || [];
-      html += `<div class="q-box">
-        <div class="q-label">해당 항목 선택 (체크박스)</div>
-        ${branch.checklist.map((item,i)=>`<div class="proxy-item"><input type="checkbox" id="tc_${l.id}_${nodeId}_${i}" ${checks.includes(item)?'checked':''} onchange="toggleTreeCheck(${l.id},'${treeKey}','${nodeId}','${item.replace(/'/g,"\\'")}',this.checked)"><label for="tc_${l.id}_${nodeId}_${i}">${item}</label></div>`).join('')}
-        ${branch.allowCustom ? `<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:12px;color:var(--gray-500);white-space:nowrap;">기타(의료기관 사정에 맞게 추가)</span>
-          <input type="text" value="${ts.checkCustom&&ts.checkCustom[nodeId]||''}" placeholder="직접 입력" oninput="setTreeCheckCustom(${l.id},'${nodeId}','${branch.root}',this.value)" style="flex:1;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 9px;font-size:13px;font-family:inherit;">
-        </div>` : ''}
-      </div>`;
-      if (checks.length > 0) {
-        html += `<div class="alert alert-warn">→ 근본원인: <strong>${branch.root}</strong></div>`;
-      }
-    } else if (branch.root && !branch.checklist) {
-      html += `<div class="alert alert-warn">→ 근본원인: <strong>${branch.root}</strong></div>`;
-    }
-
-    if (branch.freeInput) {
-      html += `<div class="q-box">
-        <div class="q-label">기타 근접원인 입력</div>
-        <input type="text" value="${ts.freeText||''}" placeholder="해당하는 원인을 직접 입력하세요" oninput="setTreeFreeText(${l.id},this.value)" style="width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:inherit;">
-      </div>`;
-    }
-
-    if (branch.end) { nodeId = null; }
-    else { nodeId = branch.next; stepNum++; }
+  if (checkedItems.length > 0) {
+    const roots = ts.finalRoots && ts.finalRoots.length ? ts.finalRoots : (ts.finalRoot ? [ts.finalRoot] : []);
+    html += `<div class="q-box">
+      <div class="q-label">체크된 근접원인 (${checkedItems.length}개)</div>
+      ${checkedItems.map(item=>`<div class="proxy-item"><input type="checkbox" checked disabled><label>${item}</label></div>`).join('')}
+    </div>
+    <div class="alert alert-warn">→ 근본원인: <strong>${roots.join(', ')}</strong></div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
+  } else if (allAnswered) {
+    html += `<div class="q-box">
+      <div class="q-label">기타 근접원인 입력</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">위 항목에 모두 해당하지 않는 경우, 의료기관 사정에 맞게 직접 입력하세요.</div>
+      <input type="text" value="${ts.freeText||''}" placeholder="해당하는 원인을 직접 입력하세요" oninput="setTreeFreeText(${l.id},this.value)" style="width:100%;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:inherit;">
+    </div>
+    <div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
   }
 
-  if (ts.finished) {
-    html += `<div class="alert alert-success" style="margin-top:10px;">✅ 이 분석수준의 검토가 끝났습니다. "다음 분석수준" 버튼을 눌러 ${levels[tree.nextLevel-1]?.name||''} 단계로 이동하세요.</div>`;
-  }
-
-  html += `<div style="display:flex; gap:8px; margin-top:8px;">`;
-  if (l.id < 10) html += `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>`;
-  if (l.id > 1) html += `<button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>`;
-  html += `</div>`;
-
-  return html;
+  return html + treeNavButtons(l);
 }
 
 
@@ -1556,31 +1937,39 @@ function renderUnimprovableLevel(l, state) {
     html += `<div class="alert alert-success">✅ 이미 ${selectedRoots.length}개의 근본원인이 도출되었습니다. 이 단계는 참고용이며, 4단계(개선전략 수립)로 바로 이동하셔도 됩니다.</div>`;
   }
 
-  html += `<div class="q-box">
-    <div class="q-label">질문</div>
-    <div class="q-text">${l.q1}</div>
-    <div class="q-btns">
-      <button class="q-btn ${state.q1==='yes'?'q-yes':''}" onclick="setQ(${l.id},1,'yes')">예</button>
-      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오</button>
-    </div>
-  </div>`;
+  if (!levelState[10]) levelState[10] = {};
+  const answers = levelState[10].uiAnswers || (levelState[10].uiAnswers = {});
 
-  if (state.q1 === 'yes') {
-    html += `<div class="alert alert-success">→ ${l.q1yesMsg}</div>`;
-  }
-  if (state.q1 === 'no') {
-    html += `<div class="alert alert-warn">→ ${l.q1noMsg}</div>
-    <div class="q-box">
-      <div class="q-label">해당 사유 선택 (해당 항목 모두 체크)</div>
-      ${l.unimprovableReasons.map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="ui_${i}" ${state.reasons&&state.reasons.includes(r)?'checked':''} onchange="setUnimprovableReason('${r.replace(/'/g,"\\'")}',this.checked)"><label for="ui_${i}">${r}</label></div>`).join('')}
+  let stop = false;
+  for (let i = 0; i < l.unimprovableQuestions.length; i++) {
+    const qObj = l.unimprovableQuestions[i];
+    const answered = answers[i];
+
+    html += `<div class="q-box">
+      <div class="q-label">질문 10-${i+1}</div>
+      <div class="q-text">${qObj.q}</div>
+      <div class="q-btns">
+        <button class="q-btn ${answered==='yes'?'q-yes':''}" onclick="setUnimprovableAnswer(${l.id},${i},'yes')">예</button>
+        <button class="q-btn ${answered==='no'?'q-bad':''}" onclick="setUnimprovableAnswer(${l.id},${i},'no')">아니오</button>
+      </div>
     </div>`;
-    if (state.reasons && state.reasons.length > 0 && !selectedRoots.includes(l.roots[0])) {
-      selectedRoots.push(l.roots[0]);
+
+    if (!answered) { stop = true; break; }
+
+    if (answered === 'yes') {
+      html += `<div class="alert alert-warn">→ ${qObj.reason}</div>`;
+      if (!selectedRoots.includes(l.roots[0])) selectedRoots.push(l.roots[0]);
+      stop = true;
+      break;
     }
-    if ((!state.reasons || state.reasons.length === 0)) {
-      const idx = selectedRoots.indexOf(l.roots[0]);
-      if (idx > -1) selectedRoots.splice(idx, 1);
-    }
+    // 'no'면 다음 질문으로 계속 진행
+  }
+
+  if (!stop) {
+    // 5개 질문 모두 '아니오'로 답한 경우
+    html += `<div class="alert alert-success">→ ${l.finalMessage}</div>`;
+    const idx = selectedRoots.indexOf(l.roots[0]);
+    if (idx > -1) selectedRoots.splice(idx, 1);
   }
 
   html += `<div style="display:flex; gap:8px; margin-top:8px;">
@@ -1589,14 +1978,15 @@ function renderUnimprovableLevel(l, state) {
   return html;
 }
 
-function setUnimprovableReason(reason, checked) {
-  if (!levelState[10]) levelState[10] = {};
-  if (!levelState[10].reasons) levelState[10].reasons = [];
-  if (checked) { if (!levelState[10].reasons.includes(reason)) levelState[10].reasons.push(reason); }
-  else levelState[10].reasons = levelState[10].reasons.filter(r => r !== reason);
+function setUnimprovableAnswer(levelId, qIndex, val) {
+  if (!levelState[levelId]) levelState[levelId] = {};
+  if (!levelState[levelId].uiAnswers) levelState[levelId].uiAnswers = {};
+  levelState[levelId].uiAnswers[qIndex] = val;
+  // 이후 질문 답변 초기화 (분기 변경 대응)
+  const keys = Object.keys(levelState[levelId].uiAnswers).map(Number);
+  keys.forEach(k => { if (k > qIndex) delete levelState[levelId].uiAnswers[k]; });
   renderLevel();
 }
-
 
 function setQ(id, qnum, val) {
   if (!levelState[id]) levelState[id] = {};
