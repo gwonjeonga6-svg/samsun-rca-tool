@@ -524,7 +524,7 @@
         <div class="step-num" id="sn3">3</div>
         <div class="step-info">
           <div class="step-name">근본원인</div>
-          <div class="step-desc">9개 분석수준 탐색</div>
+          <div class="step-desc">9개 분석수준 + 개선불가 영역 탐색</div>
         </div>
       </div>
       <div class="sidebar-step" id="nav4" onclick="tryGoStep(4)">
@@ -829,7 +829,7 @@ const topTitles = [
 const topSubs = [
   '환자안전사고 보고서 및 팀 구성',
   '사고 발생 단계와 위험요인(CF) 기록',
-  '9개 분석수준을 통한 근본원인 도출',
+  '9개 분석수준 + 개선불가 영역을 통한 근본원인 도출',
   '근본원인별 개선전략과 담당자 지정'
 ];
 
@@ -996,13 +996,24 @@ const levels = [
     q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
     roots:["8.1 의료기기 안전 설계 미흡","8.2 의료기기 운영관리 미흡"],
     proxies:["안전 설계를 고려하지 않은 의료기기","노후 의료기기 고장 예방 조치 미흡","예방/유지보수 미이행","직원의 부주의한 의료기기 사용"] },
-  { id:9, name:"시설/환경", note:"사고가 발생한 물리적 환경(화장실, 복도, 병실 등)의 시설·안전 문제를 검토합니다. 낙상의 경우 화장실 안전바, 바닥 상태 등이 해당.",
-    q1:"관련법을 준수하여 시설/환경 관리를 하였습니까?", q2:"시설 및 환경요인에 문제가 있었습니까?",
+  { id:9, name:"시설/환경", note:"사고가 발생한 물리적 환경(화장실, 복도, 병실 등)의 시설·안전 문제를 검토합니다. 낙상의 경우 화장실 안전바, 바닥 상태 등이 해당. 이 단계는 1차 질문 결과와 무관하게 2차 질문(시설/환경요인 문제 여부)도 함께 검토합니다.",
+    special:"facility",
+    q1:"관련 법을 준수하여 시설/환경 관리를 하였습니까?",
+    q1yesMsg:"법적 기준은 준수한 것으로 확인됨 — 아래 시설/환경요인 문제 여부를 계속 검토하세요.",
+    q1noMsg:"법적 기준 미준수 확인 — 근본원인: 9.1 시설 및 환경 관련 법 미준수. 아래 시설/환경요인 문제 여부도 계속 검토하세요.",
+    q2:"시설 및 환경요인에 문제가 있었습니까?",
     q2yes:"예 (문제 있음)", q2no:"아니오 (문제 없음)",
     q2yesMsg:"시설/환경 문제 있음 — 근접원인을 선택하세요.",
-    q2noMsg:"이 분석수준에서 근본원인 없음. 다음으로 이동하세요.",
+    q2noMsg:"이 분석수준에서 추가 근본원인 없음. 마지막으로 10. 개선불가 영역을 점검하세요.",
     roots:["9.1 시설 및 환경 관련 법 미준수","9.2 업무환경 안전관리 미흡","9.3 시설 및 환경 위험관리 미흡","9.4 재난관리시스템 미흡","9.5 환자 및 환자 보호자의 환자안전활동 참여 미흡"],
-    proxies:["관련 법 미준수","소음, 조도, 공간/시설 문제","위험관리 미수행","재난 시 대응 체계 없음"] }
+    proxies:["관련 법 미준수","소음, 조도, 공간/시설 문제","위험관리 미수행","재난 시 대응 체계 없음"] },
+  { id:10, name:"개선불가 영역", note:"1~9번 분석수준으로 근본원인을 하나도 찾지 못했거나, 찾았더라도 시스템 개선으로는 예방이 어려운 사고인지 마지막으로 확인합니다.",
+    special:"unimprovable",
+    q1:"이 사고는 1~9번 분석수준으로 근본원인을 파악할 수 있는 사고였습니까?",
+    q1yesMsg:"근본원인 분석을 종료하고 4단계(개선전략 수립)로 이동하세요.",
+    q1noMsg:"개선불가 영역에 해당하는지 아래 사유를 확인하세요. 해당되면 RCA 분석을 종료합니다.",
+    unimprovableReasons:["현재의 시스템 개선으로 예방하기 어려운 사고","불가항력적 상황(천재지변 등)","환자의 특이 상태나 예측 불가능성이 컸던 경우","기타 시스템적 통제가 불가능한 요인"],
+    roots:["10. 개선불가 영역(시스템 개선으로 예방 곤란)"] }
 ];
 
 const levelState = {};
@@ -1027,6 +1038,9 @@ function renderLevel() {
   const l = levels[curLevel - 1];
   const state = levelState[curLevel] || {};
   const c = document.getElementById('levelContent');
+
+  if (l.special === 'facility') { c.innerHTML = renderFacilityLevel(l, state); updateRootPanel(); return; }
+  if (l.special === 'unimprovable') { c.innerHTML = renderUnimprovableLevel(l, state); updateRootPanel(); return; }
 
   let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
   <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
@@ -1084,7 +1098,7 @@ function renderLevel() {
   }
 
   html += `<div style="display:flex; gap:8px; margin-top:8px;">`;
-  if (curLevel < 9) html += `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>`;
+  if (curLevel < 10) html += `<button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>`;
   if (curLevel > 1) html += `<button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>`;
   html += `</div>`;
 
@@ -1092,12 +1106,122 @@ function renderLevel() {
   updateRootPanel();
 }
 
+// ── 9. 시설/환경 전용 렌더 (q1 결과와 무관하게 q2까지 항상 진행) ──
+function renderFacilityLevel(l, state) {
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  html += `<div class="q-box">
+    <div class="q-label">질문 1</div>
+    <div class="q-text">${l.q1}</div>
+    <div class="q-btns">
+      <button class="q-btn ${state.q1==='yes'?'q-yes':''}" onclick="setQ(${l.id},1,'yes')">예 (준수함)</button>
+      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오 (미준수)</button>
+    </div>
+  </div>`;
+
+  if (state.q1 === 'yes') html += `<div class="alert alert-success">→ ${l.q1yesMsg}</div>`;
+  if (state.q1 === 'no') {
+    if (!selectedRoots.includes(l.roots[0])) selectedRoots.push(l.roots[0]);
+    html += `<div class="alert alert-warn">→ ${l.q1noMsg}</div>`;
+  }
+
+  // q1 답변 여부와 무관하게 q2는 항상 노출
+  if (state.q1 === 'yes' || state.q1 === 'no') {
+    html += `<div class="q-box">
+      <div class="q-label">질문 2</div>
+      <div class="q-text">${l.q2}</div>
+      <div class="q-btns">
+        <button class="q-btn ${state.q2==='yes'?'q-bad':''}" onclick="setQ(${l.id},2,'yes')">${l.q2yes}</button>
+        <button class="q-btn ${state.q2==='no'?'q-yes':''}" onclick="setQ(${l.id},2,'no')">${l.q2no}</button>
+      </div>
+    </div>`;
+
+    if (state.q2 === 'no') {
+      html += `<div class="alert alert-success">→ ${l.q2noMsg}</div>`;
+    }
+    if (state.q2 === 'yes') {
+      html += `<div class="q-box">
+        <div class="q-label">근접원인 선택 (해당 항목 모두 체크)</div>
+        ${l.proxies.map((p,i)=>`<div class="proxy-item"><input type="checkbox" id="px${l.id}_${i}" ${state.proxies&&state.proxies.includes(p)?'checked':''} onchange="setProxy(${l.id},'${p.replace(/'/g,"\\'")}',this.checked)"><label for="px${l.id}_${i}">${p}</label></div>`).join('')}
+      </div>
+      <div class="q-box">
+        <div class="q-label">근본원인 선택</div>
+        ${l.roots.slice(1).map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="rt${l.id}_${i}" ${selectedRoots.includes(r)?'checked':''} onchange="toggleRoot('${r.replace(/'/g,"\\'")}',this.checked)"><label for="rt${l.id}_${i}">${r}</label></div>`).join('')}
+      </div>
+      <div class="alert alert-warn">→ ${l.q2yesMsg}</div>`;
+    }
+  }
+
+  html += `<div style="display:flex; gap:8px; margin-top:8px;">
+    <button class="btn btn-primary btn-sm" onclick="nextLevel()">다음 분석수준 →</button>
+    <button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>
+  </div>`;
+  return html;
+}
+
+// ── 10. 개선불가 영역 전용 렌더 ──
+function renderUnimprovableLevel(l, state) {
+  let html = `<div style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:6px;">${l.id}. ${l.name}</div>
+  <div style="font-size:12px; color:var(--gray-500); background:var(--gray-50); border-left:3px solid var(--blue-mid); padding:7px 12px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:14px;">💡 ${l.note}</div>`;
+
+  if (selectedRoots.length > 0) {
+    html += `<div class="alert alert-success">✅ 이미 ${selectedRoots.length}개의 근본원인이 도출되었습니다. 이 단계는 참고용이며, 4단계(개선전략 수립)로 바로 이동하셔도 됩니다.</div>`;
+  }
+
+  html += `<div class="q-box">
+    <div class="q-label">질문</div>
+    <div class="q-text">${l.q1}</div>
+    <div class="q-btns">
+      <button class="q-btn ${state.q1==='yes'?'q-yes':''}" onclick="setQ(${l.id},1,'yes')">예</button>
+      <button class="q-btn ${state.q1==='no'?'q-bad':''}" onclick="setQ(${l.id},1,'no')">아니오</button>
+    </div>
+  </div>`;
+
+  if (state.q1 === 'yes') {
+    html += `<div class="alert alert-success">→ ${l.q1yesMsg}</div>`;
+  }
+  if (state.q1 === 'no') {
+    html += `<div class="alert alert-warn">→ ${l.q1noMsg}</div>
+    <div class="q-box">
+      <div class="q-label">해당 사유 선택 (해당 항목 모두 체크)</div>
+      ${l.unimprovableReasons.map((r,i)=>`<div class="proxy-item"><input type="checkbox" id="ui_${i}" ${state.reasons&&state.reasons.includes(r)?'checked':''} onchange="setUnimprovableReason('${r.replace(/'/g,"\\'")}',this.checked)"><label for="ui_${i}">${r}</label></div>`).join('')}
+    </div>`;
+    if (state.reasons && state.reasons.length > 0 && !selectedRoots.includes(l.roots[0])) {
+      selectedRoots.push(l.roots[0]);
+    }
+    if ((!state.reasons || state.reasons.length === 0)) {
+      const idx = selectedRoots.indexOf(l.roots[0]);
+      if (idx > -1) selectedRoots.splice(idx, 1);
+    }
+  }
+
+  html += `<div style="display:flex; gap:8px; margin-top:8px;">
+    <button class="btn btn-ghost btn-sm" onclick="prevLevel()">← 이전</button>
+  </div>`;
+  return html;
+}
+
+function setUnimprovableReason(reason, checked) {
+  if (!levelState[10]) levelState[10] = {};
+  if (!levelState[10].reasons) levelState[10].reasons = [];
+  if (checked) { if (!levelState[10].reasons.includes(reason)) levelState[10].reasons.push(reason); }
+  else levelState[10].reasons = levelState[10].reasons.filter(r => r !== reason);
+  renderLevel();
+}
+
+
 function setQ(id, qnum, val) {
   if (!levelState[id]) levelState[id] = {};
   if (qnum === 1) {
     levelState[id].q1 = val;
     delete levelState[id].q2;
     delete levelState[id].proxies;
+    if (id === 10) {
+      // 10번(개선불가)은 체크박스 선택 시에만 근본원인 추가 — renderUnimprovableLevel에서 처리
+      renderLevel();
+      return;
+    }
     // 이전 선택으로 추가됐던 roots[0] 제거 후 재처리
     const root0 = levels[id-1].roots[0];
     const idx = selectedRoots.indexOf(root0);
@@ -1134,13 +1258,13 @@ function updateRootPanel() {
   list.innerHTML = `<div class="root-panel">${selectedRoots.map(r=>`<div class="root-item"><span class="root-tag">근본원인</span>${r}</div>`).join('')}</div>`;
 }
 
-function nextLevel() { if (curLevel < 9) { curLevel++; renderLevel(); } }
+function nextLevel() { if (curLevel < 10) { curLevel++; renderLevel(); } }
 function prevLevel() { if (curLevel > 1) { curLevel--; renderLevel(); } }
 
 // 분석수준명 매핑
 const levelNames = {
   '1': '업무절차', '2': '교육/훈련', '3': '의사소통', '4': '업무수행',
-  '5': '부서관리', '6': '리더십', '7': '인간공학', '8': '의료기기', '9': '시설/환경'
+  '5': '부서관리', '6': '리더십', '7': '인간공학', '8': '의료기기', '9': '시설/환경', '10': '개선불가 영역'
 };
 
 function getLevelHeader(root) {
