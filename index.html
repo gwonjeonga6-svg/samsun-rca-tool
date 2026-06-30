@@ -1366,15 +1366,16 @@ function downloadRCAWord() {
   .lbl { font-weight: bold; color: #374151; background: #eceef2; width: 100px; }
   .footer { margin-top: 30px; border-top: 1px solid #dde1e9; padding-top: 10px; font-size: 9pt; color: #9199a8; text-align: center; }
 
-  /* 2단계 사고흐름 가로 표 */
-  table.flow-analysis-table { table-layout: fixed; }
-  table.flow-analysis-table td { text-align:center; font-size:9.5pt; }
-  table.flow-analysis-table .lbl { text-align:left; font-size:9pt; width:90px; vertical-align:middle; }
-  table.flow-analysis-table .flow-col-head { background:#fdf6e3; }
-  table.flow-analysis-table .flow-time { font-size:8.5pt; color:#b8860b; font-weight:bold; margin-bottom:2px; }
-  table.flow-analysis-table .flow-step-name { font-weight:bold; color:#1a5fa8; }
-  table.flow-analysis-table .flow-arrow { border:none; background:none; width:14px; text-align:center; font-size:11pt; color:#9199a8; padding:0; }
-  table.flow-analysis-table .flow-staff-cell { background:#fdf6e3; }
+  /* 2단계 사고흐름 가로 표 — 10pt 유지, 레이아웃만 컴팩트 */
+  table.flow-analysis-table { table-layout: fixed; font-size:10pt; }
+  table.flow-analysis-table td { text-align:center; font-size:10pt; padding:5px 6px; line-height:1.45; vertical-align:top; }
+  table.flow-analysis-table .lbl { text-align:left; font-size:9.5pt; width:80px; vertical-align:middle; line-height:1.35; }
+  table.flow-analysis-table .flow-col-head { background:#fdf6e3; vertical-align:middle; }
+  table.flow-analysis-table .flow-time { font-size:9pt; color:#b8860b; font-weight:bold; margin-bottom:2px; }
+  table.flow-analysis-table .flow-step-name { font-weight:bold; color:#1a5fa8; font-size:10pt; }
+  table.flow-analysis-table .flow-arrow { border:none; background:none; width:12px; text-align:center; font-size:11pt; color:#9199a8; padding:0; }
+  table.flow-analysis-table .flow-staff-cell { background:#fdf6e3; font-size:9.5pt; }
+  table.flow-analysis-table .cf-line { font-size:9.5pt; margin-bottom:3px; line-height:1.4; text-align:left; }
 </style>
 </head>
 <body>
@@ -1430,7 +1431,7 @@ function downloadRCAWord() {
   </tr>
   <tr>
     <td class="lbl">사고 분석을<br>위한 주요 사항</td>
-    ${flowCards.map(c => `<td style="white-space:pre-wrap;">${c.main || '-'}</td>`).join('<td></td>')}
+    ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:9.5pt;">${c.main || '-'}</td>`).join('<td></td>')}
   </tr>
   <tr>
     <td class="lbl">사고발생 흐름<br>단계에 관련된 직원</td>
@@ -1440,7 +1441,7 @@ function downloadRCAWord() {
     <td class="lbl">위험요인<br>상세기술</td>
     ${flowCards.map(c => `<td style="text-align:left;">${
       c.cf.length
-        ? c.cf.map(cf => `<div style="margin-bottom:4px;${cf.checked ? 'font-weight:bold;color:#b8860b;' : ''}">${cf.checked ? '🔶 ' : ''}${cf.text}</div>`).join('')
+        ? c.cf.map(cf => `<div class="cf-line"${cf.checked ? ' style="font-weight:bold;color:#b8860b;"' : ''}>${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
         : '-'
     }</td>`).join('<td></td>')}
   </tr>
