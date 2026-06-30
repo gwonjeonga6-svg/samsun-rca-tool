@@ -278,25 +278,33 @@
     background: #fff;
   }
   .flow-step-card-head {
-    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+    display:flex; align-items:flex-end; gap:10px; margin-bottom:12px;
   }
   .flow-step-num {
     flex-shrink:0; width:24px; height:24px; border-radius:50%;
     background:var(--blue); color:#fff; font-size:12px; font-weight:800;
     display:flex; align-items:center; justify-content:center;
+    margin-bottom:8px;
+  }
+  .flow-time-wrap { flex-shrink:0; }
+  .flow-step-wrap { flex:1; min-width:120px; }
+  .flow-mini-label {
+    font-size:11px; color:var(--gray-400); font-weight:600;
+    margin-bottom:4px;
   }
   .flow-time-input {
-    width:90px; flex-shrink:0;
+    width:100px;
     border: 1.5px solid var(--gray-200) !important;
     border-radius: var(--radius-sm) !important;
     padding: 7px 8px !important;
     font-size: 13px !important;
     text-align: center;
     font-family: inherit !important;
+    color: var(--gray-700) !important;
   }
   .flow-time-input:focus { outline:none; border-color: var(--blue) !important; }
   .flow-input {
-    flex: 1;
+    width:100%;
     border: 1.5px solid var(--gray-200) !important;
     border-radius: var(--radius-sm) !important;
     padding: 7px 10px !important;
@@ -861,8 +869,14 @@ function flowStepCardHTML(n, time='', step='') {
   <div class="flow-step-card" data-step="${n}">
     <div class="flow-step-card-head">
       <span class="flow-step-num">${n}</span>
-      <input class="flow-time-input" type="text" placeholder="시간 (예: 10:00)" value="${time}">
-      <input class="flow-input" type="text" placeholder="단계 ${n} (예: 병실)" value="${step}">
+      <div class="flow-time-wrap">
+        <div class="flow-mini-label">시간</div>
+        <input class="flow-time-input" type="text" placeholder="예: 10:00" value="${time}">
+      </div>
+      <div class="flow-step-wrap">
+        <div class="flow-mini-label">단계명</div>
+        <input class="flow-input" type="text" placeholder="예: 병실" value="${step}">
+      </div>
       <button class="flow-step-del" onclick="removeFlowStepCard(this)" title="이 단계 삭제">✕</button>
     </div>
     <div class="flow-step-body">
