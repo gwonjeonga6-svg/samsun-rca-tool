@@ -269,13 +269,61 @@
   .member-row input:nth-child(2) { flex: 2; }
   .member-row input:nth-child(3) { flex: 1; }
 
+  /* ══ Flow steps (시간순 카드) ══ */
+  .flow-step-list { display:flex; flex-direction:column; gap:14px; }
+  .flow-step-card {
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    background: #fff;
+  }
+  .flow-step-card-head {
+    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+  }
+  .flow-step-num {
+    flex-shrink:0; width:24px; height:24px; border-radius:50%;
+    background:var(--blue); color:#fff; font-size:12px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .flow-time-input {
+    width:90px; flex-shrink:0;
+    border: 1.5px solid var(--gray-200) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 7px 8px !important;
+    font-size: 13px !important;
+    text-align: center;
+    font-family: inherit !important;
+  }
+  .flow-time-input:focus { outline:none; border-color: var(--blue) !important; }
+  .flow-input {
+    flex: 1;
+    border: 1.5px solid var(--gray-200) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 7px 10px !important;
+    font-size: 14px !important;
+    font-weight: 700;
+    font-family: inherit !important;
+    color: var(--gray-900) !important;
+    background: #fff !important;
+  }
+  .flow-input:focus { outline: none; border-color: var(--blue) !important; box-shadow: 0 0 0 3px rgba(26,95,168,0.1) !important; }
+  .flow-step-del {
+    flex-shrink:0; background:none; border:none; color:var(--gray-300); font-size:13px; cursor:pointer; padding:4px 6px;
+  }
+  .flow-step-del:hover { color: var(--red); }
+  .flow-step-body { display:flex; flex-direction:column; gap:10px; }
+  .flow-step-body .field { margin-bottom:0; }
+  .flow-step-body .field > label { font-size:12px; margin-bottom:5px; }
+  .flow-step-body textarea { min-height:54px; }
+  .step-cf-list { display:flex; flex-direction:column; gap:6px; }
+
   /* ══ CF items ══ */
   .cf-item {
     display: flex; align-items: center; gap: 12px;
     padding: 10px 14px;
     border: 1.5px solid var(--gray-200);
     border-radius: var(--radius-sm);
-    margin-bottom: 7px;
+    margin-bottom: 0;
     background: #fff;
     transition: border-color 0.12s, background 0.12s;
   }
@@ -401,25 +449,7 @@
   .btn-clear { background: none; color: var(--gray-400); border: none; font-size: 11px; text-decoration: underline; cursor: pointer; }
 
 
-  /* ══ Flow steps ══ */
-  .flow-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-  }
-  .flow-input {
-    border: 1.5px solid var(--gray-200) !important;
-    border-radius: var(--radius-sm) !important;
-    padding: 9px 10px !important;
-    font-size: 13px !important;
-    text-align: center;
-    font-family: inherit !important;
-    color: var(--gray-900) !important;
-    background: #fff !important;
-    width: 100% !important;
-    transition: border-color 0.12s, box-shadow 0.12s !important;
-  }
-  .flow-input:focus { outline: none; border-color: var(--blue) !important; box-shadow: 0 0 0 3px rgba(26,95,168,0.1) !important; }
+
 
   @media print {
     .sidebar, .topbar, .btn-row, .export-bar, .save-btns, .restore-banner,
@@ -427,6 +457,7 @@
     .main { margin-left: 0 !important; }
     .page-content { padding: 4px 10px !important; max-width: 100% !important; margin-top: 0 !important; }
     .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 8px !important; }
+    .flow-step-card { break-inside: avoid; }
     body { font-size: 11pt; background: #fff; margin: 0 !important; }
     .chip { border: 1px solid #ccc !important; }
     .chip.selected { background: #eaf1fb !important; border-color: #1a5fa8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -695,42 +726,14 @@
           <div class="card-header">
             <div class="card-eyebrow">2단계 — 프로세스 분석</div>
             <div class="card-title">기여요인(CF) 찾기</div>
-            <div class="card-desc">시간 흐름에 따라 사고 발생 단계를 정리하고, 결정적으로 영향을 준 위험요인에 CF 체크를 하세요.</div>
+            <div class="card-desc">시간 흐름에 따라 사고 발생 단계를 정리하고, 각 단계별로 분석 내용과 위험요인(CF)을 기록하세요.</div>
           </div>
 
-          <div class="field">
-            <label>① 사고 발생 단계 <span class="opt">(시간 순서대로)</span></label>
-            <div class="flow-grid" id="flow-steps">
-              <input class="flow-input" type="text" placeholder="단계 1">
-              <input class="flow-input" type="text" placeholder="단계 2">
-              <input class="flow-input" type="text" placeholder="단계 3">
-              <input class="flow-input" type="text" placeholder="단계 4">
-              <input class="flow-input" type="text" placeholder="단계 5">
-            </div>
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button class="btn btn-ghost btn-sm" onclick="addFlowStep()">+ 단계 추가</button>
-              <button class="btn btn-ghost btn-sm" onclick="removeFlowStep()" style="color:var(--red);">- 단계 삭제</button>
-            </div>
-          </div>
+          <div id="flow-steps" class="flow-step-list"></div>
 
-          <div class="field">
-            <label>② 사고 분석 주요 사항</label>
-            <textarea id="s2_main" placeholder="각 단계에서 사고 분석에 필요한 주요 사항을 기술하세요."></textarea>
-          </div>
-
-          <div class="field">
-            <label>③ 관련 직원</label>
-            <input type="text" id="s2_staff" placeholder="예) 간호사, 수간호사, 담당 주치의, 간병인">
-          </div>
-
-          <div class="field">
-            <label>④ 위험요인 상세기술 <span class="opt">— 사고에 결정적 영향을 준 항목에 CF 체크</span></label>
-            <div id="cf-list">
-              <div class="cf-item"><input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 1 상세 내용"><span class="cf-badge">CF</span></div>
-              <div class="cf-item"><input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 2 상세 내용"><span class="cf-badge">CF</span></div>
-              <div class="cf-item"><input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 3 상세 내용"><span class="cf-badge">CF</span></div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="addCF()" style="margin-top:10px;">+ 위험요인 추가</button>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button class="btn btn-ghost btn-sm" onclick="addFlowStep()">+ 단계 추가</button>
+            <button class="btn btn-ghost btn-sm" onclick="removeFlowStep()" style="color:var(--red);">- 마지막 단계 삭제</button>
           </div>
         </div>
 
@@ -852,30 +855,72 @@ function addMember() {
   list.appendChild(row);
 }
 
-// ── 사고 발생 단계 추가/삭제 ──
+// ── 사고 발생 단계 (시간순 카드) ──
+function flowStepCardHTML(n, time='', step='') {
+  return `
+  <div class="flow-step-card" data-step="${n}">
+    <div class="flow-step-card-head">
+      <span class="flow-step-num">${n}</span>
+      <input class="flow-time-input" type="text" placeholder="시간 (예: 10:00)" value="${time}">
+      <input class="flow-input" type="text" placeholder="단계 ${n} (예: 병실)" value="${step}">
+      <button class="flow-step-del" onclick="removeFlowStepCard(this)" title="이 단계 삭제">✕</button>
+    </div>
+    <div class="flow-step-body">
+      <div class="field">
+        <label>사고 분석 주요 사항</label>
+        <textarea class="step-main" placeholder="이 단계에서 사고 분석에 필요한 주요 사항을 기술하세요."></textarea>
+      </div>
+      <div class="field">
+        <label>관련 직원</label>
+        <input type="text" class="step-staff" placeholder="예) 간호사, 수간호사, 담당 주치의, 간병인">
+      </div>
+      <div class="field">
+        <label>위험요인 상세기술 <span class="opt">— 사고에 결정적 영향을 준 항목에 CF 체크</span></label>
+        <div class="step-cf-list">
+          <div class="cf-item"><input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 1 상세 내용"><span class="cf-badge">CF</span></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="addCF(this)" style="margin-top:8px;">+ 위험요인 추가</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 function addFlowStep() {
-  const grid = document.getElementById('flow-steps');
-  const n = grid.children.length + 1;
-  const input = document.createElement('input');
-  input.className = 'flow-input';
-  input.type = 'text';
-  input.placeholder = '단계 ' + n;
-  grid.appendChild(input);
+  const list = document.getElementById('flow-steps');
+  const n = list.children.length + 1;
+  list.insertAdjacentHTML('beforeend', flowStepCardHTML(n));
 }
 
 function removeFlowStep() {
-  const grid = document.getElementById('flow-steps');
-  if (grid.children.length > 1) grid.removeChild(grid.lastChild);
+  const list = document.getElementById('flow-steps');
+  if (list.children.length > 1) list.removeChild(list.lastChild);
 }
 
-// ── CF ──
-function addCF() {
-  const list = document.getElementById('cf-list');
-  const n = list.children.length + 1;
+function removeFlowStepCard(btn) {
+  const list = document.getElementById('flow-steps');
+  if (list.children.length <= 1) { alert('최소 1개 단계는 있어야 해요.'); return; }
+  btn.closest('.flow-step-card').remove();
+  // 번호 재정렬
+  [...list.children].forEach((card, i) => {
+    card.dataset.step = i + 1;
+    card.querySelector('.flow-step-num').textContent = i + 1;
+  });
+}
+
+function initFlowSteps() {
+  const list = document.getElementById('flow-steps');
+  if (!list || list.children.length) return;
+  for (let i = 1; i <= 5; i++) list.insertAdjacentHTML('beforeend', flowStepCardHTML(i));
+}
+
+// ── CF (단계별) ──
+function addCF(btn) {
+  const cfList = btn.previousElementSibling; // .step-cf-list
+  const n = cfList.children.length + 1;
   const item = document.createElement('div');
   item.className = 'cf-item';
   item.innerHTML = `<input type="checkbox" class="cf-check"><input type="text" class="cf-text" placeholder="위험요인 ${n} 상세 내용"><span class="cf-badge">CF</span>`;
-  list.appendChild(item);
+  cfList.appendChild(item);
 }
 
 // ── Level data ──
@@ -1264,17 +1309,18 @@ function downloadRCAWord() {
     teamRows += `<tr><td>${role}</td><td>${dept}</td><td>${name}</td></tr>`;
   });
 
-  // 사고 발생 단계
-  const flowSteps = [...document.querySelectorAll('#flow-steps .flow-input')]
-    .map(i => i.value).filter(v => v).join(' → ');
+  // 사고 발생 단계 — 단계별 카드 데이터 수집 (가로 표 형식)
+  const flowCards = [...document.querySelectorAll('#flow-steps .flow-step-card')].map(card => ({
+    time: card.querySelector('.flow-time-input')?.value || '',
+    step: card.querySelector('.flow-input')?.value || '',
+    main: card.querySelector('.step-main')?.value || '',
+    staff: card.querySelector('.step-staff')?.value || '',
+    cf: [...card.querySelectorAll('.cf-item')]
+      .map(item => ({ checked: item.querySelector('.cf-check')?.checked, text: item.querySelector('.cf-text')?.value || '' }))
+      .filter(cf => cf.text)
+  })).filter(c => c.time || c.step || c.main || c.staff || c.cf.length);
 
-  // CF 항목
-  let cfRows = '';
-  document.querySelectorAll('#cf-list .cf-item').forEach((item, i) => {
-    const checked = item.querySelector('.cf-check')?.checked ? '✅' : '';
-    const text = item.querySelector('.cf-text')?.value || '';
-    if (text) cfRows += `<tr><td style="text-align:center">${checked}</td><td>${text}</td></tr>`;
-  });
+  const flowSteps = flowCards.map(c => (c.time ? c.time + ' ' : '') + (c.step || '')).filter(v=>v.trim()).join(' → ');
 
   // 근본원인
   const rootsHtml = selectedRoots.map(r =>
@@ -1305,6 +1351,16 @@ function downloadRCAWord() {
   td { border: 1px solid #c4cad5; padding: 6px 10px; vertical-align: top; }
   .lbl { font-weight: bold; color: #374151; background: #eceef2; width: 100px; }
   .footer { margin-top: 30px; border-top: 1px solid #dde1e9; padding-top: 10px; font-size: 9pt; color: #9199a8; text-align: center; }
+
+  /* 2단계 사고흐름 가로 표 */
+  table.flow-analysis-table { table-layout: fixed; }
+  table.flow-analysis-table td { text-align:center; font-size:9.5pt; }
+  table.flow-analysis-table .lbl { text-align:left; font-size:9pt; width:90px; vertical-align:middle; }
+  table.flow-analysis-table .flow-col-head { background:#fdf6e3; }
+  table.flow-analysis-table .flow-time { font-size:8.5pt; color:#b8860b; font-weight:bold; margin-bottom:2px; }
+  table.flow-analysis-table .flow-step-name { font-weight:bold; color:#1a5fa8; }
+  table.flow-analysis-table .flow-arrow { border:none; background:none; width:14px; text-align:center; font-size:11pt; color:#9199a8; padding:0; }
+  table.flow-analysis-table .flow-staff-cell { background:#fdf6e3; }
 </style>
 </head>
 <body>
@@ -1353,23 +1409,29 @@ function downloadRCAWord() {
 </table>
 
 <h2>2단계 — 기여요인(CF) 분석</h2>
-<table>
-  <tr><th>사고 발생 단계 (시간 순서)</th></tr>
-  <tr><td>${flowSteps || '-'}</td></tr>
+<table class="flow-analysis-table">
+  <tr>
+    <td class="lbl">사고발생<br>주요 흐름 단계</td>
+    ${flowCards.map(c => `<td class="flow-col-head">${c.time ? `<div class="flow-time">${c.time}</div>` : ''}<div class="flow-step-name">${c.step || '-'}</div></td>`).join('<td class="flow-arrow">→</td>')}
+  </tr>
+  <tr>
+    <td class="lbl">사고 분석을<br>위한 주요 사항</td>
+    ${flowCards.map(c => `<td style="white-space:pre-wrap;">${c.main || '-'}</td>`).join('<td></td>')}
+  </tr>
+  <tr>
+    <td class="lbl">사고발생 흐름<br>단계에 관련된 직원</td>
+    ${flowCards.map(c => `<td class="flow-staff-cell">${c.staff || '-'}</td>`).join('<td></td>')}
+  </tr>
+  <tr>
+    <td class="lbl">위험요인<br>상세기술</td>
+    ${flowCards.map(c => `<td style="text-align:left;">${
+      c.cf.length
+        ? c.cf.map(cf => `<div style="margin-bottom:4px;${cf.checked ? 'font-weight:bold;color:#b8860b;' : ''}">${cf.checked ? '🔶 ' : ''}${cf.text}</div>`).join('')
+        : '-'
+    }</td>`).join('<td></td>')}
+  </tr>
 </table>
-<table>
-  <tr><th>사고 분석 주요 사항</th></tr>
-  <tr><td style="line-height:1.8;">${s2main || '-'}</td></tr>
-</table>
-<table>
-  <tr><th>관련 직원</th></tr>
-  <tr><td>${s2staff || '-'}</td></tr>
-</table>
-<table>
-  <colgroup><col style="width:8%"><col style="width:92%"></colgroup>
-  <tr><th style="text-align:center;">CF</th><th>위험요인 상세기술</th></tr>
-  ${cfRows || '<tr><td colspan="2">-</td></tr>'}
-</table>
+<p style="font-size:9pt; color:#6b7280; margin-top:-10px; margin-bottom:16px;">🔶 CF (Causal Factor) : 사건을 예방할 수 있거나 유효하게 감소시킬 수 있는 문제</p>
 
 <h2>3단계 — 도출된 근본원인</h2>
 <table>
@@ -1543,13 +1605,16 @@ function collectData() {
       dept: row.querySelectorAll('input')[0]?.value || '',
       name: row.querySelectorAll('input')[1]?.value || ''
     })),
-    // 2단계
-    s2_main: document.getElementById('s2_main')?.value || '',
-    s2_staff: document.getElementById('s2_staff')?.value || '',
-    flow_steps: [...document.querySelectorAll('#flow-steps .flow-input')].map(i => i.value),
-    cf_items: [...document.querySelectorAll('#cf-list .cf-item')].map(item => ({
-      checked: item.querySelector('.cf-check')?.checked || false,
-      text: item.querySelector('.cf-text')?.value || ''
+    // 2단계 — 단계별 카드 구조
+    flow_steps: [...document.querySelectorAll('#flow-steps .flow-step-card')].map(card => ({
+      time: card.querySelector('.flow-time-input')?.value || '',
+      step: card.querySelector('.flow-input')?.value || '',
+      main: card.querySelector('.step-main')?.value || '',
+      staff: card.querySelector('.step-staff')?.value || '',
+      cf: [...card.querySelectorAll('.cf-item')].map(item => ({
+        checked: item.querySelector('.cf-check')?.checked || false,
+        text: item.querySelector('.cf-text')?.value || ''
+      }))
     })),
     // 3단계
     levelState: JSON.parse(JSON.stringify(levelState)),
@@ -1607,39 +1672,28 @@ function restoreData(data) {
     });
   }
 
-  // 2단계
-  if (data.s2_main) document.getElementById('s2_main').value = data.s2_main;
-  if (data.s2_staff) document.getElementById('s2_staff').value = data.s2_staff;
+  // 2단계 — 단계별 카드 구조
   if (data.flow_steps && data.flow_steps.length > 0) {
-    const grid = document.getElementById('flow-steps');
-    // 기존 칸 비우기
-    grid.innerHTML = '';
-    data.flow_steps.forEach((v, i) => {
-      const input = document.createElement('input');
-      input.className = 'flow-input';
-      input.type = 'text';
-      input.placeholder = '단계 ' + (i+1);
-      input.value = v;
-      grid.appendChild(input);
-    });
-    // 최소 5칸 유지
-    while (grid.children.length < 5) {
-      const input = document.createElement('input');
-      input.className = 'flow-input';
-      input.type = 'text';
-      input.placeholder = '단계 ' + grid.children.length;
-      grid.appendChild(input);
-    }
-  }
-  if (data.cf_items) {
-    const list = document.getElementById('cf-list');
+    const list = document.getElementById('flow-steps');
     list.innerHTML = '';
-    data.cf_items.forEach((cf, i) => {
-      const div = document.createElement('div');
-      div.className = 'cf-item';
-      div.innerHTML = `<input type="checkbox" class="cf-check"${cf.checked?' checked':''}><input type="text" class="cf-text" value="${cf.text}" placeholder="위험요인 ${i+1} 상세 내용"><span class="cf-badge">CF</span>`;
-      list.appendChild(div);
+    data.flow_steps.forEach((fs, i) => {
+      list.insertAdjacentHTML('beforeend', flowStepCardHTML(i+1, fs.time||'', fs.step||''));
+      const card = list.lastElementChild;
+      if (fs.main) card.querySelector('.step-main').value = fs.main;
+      if (fs.staff) card.querySelector('.step-staff').value = fs.staff;
+      if (fs.cf && fs.cf.length) {
+        const cfList = card.querySelector('.step-cf-list');
+        cfList.innerHTML = '';
+        fs.cf.forEach((cf, j) => {
+          const div = document.createElement('div');
+          div.className = 'cf-item';
+          div.innerHTML = `<input type="checkbox" class="cf-check"${cf.checked?' checked':''}><input type="text" class="cf-text" value="${cf.text||''}" placeholder="위험요인 ${j+1} 상세 내용"><span class="cf-badge">CF</span>`;
+          cfList.appendChild(div);
+        });
+      }
     });
+  } else {
+    initFlowSteps();
   }
 
   // 3단계
@@ -1717,10 +1771,11 @@ function showToast(msg) {
 }
 
 // 자동저장 제거 (JSON 파일 방식)
-// 페이지 로드 시 배너 숨김
+// 페이지 로드 시 배너 숨김 + 초기 단계 카드 생성
 window.addEventListener('load', () => {
   const banner = document.getElementById('restore-banner');
   if (banner) banner.style.display = 'none';
+  initFlowSteps();
 });
 </script>
 <div class="toast" id="toast"></div>
