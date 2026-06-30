@@ -2275,7 +2275,7 @@ function downloadRCAWord() {
   @page { size: 21cm 29.7cm; margin: 1.5cm; }
   body { font-family: '나눔고딕', 'Nanum Gothic', '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; line-height: 1.6; }
   h1 { font-size: 18pt; color: #0f4080; border-bottom: 3px solid #1a5fa8; padding-bottom: 8px; margin-bottom: 20px; text-align: center; }
-  h2 { font-size: 11pt; color: #ffffff; background: #1a5fa8; padding: 6px 14px; margin-top: 24px; margin-bottom: 10px; }
+  h2 { font-size: 11pt; color: #ffffff; background: #1a5fa8; padding: 6px 14px; margin-top: 24px; margin-bottom: 10px; width:100%; display:block; box-sizing:border-box; }
   table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 10pt; page-break-inside: avoid; }
   th { background: #1a5fa8; color: white; padding: 7px 10px; text-align: left; font-weight: bold; border: 1px solid #1a5fa8; }
   td { border: 1px solid #c4cad5; padding: 6px 10px; vertical-align: top; }
@@ -2308,7 +2308,7 @@ function downloadRCAWord() {
 </table>
 
 <table style="border-collapse:collapse;width:100%;">
-  <tr><th width="15%" style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;">6하원칙</th><th style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;">내용</th></tr>
+  <tr><th width="15%" style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">6하원칙</th><th style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">내용</th></tr>
   <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">누가</td><td style="border:1pt solid #94a3b8;padding:6px;">${who}</td></tr>
   <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">어디서</td><td style="border:1pt solid #94a3b8;padding:6px;">${where}</td></tr>
   <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">무엇을</td><td style="border:1pt solid #94a3b8;padding:6px;">${what}</td></tr>
@@ -2317,18 +2317,18 @@ function downloadRCAWord() {
   <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">추가내용</td><td style="border:1pt solid #94a3b8;padding:6px;">${etc}</td></tr>
 </table>
 
+<h2>사고내용 (자동 조합)</h2>
 <table>
-  <tr><th>사고내용 (자동 조합)</th></tr>
   <tr><td style="line-height:1.8;">${content}</td></tr>
 </table>
 
+<h2>사고 후 조치</h2>
 <table>
-  <tr><th>사고 후 조치</th></tr>
   <tr><td style="line-height:1.8;">${action}</td></tr>
 </table>
 
+<h2>문제정의 (간단 요약)</h2>
 <table>
-  <tr><th>문제정의 (간단 요약)</th></tr>
   <tr><td style="line-height:1.8;">${probDef}</td></tr>
 </table>
 
