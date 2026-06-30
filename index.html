@@ -2298,22 +2298,22 @@ function downloadRCAWord() {
 <p style="text-align:center; color:#6b7280; font-size:9.5pt; margin-bottom:24px;">KoSQIN · 환자안전법 제12조 기반 · 작성일: ${new Date().toLocaleDateString('ko-KR')}</p>
 
 <h2>1단계 — 사고 기본 정보</h2>
-<table>
+<table style="border-collapse:collapse;width:100%;">
   <colgroup><col style="width:18%"><col style="width:32%"><col style="width:18%"><col style="width:32%"></colgroup>
-  <tr><td class="lbl">발생일시</td><td>${accDate}</td><td class="lbl">보고일시</td><td>${repDate}</td></tr>
-  <tr><td class="lbl">성별</td><td>${gender}</td><td class="lbl">연령</td><td>${age}</td></tr>
-  <tr><td class="lbl">사고 발생 장소</td><td>${place}</td><td class="lbl">사고분류</td><td>${acctype}</td></tr>
-  <tr><td class="lbl">사고 위해정도</td><td colspan="3">${severity}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">발생일시</td><td style="border:1pt solid #94a3b8;padding:6px;">${accDate}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">보고일시</td><td style="border:1pt solid #94a3b8;padding:6px;">${repDate}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">성별</td><td style="border:1pt solid #94a3b8;padding:6px;">${gender}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">연령</td><td style="border:1pt solid #94a3b8;padding:6px;">${age}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">사고 발생 장소</td><td style="border:1pt solid #94a3b8;padding:6px;">${place}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">사고분류</td><td style="border:1pt solid #94a3b8;padding:6px;">${acctype}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">사고 위해정도</td><td colspan="3" style="border:1pt solid #94a3b8;padding:6px;">${severity}</td></tr>
 </table>
 
-<table>
-  <tr><th width="15%">6하원칙</th><th>내용</th></tr>
-  <tr><td class="lbl">누가</td><td>${who}</td></tr>
-  <tr><td class="lbl">어디서</td><td>${where}</td></tr>
-  <tr><td class="lbl">무엇을</td><td>${what}</td></tr>
-  <tr><td class="lbl">어떻게</td><td>${how}</td></tr>
-  <tr><td class="lbl">왜 (원인)</td><td>${why}</td></tr>
-  <tr><td class="lbl">추가내용</td><td>${etc}</td></tr>
+<table style="border-collapse:collapse;width:100%;">
+  <tr><th width="15%" style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;">6하원칙</th><th style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;">내용</th></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">누가</td><td style="border:1pt solid #94a3b8;padding:6px;">${who}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">어디서</td><td style="border:1pt solid #94a3b8;padding:6px;">${where}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">무엇을</td><td style="border:1pt solid #94a3b8;padding:6px;">${what}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">어떻게</td><td style="border:1pt solid #94a3b8;padding:6px;">${how}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">왜 (원인)</td><td style="border:1pt solid #94a3b8;padding:6px;">${why}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">추가내용</td><td style="border:1pt solid #94a3b8;padding:6px;">${etc}</td></tr>
 </table>
 
 <table>
@@ -2339,26 +2339,26 @@ function downloadRCAWord() {
 </table>
 
 <h2>2단계 — 기여요인(CF) 분석</h2>
-<table class="flow-analysis-table">
+<table style="table-layout:fixed;font-size:10pt;border-collapse:collapse;width:100%;">
   <tr>
-    <td class="lbl">사고발생<br>주요 흐름 단계</td>
-    ${flowCards.map(c => `<td class="flow-col-head">${c.time ? `<div class="flow-time">${c.time}</div>` : ''}<div class="flow-step-name">${c.step || '-'}</div></td>`).join('<td class="flow-arrow">→</td>')}
+    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">사고발생<br>주요 흐름 단계</td>
+    ${flowCards.map(c => `<td style="text-align:center;font-size:10pt;padding:5px 6px;line-height:1.45;vertical-align:middle;background:#fdf6e3;border:1pt solid #94a3b8;">${c.time ? `<div style="font-size:9pt;color:#b8860b;font-weight:bold;margin-bottom:2px;">${c.time}</div>` : ''}<div style="font-weight:bold;color:#1a5fa8;font-size:10pt;">${c.step || '-'}</div></td>`).join('<td style="border:none;background:none;width:12px;text-align:center;font-size:11pt;color:#9199a8;padding:0;">→</td>')}
   </tr>
   <tr>
-    <td class="lbl">사고 분석을<br>위한 주요 사항</td>
-    ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:9.5pt;">${c.main || '-'}</td>`).join('<td></td>')}
+    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">사고 분석을<br>위한 주요 사항</td>
+    ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:9.5pt;vertical-align:top;border:1pt solid #94a3b8;padding:5px 6px;">${c.main || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
   <tr>
-    <td class="lbl">사고발생 흐름<br>단계에 관련된 직원</td>
-    ${flowCards.map(c => `<td class="flow-staff-cell">${c.staff || '-'}</td>`).join('<td></td>')}
+    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">사고발생 흐름<br>단계에 관련된 직원</td>
+    ${flowCards.map(c => `<td style="text-align:center;font-size:9.5pt;background:#fdf6e3;vertical-align:top;border:1pt solid #94a3b8;padding:5px 6px;">${c.staff || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
   <tr>
-    <td class="lbl">위험요인<br>상세기술</td>
-    ${flowCards.map(c => `<td style="text-align:left;">${
+    <td style="text-align:left;font-size:9.5pt;width:80px;vertical-align:middle;line-height:1.35;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:5px 6px;">위험요인<br>상세기술</td>
+    ${flowCards.map(c => `<td style="text-align:left;vertical-align:top;border:1pt solid #94a3b8;padding:5px 6px;">${
       c.cf.length
-        ? c.cf.map(cf => `<div class="cf-line"${cf.checked ? ' style="font-weight:bold;color:#b8860b;"' : ''}>${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
+        ? c.cf.map(cf => `<div style="font-size:9.5pt;margin-bottom:3px;line-height:1.4;text-align:left;${cf.checked ? 'font-weight:bold;color:#b8860b;' : ''}">${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
         : '-'
-    }</td>`).join('<td></td>')}
+    }</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
 </table>
 <p style="font-size:9pt; color:#6b7280; margin-top:-10px; margin-bottom:16px;">🔶 CF (Causal Factor) : 사건을 예방할 수 있거나 유효하게 감소시킬 수 있는 문제</p>
