@@ -2428,11 +2428,25 @@ function downloadRCAWord() {
       ${o.caption ? `<p style="margin:6px 0 0 0;font-size:9.5pt;color:#4b5563;">${o.caption}</p>` : ''}
     </td>` : `<td style="width:50%;border:none;"></td>`;
 
+  const obsCellFull = (o) => `<td style="width:100%;border:1pt solid #94a3b8;padding:8px;text-align:center;vertical-align:top;">
+      <p style="margin:0 0 6px 0;font-weight:bold;color:#374151;background:#eceef2;padding:4px 0;">${o.title || '현장 관찰'}</p>
+      ${o.img ? `<img src="${o.img}" style="max-width:100%;max-height:320px;">` : ''}
+      ${o.caption ? `<p style="margin:6px 0 0 0;font-size:9.5pt;color:#4b5563;">${o.caption}</p>` : ''}
+    </td>`;
+
   for (let i = 0; i < obsRows.length; i += 2) {
-    observationBlocks += `
+    if (i + 1 === obsRows.length) {
+      // 마지막에 하나만 남으면 전체 너비로 표시
+      observationBlocks += `
+<table style="margin-bottom:14px;table-layout:fixed;">
+  <tr>${obsCellFull(obsRows[i])}</tr>
+</table>`;
+    } else {
+      observationBlocks += `
 <table style="margin-bottom:14px;table-layout:fixed;">
   <tr>${obsCell(obsRows[i])}${obsCell(obsRows[i+1])}</tr>
 </table>`;
+    }
   }
 
   // 팀 구성
