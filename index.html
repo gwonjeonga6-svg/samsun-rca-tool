@@ -2235,7 +2235,8 @@ function downloadRCAWord() {
     const role = row.querySelector('select')?.value || '';
     const dept = row.querySelectorAll('input')[0]?.value || '';
     const name = row.querySelectorAll('input')[1]?.value || '';
-    teamRows += `<tr><td>${role}</td><td>${dept}</td><td>${name}</td></tr>`;
+    const tdStyle = 'vertical-align:middle;padding:5px 10px;';
+    teamRows += `<tr><td style="${tdStyle}">${role}</td><td style="${tdStyle}">${dept}</td><td style="${tdStyle}">${name}</td></tr>`;
   });
 
   // 사고 발생 단계 — 단계별 카드 데이터 수집 (가로 표 형식)
@@ -2268,6 +2269,9 @@ function downloadRCAWord() {
     improveRows += `<tr><td>${level}</td><td>${ta}</td><td>${manager}</td><td>${deadline}</td><td>${kpi}</td></tr>`;
   });
 
+  // 섹션 타이틀 바 — h2 대신 표 기반으로 만들어 본문 표와 폭이 항상 동일하게 맞춰줌
+  const sectionTitle = (label) => `<table style="border-collapse:collapse;width:100%;margin-top:24px;margin-bottom:10px;"><tr><td style="background:#1a5fa8;color:#ffffff;font-size:11pt;font-weight:bold;padding:6px 14px;border:none;">${label}</td></tr></table>`;
+
   const html = `
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset='utf-8'>
@@ -2275,7 +2279,6 @@ function downloadRCAWord() {
   @page { size: 21cm 29.7cm; margin: 1.5cm; }
   body { font-family: '나눔고딕', 'Nanum Gothic', '맑은 고딕', Arial, sans-serif; font-size: 10.5pt; line-height: 1.6; }
   h1 { font-size: 18pt; color: #0f4080; border-bottom: 3px solid #1a5fa8; padding-bottom: 8px; margin-bottom: 20px; text-align: center; }
-  h2 { font-size: 11pt; color: #ffffff; background: #1a5fa8; padding: 6px 14px; margin-top: 24px; margin-bottom: 10px; width:100%; display:block; box-sizing:border-box; }
   table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 10pt; page-break-inside: avoid; }
   th { background: #1a5fa8; color: white; padding: 7px 10px; text-align: left; font-weight: bold; border: 1px solid #1a5fa8; }
   td { border: 1px solid #c4cad5; padding: 6px 10px; vertical-align: top; }
@@ -2298,7 +2301,7 @@ function downloadRCAWord() {
 <h1>근본원인분석(RCA) 보고서</h1>
 <p style="text-align:center; color:#6b7280; font-size:9.5pt; margin-bottom:24px;">KoSQIN · 환자안전법 제12조 기반 · 작성일: ${new Date().toLocaleDateString('ko-KR')}</p>
 
-<h2>1단계 — 사고 기본 정보</h2>
+${sectionTitle('1단계 — 사고 기본 정보')}
 <table style="border-collapse:collapse;width:100%;">
   <colgroup><col style="width:18%"><col style="width:32%"><col style="width:18%"><col style="width:32%"></colgroup>
   <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">발생일시</td><td style="border:1pt solid #94a3b8;padding:6px;">${accDate}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">보고일시</td><td style="border:1pt solid #94a3b8;padding:6px;">${repDate}</td></tr>
@@ -2317,30 +2320,30 @@ function downloadRCAWord() {
   <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;">추가내용</td><td style="border:1pt solid #94a3b8;padding:6px;">${etc}</td></tr>
 </table>
 
-<h2>사고내용 (자동 조합)</h2>
+${sectionTitle('사고내용 (자동 조합)')}
 <table>
   <tr><td style="line-height:1.8;">${content}</td></tr>
 </table>
 
-<h2>사고 후 조치</h2>
+${sectionTitle('사고 후 조치')}
 <table>
   <tr><td style="line-height:1.8;">${action}</td></tr>
 </table>
 
-<h2>문제정의 (간단 요약)</h2>
+${sectionTitle('문제정의 (간단 요약)')}
 <table>
   <tr><td style="line-height:1.8;">${probDef}</td></tr>
 </table>
 
-<h2>팀 구성</h2>
+${sectionTitle('팀 구성')}
 <table>
   <colgroup><col style="width:15%"><col style="width:50%"><col style="width:35%"></colgroup>
-  <tr><th>역할</th><th>소속부서/직위</th><th>이름</th></tr>
+  <tr><th style="padding:5px 10px;">역할</th><th style="padding:5px 10px;">소속부서/직위</th><th style="padding:5px 10px;">이름</th></tr>
   ${teamRows || '<tr><td colspan="3">-</td></tr>'}
 </table>
 
 <div style="page-break-before:always;"></div>
-<h2>2단계 — 기여요인(CF) 분석</h2>
+${sectionTitle('2단계 — 기여요인(CF) 분석')}
 ${(() => {
   const n = flowCards.length || 1;
   const lblPct = 12; // 라벨 컬럼 %
@@ -2378,13 +2381,13 @@ ${(() => {
 })()}
 <p style="font-size:9pt; color:#6b7280; margin-top:-10px; margin-bottom:16px;">🔶 CF (Causal Factor) : 사건을 예방할 수 있거나 유효하게 감소시킬 수 있는 문제</p>
 
-<h2>3단계 — 도출된 근본원인</h2>
+${sectionTitle('3단계 — 도출된 근본원인')}
 <table>
   <tr><th>근본원인</th></tr>
   ${rootsHtml || '<tr><td>-</td></tr>'}
 </table>
 
-<h2>4단계 — 개선활동 계획</h2>
+${sectionTitle('4단계 — 개선활동 계획')}
 <table>
   <colgroup><col style="width:25%"><col style="width:32%"><col style="width:15%"><col style="width:13%"><col style="width:15%"></colgroup>
   <tr><th>분석수준 / 근본원인</th><th>개선전략</th><th>담당자</th><th>완료예정일</th><th>효과측정지표</th></tr>
