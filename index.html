@@ -2235,7 +2235,7 @@ function downloadRCAWord() {
     const role = row.querySelector('select')?.value || '';
     const dept = row.querySelectorAll('input')[0]?.value || '';
     const name = row.querySelectorAll('input')[1]?.value || '';
-    const tdStyle = 'vertical-align:middle;padding:5px 10px;';
+    const tdStyle = 'vertical-align:center;padding:5px 10px;';
     teamRows += `<tr><td style="${tdStyle}">${role}</td><td style="${tdStyle}">${dept}</td><td style="${tdStyle}">${name}</td></tr>`;
   });
 
@@ -2254,7 +2254,7 @@ function downloadRCAWord() {
 
   // 근본원인
   const rootsHtml = selectedRoots.map(r =>
-    `<tr><td style="background:#eaf1fb; color:#1a5fa8; font-weight:bold; vertical-align:middle;">${r}</td></tr>`
+    `<tr><td style="background:#eaf1fb; color:#1a5fa8; font-weight:bold; vertical-align:center;">${r}</td></tr>`
   ).join('');
 
   // 개선활동
@@ -2266,7 +2266,7 @@ function downloadRCAWord() {
     const manager = inputs[1]?.value || '';
     const deadline = inputs[2]?.value || '';
     const kpi = inputs[3]?.value || '';
-    const vAlign = 'vertical-align:middle;';
+    const vAlign = 'vertical-align:center;';
     improveRows += `<tr><td style="${vAlign}">${level}</td><td style="${vAlign}">${ta}</td><td style="${vAlign}">${manager}</td><td style="${vAlign}">${deadline}</td><td style="${vAlign}">${kpi}</td></tr>`;
   });
 
@@ -2293,8 +2293,8 @@ function downloadRCAWord() {
   /* 2단계 사고흐름 가로 표 — 10pt 유지, 레이아웃만 컴팩트 */
   table.flow-analysis-table { table-layout: fixed; font-size:10pt; }
   table.flow-analysis-table td { text-align:center; font-size:10pt; padding:5px 6px; line-height:1.45; vertical-align:top; }
-  table.flow-analysis-table .lbl { text-align:left; font-size:9.5pt; width:80px; vertical-align:middle; line-height:1.35; }
-  table.flow-analysis-table .flow-col-head { background:#fdf6e3; vertical-align:middle; }
+  table.flow-analysis-table .lbl { text-align:left; font-size:9.5pt; width:80px; vertical-align:center; line-height:1.35; }
+  table.flow-analysis-table .flow-col-head { background:#fdf6e3; vertical-align:center; }
   table.flow-analysis-table .flow-time { font-size:9pt; color:#b8860b; font-weight:bold; margin-bottom:2px; }
   table.flow-analysis-table .flow-step-name { font-weight:bold; color:#1a5fa8; font-size:10pt; }
   table.flow-analysis-table .flow-arrow { border:none; background:none; width:12px; text-align:center; font-size:11pt; color:#9199a8; padding:0; }
@@ -2309,20 +2309,20 @@ function downloadRCAWord() {
 ${sectionTitle('사고 기본 정보')}
 <table style="border-collapse:collapse;width:100%;">
   <colgroup><col style="width:18%"><col style="width:32%"><col style="width:18%"><col style="width:32%"></colgroup>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">발생일시</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${accDate}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">보고일시</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${repDate}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">성별</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${gender}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">연령</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${age}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">사고 발생 장소</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${place}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">사고분류</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${acctype}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">사고 위해정도</td><td colspan="3" style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${severity}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">발생일시</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${accDate}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">보고일시</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${repDate}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">성별</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${gender}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">연령</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${age}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">사고 발생 장소</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${place}</td><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">사고분류</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${acctype}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">사고 위해정도</td><td colspan="3" style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${severity}</td></tr>
 </table>
 
 <table style="border-collapse:collapse;width:100%;">
   <tr><th width="15%" style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">6하원칙</th><th style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">내용</th></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">누가</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${who}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">어디서</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${where}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">무엇을</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${what}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">어떻게</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${how}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">왜 (원인)</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${why}</td></tr>
-  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">추가내용</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:middle;">${etc}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">누가</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${who}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">어디서</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${where}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">무엇을</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${what}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">어떻게</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${how}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">왜 (원인)</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${why}</td></tr>
+  <tr><td style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">추가내용</td><td style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;">${etc}</td></tr>
 </table>
 
 ${sectionTitle('사고내용 (자동 조합)')}
@@ -2363,19 +2363,19 @@ ${(() => {
   return `<table style="table-layout:fixed;font-size:9pt;border-collapse:collapse;width:100%;">
   <colgroup>${colgroupCols.join('')}</colgroup>
   <tr>
-    <td style="text-align:center;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고발생<br>주요 흐름 단계</td>
-    ${flowCards.map(c => `<td style="text-align:center;font-size:9pt;padding:4px 5px;line-height:1.3;vertical-align:middle;background:#fdf6e3;border:1pt solid #94a3b8;word-break:break-all;">${c.time ? `<div style="font-size:8pt;color:#b8860b;font-weight:bold;margin-bottom:2px;">${c.time}</div>` : ''}<div style="font-weight:bold;color:#1a5fa8;font-size:9pt;">${c.step || '-'}</div></td>`).join('<td style="border:none;background:none;text-align:center;font-size:10pt;color:#9199a8;padding:0;">→</td>')}
+    <td style="text-align:center;font-size:8.5pt;vertical-align:center;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고발생<br>주요 흐름 단계</td>
+    ${flowCards.map(c => `<td style="text-align:center;font-size:9pt;padding:4px 5px;line-height:1.3;vertical-align:center;background:#fdf6e3;border:1pt solid #94a3b8;word-break:break-all;">${c.time ? `<div style="font-size:8pt;color:#b8860b;font-weight:bold;margin-bottom:2px;">${c.time}</div>` : ''}<div style="font-weight:bold;color:#1a5fa8;font-size:9pt;">${c.step || '-'}</div></td>`).join('<td style="border:none;background:none;text-align:center;font-size:10pt;color:#9199a8;padding:0;">→</td>')}
   </tr>
   <tr>
-    <td style="text-align:center;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고 분석을<br>위한 주요 사항</td>
+    <td style="text-align:center;font-size:8.5pt;vertical-align:center;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고 분석을<br>위한 주요 사항</td>
     ${flowCards.map(c => `<td style="white-space:pre-wrap;text-align:left;font-size:8pt;vertical-align:top;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${c.main || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
   <tr>
-    <td style="text-align:center;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고발생 흐름<br>단계에 관련된 직원</td>
-    ${flowCards.map(c => `<td style="text-align:center;font-size:8pt;background:#fdf6e3;vertical-align:middle;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${c.staff || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
+    <td style="text-align:center;font-size:8.5pt;vertical-align:center;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">사고발생 흐름<br>단계에 관련된 직원</td>
+    ${flowCards.map(c => `<td style="text-align:center;font-size:8pt;background:#fdf6e3;vertical-align:center;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${c.staff || '-'}</td>`).join('<td style="border:1pt solid #94a3b8;"></td>')}
   </tr>
   <tr>
-    <td style="text-align:center;font-size:8.5pt;vertical-align:middle;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">위험요인<br>상세기술</td>
+    <td style="text-align:center;font-size:8.5pt;vertical-align:center;line-height:1.3;font-weight:bold;color:#374151;background:#eceef2;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">위험요인<br>상세기술</td>
     ${flowCards.map(c => `<td style="text-align:left;vertical-align:top;border:1pt solid #94a3b8;padding:4px 5px;word-break:break-all;">${
       c.cf.length
         ? c.cf.map(cf => `<div style="font-size:8pt;margin-bottom:2px;line-height:1.3;text-align:left;${cf.checked ? 'font-weight:bold;color:#b8860b;' : ''}">${cf.checked ? '🔶' : '·'} ${cf.text}</div>`).join('')
