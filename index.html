@@ -721,7 +721,7 @@
             <label>간단 요약
               <button type="button" id="aiSumBtn" onclick="aiSummarize()" style="margin-left:10px; padding:4px 12px; font-size:12px; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:600;">⚡ 자동 요약</button>
             </label>
-            <div style="font-size:12px; color:var(--gray-400); margin-bottom:6px;">위 항목 입력 후 버튼을 누르면 6하원칙 형식으로 자동 정리됩니다.</div>
+            <div style="font-size:12px; color:var(--gray-400); margin-bottom:6px;">위 항목 입력 후 버튼을 누르면 육하원칙 형식으로 자동 정리됩니다.</div>
             <textarea id="prob_def" placeholder="자동 요약 버튼을 누르거나 직접 입력하세요."></textarea>
           </div>
         </div>
@@ -2274,7 +2274,7 @@ function initImprove() {
   }
 }
 
-// 6하원칙 자동 조합
+// 육하원칙 자동 조합
 function composeContent() {
   const who   = document.getElementById('w_who')?.value.trim() || '';
   const where = document.getElementById('w_where')?.value.trim() || '';
@@ -2412,19 +2412,28 @@ function downloadRCAWord() {
 </table>`;
   });
 
-  // 문제조사 — 현장 관찰
+  // 문제조사 — 현장 관찰 (사진 2개씩 한 행에 배치)
   let observationBlocks = '';
-  document.querySelectorAll('#observation-list .invest-row').forEach(row => {
+  const obsRows = [...document.querySelectorAll('#observation-list .invest-row')].map(row => {
     const title = row.querySelector('.ob-title')?.value || '';
     const caption = row.querySelector('.ob-caption')?.value || '';
     const img = row.querySelector('.ob-preview img')?.getAttribute('src') || '';
-    if (!title && !caption && !img) return;
+    if (!title && !caption && !img) return null;
+    return { title, caption, img };
+  }).filter(Boolean);
+
+  const obsCell = (o) => o ? `<td style="width:50%;border:1pt solid #94a3b8;padding:8px;text-align:center;vertical-align:top;">
+      <p style="margin:0 0 6px 0;font-weight:bold;color:#374151;background:#eceef2;padding:4px 0;">${o.title || '현장 관찰'}</p>
+      ${o.img ? `<img src="${o.img}" style="max-width:100%;max-height:220px;">` : ''}
+      ${o.caption ? `<p style="margin:6px 0 0 0;font-size:9.5pt;color:#4b5563;">${o.caption}</p>` : ''}
+    </td>` : `<td style="width:50%;border:none;"></td>`;
+
+  for (let i = 0; i < obsRows.length; i += 2) {
     observationBlocks += `
-<table style="margin-bottom:14px;">
-  <tr><td style="background:#eceef2;color:#374151;font-weight:bold;border:1pt solid #94a3b8;padding:6px;text-align:center;"><p style="margin:0;">${title || '현장 관찰'}</p></td></tr>
-  <tr><td style="border:1pt solid #94a3b8;padding:10px;text-align:center;">${img ? `<img src="${img}" style="max-width:100%;max-height:320px;">` : ''}${caption ? `<p style="margin:${img?'8px 0 0 0':'0'};font-size:9.5pt;color:#4b5563;">${caption}</p>` : ''}</td></tr>
+<table style="margin-bottom:14px;table-layout:fixed;">
+  <tr>${obsCell(obsRows[i])}${obsCell(obsRows[i+1])}</tr>
 </table>`;
-  });
+  }
 
   // 팀 구성
   let teamRows = '';
@@ -2514,7 +2523,7 @@ ${sectionTitle('사고 기본 정보')}
 </table>
 
 <table style="border-collapse:collapse;width:100%;">
-  <tr><th width="15%" style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">6하원칙</th><th style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">내용</th></tr>
+  <tr><th width="15%" style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">육하원칙</th><th style="border:1pt solid #94a3b8;padding:6px;background:#eceef2;color:#374151;">내용</th></tr>
   <tr><td valign="center" style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">누가</td><td valign="center" style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;"><p style="margin:0;">${who}</p></td></tr>
   <tr><td valign="center" style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">어디서</td><td valign="center" style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;"><p style="margin:0;">${where}</p></td></tr>
   <tr><td valign="center" style="font-weight:bold;color:#374151;background:#eceef2;width:100px;border:1pt solid #94a3b8;padding:6px;vertical-align:center;">무엇을</td><td valign="center" style="border:1pt solid #94a3b8;padding:6px;vertical-align:center;"><p style="margin:0;">${what}</p></td></tr>
