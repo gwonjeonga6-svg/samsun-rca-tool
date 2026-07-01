@@ -2575,6 +2575,17 @@ function collectData() {
     treeState: JSON.parse(JSON.stringify(treeState)),
     selectedRoots: [...selectedRoots],
     curLevel,
+    // 4단계 — 개선활동 계획
+    improvePlan: [...document.querySelectorAll('#improvePlan .improve-card')].map(card => {
+      const inputs = card.querySelectorAll('input[type=text]');
+      return {
+        level: inputs[0]?.value || '',
+        strategy: card.querySelector('textarea')?.value || '',
+        manager: inputs[1]?.value || '',
+        deadline: inputs[2]?.value || '',
+        kpi: inputs[3]?.value || ''
+      };
+    }),
   };
   return data;
 }
@@ -2656,6 +2667,28 @@ function restoreData(data) {
   if (data.treeState) Object.assign(treeState, data.treeState);
   if (data.selectedRoots) { selectedRoots.length = 0; data.selectedRoots.forEach(r => selectedRoots.push(r)); }
   if (data.curLevel) curLevel = data.curLevel;
+
+  // 4단계 — 개선활동 계획 복원
+  if (data.improvePlan && data.improvePlan.length > 0) {
+    const plan = document.getElementById('improvePlan');
+    plan.innerHTML = '';
+    data.improvePlan.forEach(ip => {
+      const div = document.createElement('div');
+      div.className = 'improve-card';
+      div.innerHTML = `
+        <div class="field">
+          <label>분석수준 / 근본원인</label>
+          <input type="text" value="${ip.level || ''}" style="color:var(--blue); font-weight:600;">
+        </div>
+        <div class="field"><label>개선전략</label><textarea placeholder="해당 근본원인에 대한 개선전략을 작성하세요.">${ip.strategy || ''}</textarea></div>
+        <div class="grid3">
+          <div class="field"><label>담당자</label><input type="text" value="${ip.manager || ''}" placeholder="담당자명"></div>
+          <div class="field"><label>완료예정일</label><input type="text" value="${ip.deadline || ''}" placeholder="예) 6개월 이내"></div>
+          <div class="field"><label>효과측정지표</label><input type="text" value="${ip.kpi || ''}" placeholder="예) 교육이수율"></div>
+        </div>`;
+      plan.appendChild(div);
+    });
+  }
 }
 
 function autoSave() {
